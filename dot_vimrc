@@ -1,0 +1,260 @@
+" vim:foldmethod=marker
+
+set nocompatible
+
+" {{{ Vim-Plug
+  if !filereadable(expand('~/.vim/autoload/plug.vim'))
+    if !executable("curl")
+      echoerr "You have to install curl or first install vim-plug yourself!"
+      execute "q!"
+    endif
+    echo "Installing Vim-Plug..."
+    echo ""
+    silent !\curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+    autocmd VimEnter * PlugInstall
+  endif
+
+  call plug#begin('~/.vim/plugged')
+    Plug 'AndrewRadev/sideways.vim'
+    Plug 'AndrewRadev/splitjoin.vim'
+    Plug 'airblade/vim-gitgutter'
+    Plug 'christoomey/vim-tmux-navigator'
+    Plug 'ctrlpvim/ctrlp.vim'
+    Plug 'docunext/closetag.vim'
+    Plug 'janko-m/vim-test'
+    Plug 'lokikl/vim-ctrlp-ag'
+    Plug 'rking/ag.vim'
+    Plug 'ryanoasis/vim-devicons', { 'branch': 'master' }
+    Plug 'scrooloose/nerdtree'
+    Plug 'sheerun/vim-polyglot'
+    Plug 'sonph/onehalf', { 'rtp': 'vim' }
+    Plug 'tpope/vim-commentary'
+    Plug 'tpope/vim-dispatch'
+    Plug 'tpope/vim-rails'
+    Plug 'tpope/vim-repeat'
+    Plug 'tpope/vim-surround'
+    Plug 'tpope/vim-unimpaired'
+    Plug 'troydm/zoomwintab.vim'
+    Plug 'vim-scripts/BufOnly.vim'
+  call plug#end()
+" }}}
+
+" Misc {{{
+  let mapleader=" "
+
+  " Use system clipboard
+  if system('uname -s') == "Darwin\n"
+    set clipboard=unnamed
+  else
+    set clipboard=unnamedplus
+  endif
+  set completeopt=menuone,noselect
+  set noswapfile                      " Disable swap
+  set scrolloff=5                     " Start scrolling 5 lines away from margin
+  set sidescrolloff=15                " Start scrolling 15 lines away from side margin
+  set nospell                         " Spell checking off
+  set splitbelow                      " Split below
+  set splitright                      " Split on the right side
+" }}}
+
+" Whitespace, tabs & spaces {{{
+  set nowrap
+  set linebreak
+  set textwidth=120
+  set wrapmargin=0
+  set expandtab                     " Indent with spaces
+  set list                          " Show invisible characters
+  set listchars=tab:▸\ ,eol:¬,trail:·
+  set softtabstop=2                 " Number of spaces per <tab> when inserting
+  set shiftwidth=2                  " Number of spaces per <tab> when indenting
+  set tabstop=4                     " Number of spaces <tab> counts for
+" }}}
+
+" Search {{{
+  set ignorecase                    " Ignore case when searching
+  set smartcase                     " unless there is a capital letter in the query
+  set incsearch                     " Enable incremental search
+" }}}
+
+" Backups {{{
+  set nobackup                      " Disable backup
+  set nowritebackup
+  set undodir=$HOME/.vim/tmp/undo   " Persistent undo directory
+  set undofile                      " Enable undo file
+  set undolevels=1000               " Maximum number of changes that can be undone
+  set undoreload=10000              " Maximum number lines to save for undo on a buffer reload
+" }}}
+
+" UI {{{
+  set t_Co=256
+  colorscheme onehalflight
+
+  " Temporary fix for colors until https://github.com/sonph/onehalf/pull/108 is merged
+  highlight Comment gui=NONE cterm=NONE
+
+  set cursorline                    " Show cursor line
+  set laststatus=2                  " Show status line
+  set number                        " Show line numbers
+  set relativenumber                " Use relative line numbers
+
+  " Statusline {{{
+    set statusline=
+    set statusline+=%f                " File path
+    set statusline+=%=                " Padding
+    set statusline+=\ %y              " File type
+    set statusline+=\ %{&fileencoding?&fileencoding:&encoding}
+    set statusline+=\ %p%%            " Current place in the document
+    set statusline+=\ %l:%c           " Line and column
+  " }}}
+" }}}
+
+" Plugins {{{
+  " NERDTree {{{
+    let g:NERDTreeShowHidden = 1
+  " }}}
+
+  " CtrlP {{{
+     " Disable caching
+     let g:ctrlp_use_caching = 0
+     " Always open files in new buffers
+     let g:ctrlp_switch_buffer = 0
+     " Respect current working directory during Vim session
+     let g:ctrlp_working_path_mode = 0
+     " Ignore those directories
+     let g:ctrlp_ag_ignores = '
+          \ --ignore ".git"
+          \ --ignore "_build/*"
+          \ --ignore "deps/*"
+          \ --ignore "node_modules/*"
+          \ --ignore "vendor/bundle"'
+  " }}}
+
+  " Splitjoin {{{
+    " Disable default mappings
+    let g:splitjoin_split_mapping = ''
+    let g:splitjoin_join_mapping = ''
+  " }}}
+
+  " VimTest {{{
+    let test#strategy = {
+          \ "nearest": "dispatch",
+          \ "file": "dispatch",
+          \ "suite": "dispatch_background",
+          \ }
+  " }}}
+" }}}
+
+" Mappings {{{
+  nnoremap ; :
+
+  " Enable block move via x (to allow use C-c and C-v for natural copy paste)
+  nnoremap <C-x> <C-v>
+  nnoremap X V
+
+  " Quickly switch between buffers
+  nnoremap <silent> <leader><leader> :b#<CR>
+
+  " Copy buffer path (relative / absolute) to system clipboard
+  nnoremap <silent> <leader>p :let @+=expand('%')<CR>
+  nnoremap <silent> <leader>P :let @+=expand('%:p')<CR>
+
+  " CtrlP
+  nnoremap <c-f> :CtrlPag<cr>
+  nnoremap <leader>f :CtrlPagLocate<space>
+  vnoremap <leader>f :CtrlPagVisual<cr>
+
+  " Move more senibly when line wrapping enabled
+  nmap <silent> k gk
+  nmap <silent> j gj
+
+  " Select all text
+  nnoremap <silent> va ggVG
+
+  " Disable hl
+  nnoremap <silent> <leader><cr> :noh<cr>
+
+  " Moving block of codes
+  vnoremap < <gv
+  vnoremap > >gv
+
+  " Tabs
+  nnoremap [g gT
+  nnoremap ]g gt
+
+  " Alt files
+  nnoremap <leader>. :call AltCommand(expand('%'), ':e')<cr>
+  command! AE :call AltCommand(expand('%'), ':e')<cr>
+  command! AS :call AltCommand(expand('%'), ':sp')<cr>
+  command! AT :call AltCommand(expand('%'), ':tabnew')<cr>
+  command! AV :call AltCommand(expand('%'), ':vs')<cr>
+
+  " NERDTree
+  nnoremap <silent> <C-e>     :NERDTreeToggle<CR>
+  nnoremap <silent> <leader>e :NERDTreeFind<CR>
+
+  " Delete and yank to the end of line
+  nnoremap D d$
+  nnoremap Y y$
+
+  " Enable hlserch on start
+  nnoremap / :set hlsearch<cr>/
+
+  " Close location, quickfix list with single keystroke
+  nnoremap <silent> x :cclose<CR> :lclose<CR> :pclose<CR>
+
+  " Git
+  nnoremap <leader>gb :<C-u>call gitblame#echo()<CR>
+  nnoremap <leader>gm :GitMessenger<CR>
+
+  " Tests
+  nmap <silent> <leader>t. :TestLast<CR>
+  nmap <silent> <leader>ta :TestSuite<CR>
+  nmap <silent> <leader>tf :TestFile<CR>
+  nmap <silent> <leader>tt :TestNearest<CR>
+  nmap <silent> <leader>tv :TestVisit<CR>
+
+  " Refactoring
+  nmap <silent> <leader>rh :SidewaysLeft<cr>
+  nmap <silent> <leader>rl :SidewaysRight<cr>
+  nmap <silent> <leader>rj :SplitjoinJoin<cr>
+  nmap <silent> <leader>rk :SplitjoinSplit<cr>
+
+  " Reload config file
+  nmap <silent> <leader>R :source ~/.vimrc<CR>
+" }}}
+
+" Functions {{{
+  function! AltCommand(path, vim_command)
+    let l:alternate = system("alt " . a:path)
+    if empty(l:alternate)
+      echo "No alternate file for " . a:path . " exists!"
+    else
+      exec a:vim_command . " " . l:alternate
+    endif
+  endfunction
+
+  function! StripTrailingWhiteSpace()
+    " Ignore for markdown and slim
+    if &filetype =~ 'markdown' || &filetype =~ 'slim'
+      return
+    endif
+    %s/\s\+$//e
+  endfunction
+" }}}
+
+" Commands {{{
+  augroup hooks
+    autocmd BufEnter,FocusGained * set relativenumber
+    autocmd BufLeave,FocusLost * set norelativenumber
+    autocmd BufWritePre * call StripTrailingWhiteSpace()
+
+    autocmd Filetype gitcommit setl spell textwidth=72
+    autocmd Filetype go setl softtabstop=4 shiftwidth=4 noexpandtab
+    autocmd Filetype markdown setl spell colorcolumn=0 wrap linebreak
+
+    autocmd InsertLeave * set nopaste
+  augroup END
+
+  cnoreabbrev bo BufOnly
+" }}}

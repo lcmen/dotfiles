@@ -1,0 +1,71 @@
+shopt -s expand_aliases
+
+#===============================================================
+# Variables
+#===============================================================
+WARNING="\033[1;33m"
+RESET="\033[m"
+
+export CLICOLOR=1
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
+#===============================================================
+# Functions
+#===============================================================
+parse_git_dirty () {
+  if [[ $(git status 2> /dev/null | tail -n1 | cut -c 1-17) != "nothing to commit" ]]; then
+    echo "✗"
+  else
+    echo "ツ"
+  fi
+}
+parse_git_branch () {
+  git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e "s/* \(.*\)/\1 $(parse_git_dirty)/"
+}
+
+tmux-join() {
+  tmux attach-session -t $1
+}
+
+tmux-kill() {
+  tmux kill-session -t $1
+}
+
+#===============================================================
+# Components
+#===============================================================
+if [ -d "$HOME/homebrew" ]; then
+  export PATH="$HOME/homebrew/bin:$PATH"
+fi
+
+if [ -d "$HOME/.anyenv" ]; then
+  export PATH="$HOME/.anyenv/bin:$PATH"
+  eval "$(anyenv init -)"
+fi
+
+if [ -x "$(command -v direnv)" ]; then
+  eval "$(direnv hook bash)"
+fi
+
+#===============================================================
+# Completions
+#===============================================================
+{{ if eq .chezmoi.os "darwin" -}}
+if [ -d $(brew --prefix)/etc/bash_completion.d ]; then
+  for f in $(brew --prefix)/etc/bash_completion.d/*.{bash,sh}; do source $f; done
+fi
+{{ else if eq .chezmoi.os "linux" -}}
+# Nothing for now
+{{ end -}}
+
+#===============================================================
+# Customization
+#===============================================================
+if [ -f "$HOME/.bash_aliases" ]; then
+  source "$HOME/.bash_aliases"
+fi
+
+PS1="\u in \w\$([[ -n \$(git branch 2> /dev/null) ]] && echo \" on \")\[$WARNING\]\$(parse_git_branch)\[$RESET\]\n\$ "
+export PATH="./node_modules/.bin:$PATH"
+

@@ -1,0 +1,23 @@
+# Ignore vendors
+.bundle
+node_modules
+vendor/bundle/
+
+# Temp files
+.sass-cache
+
+# Ignore OS related files
+.AppleDouble
+.DS_Store
+.LSOverride
+.Spotlight-V100
+.Trashes
+Icon
+*.savedSearch
+
+# Ignore Project dev environment specific
+.direnv
+.envrc
+.vscode
+Procfile.dev
+Procfile.local

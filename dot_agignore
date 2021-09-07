@@ -1,0 +1,15 @@
+.asset-cache
+.git
+
+coverage
+doc
+log
+tmp
+
+bower_components
+node_modules
+vendor
+
+_build
+build
+dist
