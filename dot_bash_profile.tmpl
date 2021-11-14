@@ -24,8 +24,26 @@ parse_git_dirty () {
     echo "ツ"
   fi
 }
+
 parse_git_branch () {
   git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e "s/* \(.*\)/\1 $(parse_git_dirty)/"
+}
+
+redis-up() {
+  mkdir -p /tmp/redis
+  chmod 777 /tmp/redis
+  echo "Redis: starting ${app_name} on ${socket_file}"
+
+  docker run \
+    --name "${cont_name}" \
+    -v "/tmp/redis:/tmp/redis" \
+    -d redis \
+    redis-server --port 0 --unixsocket "/tmp/redis/${app_name}.sock" --unixsocketperm 777
+}
+
+redis-down() {
+  docker stop $cont_name
+  docker rm $cont_name
 }
 
 tmux-join() {

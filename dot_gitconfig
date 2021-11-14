@@ -1,6 +1,15 @@
 [core]
   excludesfile = ~/.gitignore
-  editor = vim
+  editor = nvim
+[user]
+  name = Lucas Mendelowski
+  email = lucas@mendelowski.com
+[fetch]
+  prune = true
+[pull]
+  ff = only
+[push]
+  default = upstream
 [alias]
   br = branch --sort=committerdate
   brc = "!f() { git br --merged | grep -v "master" | grep -v "staging" | xargs git br -D; }; f"
@@ -12,12 +21,3 @@
   df = difftool
   st = status
   wip = !git add -A && git commit -m "WIP"
-[fetch]
-  prune = true
-[pull]
-  ff = only
-[push]
-  default = upstream
-[user]
-  name = Lucas Mendelowski
-  email = lucas@mendelowski.com
