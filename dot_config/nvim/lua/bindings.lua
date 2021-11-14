@@ -35,7 +35,10 @@ map('n', 'Y', 'y$', opts)                                -- Yank to the end of l
 -----------------------------------------------------------
 -- Plugins Key bindings
 -----------------------------------------------------------
-map('n', '<leader>t.', ':TestLast<CR>', opts)           -- Run last test
+map('n', '<C-e>', ':NERDTreeToggle<CR>', opts)          -- Toggle NERDTree
+map('n', '<leader>e', ':NERDTreeFind<CR>', opts)        -- Focus current buffer in NERDTree
+
+map('n', '<leader>t.', ':TestLast<CR>', opts)           -- Re-run last test
 map('n', '<leader>ta', ':TestSuite<CR>', opts)          -- Test the whole suite
 map('n', '<leader>tf', ':TestFile<CR>', opts)           -- Test current file
 map('n', '<leader>tt', ':TestNearest<CR>', opts)        -- Test nearest code
