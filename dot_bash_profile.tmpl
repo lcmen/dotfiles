@@ -12,6 +12,7 @@ export LC_ALL=en_US.UTF-8
 
 # Save iex history
 export ERL_AFLAGS="-kernel shell_history enabled -kernel shell_history_path '\"$HOME/.iex_history\"'"
+export PATH="./node_modules/.bin:$PATH"
 
 #===============================================================
 # Functions
@@ -38,18 +39,11 @@ tmux-kill() {
 #===============================================================
 # Components
 #===============================================================
-if [ -d "$HOME/homebrew" ]; then
-  export PATH="$HOME/homebrew/bin:$PATH"
+{{ if eq .chezmoi.os "darwin" -}}
+if [ -x "$(command -v asdf)" ]; then
+  . $(brew --prefix asdf)/libexec/asdf.sh
 fi
-
-if [ -d "$HOME/.anyenv" ]; then
-  export PATH="$HOME/.anyenv/bin:$PATH"
-  eval "$(anyenv init -)"
-fi
-
-if [ -x "$(command -v direnv)" ]; then
-  eval "$(direnv hook bash)"
-fi
+{{ end -}}
 
 #===============================================================
 # Completions
@@ -70,5 +64,3 @@ if [ -f "$HOME/.bash_aliases" ]; then
 fi
 
 PS1="\u in \w\$([[ -n \$(git branch 2> /dev/null) ]] && echo \" on \")\[$WARNING\]\$(parse_git_branch)\[$RESET\]\n\$ "
-export PATH="./node_modules/.bin:$PATH"
-

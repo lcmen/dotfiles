@@ -24,6 +24,9 @@ set nocompatible
     Plug 'docunext/closetag.vim'
     Plug 'janko-m/vim-test'
     Plug 'lokikl/vim-ctrlp-ag'
+    Plug 'mattn/vim-lsp-settings'
+    Plug 'prabirshrestha/vim-lsp'
+    Plug 'psliwka/vim-smoothie'
     Plug 'rking/ag.vim'
     Plug 'ryanoasis/vim-devicons', { 'branch': 'master' }
     Plug 'scrooloose/nerdtree'
