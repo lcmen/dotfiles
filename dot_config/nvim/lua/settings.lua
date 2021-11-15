@@ -52,7 +52,7 @@ opt.smartcase = true                  -- unless there is a capital letter in the
 opt.backup = false                    --  Disable backup
 opt.writebackup = false
 opt.undofile = true                   -- Enable undo file
-opt.undodir = '~/.config/invim/tmp/undo/'
+opt.undodir = '$HOME/.config/invim/tmp/undo/'
 opt.undolevels = 1000                 -- Maximum number of changes that can be undone
 opt.undoreload = 10000                -- Maximum number lines to save for undo on a buffer reload
 
