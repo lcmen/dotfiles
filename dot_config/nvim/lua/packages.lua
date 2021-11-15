@@ -2,6 +2,7 @@
 -- Neovim API aliases
 -----------------------------------------------------------
 local call = vim.call
+local g = vim.g
 local Plug = vim.fn['plug#']
 
 -----------------------------------------------------------
@@ -17,7 +18,6 @@ Plug('ctrlpvim/ctrlp.vim')
 Plug('docunext/closetag.vim')
 Plug('janko-m/vim-test')
 Plug('lokikl/vim-ctrlp-ag')
-Plug('psliwka/vim-smoothie')
 Plug('rking/ag.vim')
 Plug('ryanoasis/vim-devicons')
 Plug('scrooloose/nerdtree')
@@ -33,3 +33,8 @@ Plug('troydm/zoomwintab.vim')
 Plug('vim-scripts/BufOnly.vim')
 
 call('plug#end')
+
+-----------------------------------------------------------
+-- Packages settings
+-----------------------------------------------------------
+g.NERDTreeShowHidden = 1
