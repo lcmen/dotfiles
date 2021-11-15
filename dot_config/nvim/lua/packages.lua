@@ -3,7 +3,8 @@
 -----------------------------------------------------------
 local call = vim.call
 local g = vim.g
-local map = vim.api.nvim_set_keymap
+local map = vim.api.nvim_buf_set_keymap
+local ion = vim.api.nvim_buf_set_option
 local opts = { noremap = true }
 local Plug = vim.fn['plug#']
 
