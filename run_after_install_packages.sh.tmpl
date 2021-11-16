@@ -1,0 +1,9 @@
+{{ if eq .chezmoi.os "darwin" -}}
+{{ else if eq .chezmoi.os "linux" -}}
+#!/usr/bin/env bash
+if [ ! -d "$HOME/.asdf" ]; then
+  git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf
+fi
+
+(cd $HOME/.asdf && git pull origin master)
+{{ end -}}
