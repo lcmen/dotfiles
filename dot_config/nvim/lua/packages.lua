@@ -61,6 +61,11 @@ call('plug#end')
 -----------------------------------------------------------
 -- Packages settings
 -----------------------------------------------------------
+g.ctrlp_use_caching = 0
+g.ctrlp_switch_buffer = 0
+g.ctrlp_working_path_mode = 0
+g.ctrlp_use_caching = 0               -- Disable caching for CtrlP and use ripgrep
+g.ctrlp_user_command = 'rg %s --files --color=never --glob=!git --glob=!node_modules --glob=!vendor/bundle --glob ""'
 g.NERDTreeShowHidden = 1
 
 require'compe'.setup({

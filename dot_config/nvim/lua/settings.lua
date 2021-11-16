@@ -40,8 +40,6 @@ opt.textwidth = 120
 -----------------------------------------------------------
 -- Search
 -----------------------------------------------------------
-g.ctrlp_use_caching = 0               -- Disable caching for CtrlP and use ripgrep
-g.ctrlp_user_command = 'rg %s --files --color=never --glob ""'
 opt.incsearch = true                  --  Enable incremental search
 opt.ignorecase = true                 -- Ignore case when searching
 opt.smartcase = true                  -- unless there is a capital letter in the query
