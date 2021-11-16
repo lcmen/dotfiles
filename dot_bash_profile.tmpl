@@ -48,7 +48,7 @@ redis-down() {
 }
 
 tmux-join() {
-  tmux attach-session -t $1
+  tmux attach-session -dt $1
 }
 
 tmux-kill() {
