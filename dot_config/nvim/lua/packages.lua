@@ -43,6 +43,7 @@ Plug('janko-m/vim-test')
 Plug('kabouzeid/nvim-lspinstall')
 Plug('miyase256/vim-ripgrep', { branch = 'fix/remove-complete-from-RgRoot' })
 Plug('neovim/nvim-lspconfig')
+Plug('ojroques/vim-oscyank')
 Plug('ryanoasis/vim-devicons')
 Plug('scrooloose/nerdtree')
 Plug('sheerun/vim-polyglot')
@@ -61,10 +62,9 @@ call('plug#end')
 -----------------------------------------------------------
 -- Packages settings
 -----------------------------------------------------------
-g.ctrlp_use_caching = 0
 g.ctrlp_switch_buffer = 0
 g.ctrlp_working_path_mode = 0
-g.ctrlp_use_caching = 0               -- Disable caching for CtrlP and use ripgrep
+g.ctrlp_use_caching = 0                                      -- Disable caching for CtrlP and use ripgrep
 g.ctrlp_user_command = 'rg %s --files --color=never --glob=!git --glob=!node_modules --glob=!vendor/bundle --glob ""'
 g.NERDTreeShowHidden = 1
 
