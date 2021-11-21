@@ -1,4 +1,6 @@
-# My dotfiles managed with [chezmoi](https://www.chezmoi.io/)
+# .files
+
+Dotfiles for applications I use on MacOS and Linux systems managed with [chezmoi](https://www.chezmoi.io/).
 
 ## Installation
 
