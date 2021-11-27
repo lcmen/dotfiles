@@ -9,6 +9,7 @@ alias br="bundle exec gem remove"
 
 # Misc
 alias c="clear"
+alias dcl=docker-cleanup
 alias vim="nvim"
 
 {{ if eq .chezmoi.os "darwin" -}}
@@ -19,8 +20,8 @@ alias dns-flush="sudo systemd-resolve --flush-caches"
 {{ end -}}
 
 # Redis
-alias rd-up="redis-up"
-alias rd-down="redis-down"
+alias rd-up=redis-up
+alias rd-down=redis-down
 
 # Tmux
 alias txj=tmux-join

@@ -18,6 +18,11 @@ export PATH="./node_modules/.bin:$PATH"
 #===============================================================
 # Functions
 #===============================================================
+docker-cleanup() {
+  docker ps -a | grep "Exit\|Created" | awk '{print $1}' | xargs docker rm
+  docker images | grep "none" | awk '{print $3}' | xargs docker rmi
+}
+
 parse_git_dirty () {
   if [[ $(git status 2> /dev/null | tail -n1 | cut -c 1-17) != "nothing to commit" ]]; then
     echo "✗"
@@ -31,15 +36,19 @@ parse_git_branch () {
 }
 
 redis-up() {
+  local app_name=$1
+  local cont_name="redis-${app_name}"
+  local socket_file="/tmp/redis/${app_name}.sock"
+
   mkdir -p /tmp/redis
   chmod 777 /tmp/redis
-  echo "Redis: starting ${app_name} on ${socket_file}"
+  echo "Redis: starting ${app_name} on ${socket_file} in ${cont_name} container."
 
   docker run \
     --name "${cont_name}" \
     -v "/tmp/redis:/tmp/redis" \
     -d redis \
-    redis-server --port 0 --unixsocket "/tmp/redis/${app_name}.sock" --unixsocketperm 777
+    redis-server --port 0 --unixsocket "${socket_file}" --unixsocketperm 777
 }
 
 redis-down() {
