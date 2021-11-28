@@ -1,4 +1,8 @@
 {{ if eq .chezmoi.os "darwin" -}}
+#!/usr/bin/env bash
+
+brew update
+brew upgrade
 {{ else if eq .chezmoi.os "linux" -}}
 #!/usr/bin/env bash
 if [ ! -d "$HOME/.asdf" ]; then

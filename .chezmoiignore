@@ -1,5 +1,4 @@
-# Ignore symlinks
-.tool-versions
-
-# Ignore regular files
 README.md
+
+# Ignore symlinks
+tool-versions
