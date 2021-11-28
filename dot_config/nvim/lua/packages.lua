@@ -3,7 +3,6 @@
 -----------------------------------------------------------
 local call = vim.call
 local g = vim.g
-local lsp = vim.lsp
 local opts = { noremap = true }
 local Plug = vim.fn['plug#']
 
@@ -15,6 +14,7 @@ local on_attach = function(client, bufnr)
     local ion = vim.api.nvim_buf_set_option
 
     ion(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+    ion(bufnr, 'formatexpr', 'v:lua.vim.lsp.formatexpr()')
     map(bufnr, 'n', 'g0', '<cmd>lua vim.lsp.buf.document_symbol()<CR>', opts)
     map(bufnr, 'n', 'gd', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
     map(bufnr, 'n', 'gf', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
@@ -38,12 +38,14 @@ Plug('airblade/vim-gitgutter')
 Plug('christoomey/vim-tmux-navigator')
 Plug('ctrlpvim/ctrlp.vim')
 Plug('docunext/closetag.vim')
-Plug('hrsh7th/nvim-compe')
+Plug('hrsh7th/cmp-nvim-lsp')
+Plug('hrsh7th/cmp-buffer')
+Plug('hrsh7th/cmp-path')
+Plug('hrsh7th/nvim-cmp')
 Plug('janko-m/vim-test')
-Plug('kabouzeid/nvim-lspinstall')
+-- Switch to 'jremmen/vim-ripgrep' once https://github.com/jremmen/vim-ripgrep/pull/62 is merged
 Plug('miyase256/vim-ripgrep', { branch = 'fix/remove-complete-from-RgRoot' })
--- Until https://github.com/neovim/nvim-lspconfig/issues/1488 is fixed
-Plug('neovim/nvim-lspconfig', { commit = '414af1b02aad0bc106967f75ed8defb1e29cb538' })
+Plug('neovim/nvim-lspconfig')
 Plug('ojroques/vim-oscyank')
 Plug('ryanoasis/vim-devicons')
 Plug('scrooloose/nerdtree')
@@ -56,6 +58,7 @@ Plug('tpope/vim-repeat')
 Plug('tpope/vim-surround')
 Plug('tpope/vim-unimpaired')
 Plug('troydm/zoomwintab.vim')
+Plug('williamboman/nvim-lsp-installer')
 Plug('vim-scripts/BufOnly.vim')
 
 call('plug#end')
@@ -63,32 +66,25 @@ call('plug#end')
 -----------------------------------------------------------
 -- Packages settings
 -----------------------------------------------------------
-g.ctrlp_switch_buffer = 0
-g.ctrlp_working_path_mode = 0
+g.ctrlp_switch_buffer = 0                                    -- Always open a new window when opening a file
+g.ctrlp_working_path_mode = 0                                -- Always search under current working directory
 g.ctrlp_use_caching = 0                                      -- Disable caching for CtrlP and use ripgrep
 g.ctrlp_user_command = 'rg %s --files --color=never --glob=!git --glob=!node_modules --glob=!vendor/bundle --glob ""'
-g.NERDTreeShowHidden = 1
 
-require'compe'.setup({
+g.NERDTreeShowHidden = 1                                     -- Show hidden files on NERDTree
+
+local cmp = require'cmp'
+local lsp_installer = require("nvim-lsp-installer")
+
+cmp.setup({
     enabled = true;
-    autocomplete = true;
-    min_length = 1;
-    source = {
-        path = true;
-        buffer = true;
-        calc = true;
-        nvim_lsp = true;
-    };
+    sources = cmp.config.sources({
+        { name = 'nvim_lsp' },
+        { name = 'buffer' },
+        { name = 'path' }
+    });
 })
 
-require'lspinstall'.setup()
-for _, server in pairs(require'lspinstall'.installed_servers()) do
-    require'lspconfig'[server].setup{ on_attach = on_attach }
-end
-
-lsp.handlers['textDocument/publishDiagnostics'] = lsp.with(lsp.diagnostic.on_publish_diagnostics, {
-  virtual_text = false,
-  signs = true,
-  update_in_insert = false,
-  underline = true,
-})
+lsp_installer.on_server_ready(function (server)
+    server:setup { on_attach = on_attach }
+end)

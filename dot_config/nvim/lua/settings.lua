@@ -3,6 +3,7 @@
 -----------------------------------------------------------
 local cmd = vim.cmd
 local fn = vim.fn
+local lsp = vim.lsp
 local opt = vim.opt
 
 -----------------------------------------------------------
@@ -11,6 +12,7 @@ local opt = vim.opt
 vim.g.mapleader = " "                                        -- Change leader to space
 
 opt.clipboard = 'unnamedplus'                                -- Use System clipboard
+opt.completeopt = 'menuone,noselect'
 opt.mouse = 'a'                                              -- Enable mouse support
 opt.swapfile = false                                         -- No swapfile
 opt.scrolloff = 5                                            -- Start scrolling 5 lines away from margin
@@ -35,7 +37,7 @@ opt.textwidth = 120
 -----------------------------------------------------------
 -- Search
 -----------------------------------------------------------
-opt.incsearch = true                                         --  Enable incremental search
+opt.incsearch = true                                         -- Enable incremental search
 opt.ignorecase = true                                        -- Ignore case when searching
 opt.smartcase = true                                         -- unless there is a capital letter in the query
 
@@ -57,3 +59,13 @@ opt.cursorline = true                                        -- Show cursor line
 opt.laststatus = 2                                           -- Show status line
 opt.number = true                                            -- Show line numbers
 opt.relativenumber = true                                    -- Use relative line numbers
+
+-----------------------------------------------------------
+-- Language Server Protocol
+-----------------------------------------------------------
+lsp.handlers['textDocument/publishDiagnostics'] = lsp.with(lsp.diagnostic.on_publish_diagnostics, {
+  virtual_text = false,                                      -- Disable displaying warnings / errors inline
+  signs = true,                                              -- Display warning / errors signs next to the line number
+  update_in_insert = false,                                  -- Wait with updating diagnostics for switch between modes
+  underline = true,                                          -- Underline affected code
+})
