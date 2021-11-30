@@ -80,7 +80,14 @@ cmp.setup({
     enabled = true;
     sources = cmp.config.sources({
         { name = 'nvim_lsp' },
-        { name = 'buffer' },
+        {
+            name = 'buffer',
+            option = {
+                get_bufnrs = function()
+                    return vim.api.nvim_list_bufs()
+                end
+            }
+        },
         { name = 'path' }
     });
 })
