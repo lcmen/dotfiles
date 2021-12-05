@@ -43,8 +43,7 @@ Plug('hrsh7th/cmp-buffer')
 Plug('hrsh7th/cmp-path')
 Plug('hrsh7th/nvim-cmp')
 Plug('janko-m/vim-test')
--- Switch to 'jremmen/vim-ripgrep' once https://github.com/jremmen/vim-ripgrep/pull/62 is merged
-Plug('miyase256/vim-ripgrep', { branch = 'fix/remove-complete-from-RgRoot' })
+Plug('jremmen/vim-ripgrep')
 Plug('neovim/nvim-lspconfig')
 Plug('ojroques/vim-oscyank')
 Plug('ryanoasis/vim-devicons')
@@ -83,7 +82,7 @@ cmp.setup({
         {
             name = 'buffer',
             option = {
-                get_bufnrs = function()
+                get_bufnrs = function()                      -- Complete from all buffers
                     return vim.api.nvim_list_bufs()
                 end
             }
