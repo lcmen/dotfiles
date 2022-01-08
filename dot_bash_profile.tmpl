@@ -8,12 +8,12 @@ RESET="\033[m"
 
 export CLICOLOR=1
 export EDITOR=nvim
+export FZF_DEFAULT_COMMAND='rg --files --hidden --follow -g !.git'
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 
 # Save iex history
 export ERL_AFLAGS="-kernel shell_history enabled -kernel shell_history_path '\"$HOME/.iex_history\"'"
-export PATH="./node_modules/.bin:$PATH"
 
 #===============================================================
 # Functions
