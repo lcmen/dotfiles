@@ -36,7 +36,6 @@ Plug('AndrewRadev/sideways.vim')
 Plug('AndrewRadev/splitjoin.vim')
 Plug('airblade/vim-gitgutter')
 Plug('christoomey/vim-tmux-navigator')
-Plug('ctrlpvim/ctrlp.vim')
 Plug('docunext/closetag.vim')
 Plug('hrsh7th/cmp-nvim-lsp')
 Plug('hrsh7th/cmp-buffer')
@@ -44,12 +43,14 @@ Plug('hrsh7th/cmp-path')
 Plug('hrsh7th/nvim-cmp')
 Plug('janko-m/vim-test')
 Plug('jremmen/vim-ripgrep')
+Plug('junegunn/fzf', { ['do'] = vim.fn['fzf#install()'] })
+Plug('junegunn/fzf.vim')
 Plug('neovim/nvim-lspconfig')
 Plug('ojroques/vim-oscyank')
 Plug('ryanoasis/vim-devicons')
 Plug('scrooloose/nerdtree')
 Plug('sheerun/vim-polyglot')
-Plug('sonph/onehalf', { rtp = 'vim' })
+Plug('sonph/onehalf', { ['rtp'] = 'vim' })
 Plug('tpope/vim-commentary')
 Plug('tpope/vim-dispatch')
 Plug('tpope/vim-rails')
@@ -65,11 +66,8 @@ call('plug#end')
 -----------------------------------------------------------
 -- Packages settings
 -----------------------------------------------------------
-g.ctrlp_switch_buffer = 0                                    -- Always open a new window when opening a file
-g.ctrlp_working_path_mode = 0                                -- Always search under current working directory
-g.ctrlp_use_caching = 0                                      -- Disable caching for CtrlP and use ripgrep
-g.ctrlp_user_command = 'rg %s --files --color=never --glob=!git --glob=!node_modules --glob=!vendor/bundle --glob ""'
 
+g.fzf_preview_window = {'right:50%', 'ctrl-/'}               -- Show preview window for FZF
 g.NERDTreeShowHidden = 1                                     -- Show hidden files on NERDTree
 
 local cmp = require'cmp'

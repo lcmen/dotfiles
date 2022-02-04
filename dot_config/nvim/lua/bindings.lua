@@ -35,6 +35,9 @@ map('n', 'Y', 'y$', opts)                                    -- Yank to the end 
 -----------------------------------------------------------
 -- Plugins Key bindings
 -----------------------------------------------------------
+map('n', '<leader>ff', ':Files<CR>', opts)                   -- FZF files
+map('n', '<leader>fb', ':Buffers<CR>', opts)                 -- FZF buffers
+
 map('n', '<C-e>', ':NERDTreeToggle<CR>', opts)               -- Toggle NERDTree
 map('n', '<leader>e', ':NERDTreeFind<CR>', opts)             -- Focus current buffer in NERDTree
 

@@ -12,7 +12,6 @@ local opt = vim.opt
 vim.g.mapleader = " "                                        -- Change leader to space
 
 opt.clipboard = 'unnamedplus'                                -- Use System clipboard
-opt.completeopt = 'menuone,noselect'
 opt.mouse = 'a'                                              -- Enable mouse support
 opt.swapfile = false                                         -- No swapfile
 opt.scrolloff = 5                                            -- Start scrolling 5 lines away from margin
@@ -46,10 +45,6 @@ opt.smartcase = true                                         -- unless there is 
 -----------------------------------------------------------
 opt.backup = false                                           --  Disable backup
 opt.writebackup = false
-opt.undofile = true                                          -- Enable undo file
-opt.undodir = fn.stdpath('config') .. '/nvim/tmp/undo/'
-opt.undolevels = 1000                                        -- Maximum number of changes that can be undone
-opt.undoreload = 10000                                       -- Maximum number lines to save for undo on a buffer reload
 
 -----------------------------------------------------------
 -- UI
