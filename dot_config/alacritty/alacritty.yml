@@ -34,6 +34,9 @@ font:
     family: 'SauceCodePro Nerd Font'
   size: 13.0
 
+key_bindings:
+  - { key: N, mods: Shift|Control, action: CreateNewWindow }
+
 window:
   padding:
     x: 10
