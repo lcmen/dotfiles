@@ -45,6 +45,7 @@ Plug('janko-m/vim-test')
 Plug('jremmen/vim-ripgrep')
 Plug('junegunn/fzf', { ['do'] = vim.fn['fzf#install()'] })
 Plug('junegunn/fzf.vim')
+Plug('mickael-menu/zk-nvim')
 Plug('neovim/nvim-lspconfig')
 Plug('ojroques/vim-oscyank')
 Plug('ryanoasis/vim-devicons')
@@ -72,6 +73,7 @@ g.NERDTreeShowHidden = 1                                     -- Show hidden file
 
 local cmp = require'cmp'
 local lsp_installer = require("nvim-lsp-installer")
+local zk = require("zk")
 
 cmp.setup({
     enabled = true;
@@ -92,3 +94,12 @@ cmp.setup({
 lsp_installer.on_server_ready(function (server)
     server:setup { on_attach = on_attach }
 end)
+
+zk.setup({
+    picker = "fzf";
+
+    auto_attach = {
+      enabled = true,
+      filetypes = { "markdown" },
+    };
+})
