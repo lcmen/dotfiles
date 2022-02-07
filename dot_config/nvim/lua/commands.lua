@@ -4,7 +4,7 @@
 local api = vim.api
 local bo = vim.bo
 local cmd = vim.cmd
-
+local wo = vim.wo
 -----------------------------------------------------------
 -- Functions
 -----------------------------------------------------------
@@ -23,6 +23,17 @@ function CopyToOSC()
     if vim.v.event.operator == 'y' then                      -- Copy yanks only
         api.nvim_command('OSCYankReg +')
     end
+end
+
+function SetupMarkdown()
+    local cmp = require('cmp')
+
+    cmp.setup.buffer({
+        sources = {{ name = 'nvim_lsp' }}
+    });
+    bo.suffixesadd = '.md'
+    wo.spell = true
+    wo.wrap = true
 end
 
 function StripTrailingWhiteSpace()
@@ -56,4 +67,4 @@ cmd [[autocmd TextYankPost * lua CopyToOSC()]]               -- Copy to OSC sequ
 -----------------------------------------------------------
 cmd [[autocmd Filetype gitcommit setl spell textwidth=72]]
 cmd [[autocmd Filetype go setl softtabstop=4 shiftwidth=4 noexpandtab]]
-cmd [[autocmd Filetype markdown setl spell colorcolumn=0 wrap linebreak]]
+cmd [[autocmd Filetype markdown lua SetupMarkdown()]]

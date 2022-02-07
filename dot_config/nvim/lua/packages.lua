@@ -48,6 +48,7 @@ Plug('junegunn/fzf.vim')
 Plug('mickael-menu/zk-nvim')
 Plug('neovim/nvim-lspconfig')
 Plug('ojroques/vim-oscyank')
+Plug('onsails/lspkind-nvim')
 Plug('ryanoasis/vim-devicons')
 Plug('scrooloose/nerdtree')
 Plug('sheerun/vim-polyglot')
@@ -73,10 +74,17 @@ g.NERDTreeShowHidden = 1                                     -- Show hidden file
 
 local cmp = require'cmp'
 local lsp_installer = require("nvim-lsp-installer")
+local lspkind = require('lspkind')
 local zk = require("zk")
 
 cmp.setup({
     enabled = true;
+    formatting = {
+        format = lspkind.cmp_format(),
+    };
+    mapping = {
+        ['<CR>'] = cmp.mapping.confirm({ select = true })
+    };
     sources = cmp.config.sources({
         { name = 'nvim_lsp' },
         {
