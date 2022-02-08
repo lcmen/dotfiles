@@ -19,6 +19,7 @@ opt.sidescrolloff = 15                                       -- Start scrolling 
 opt.spell = false                                            -- Spell checking off
 opt.splitbelow = true                                        -- Split below
 opt.splitright = true                                        -- Split on the right side
+opt.completeopt = { 'menu', 'menuone', 'noselect' }          -- Don't select completion menu
 
 -----------------------------------------------------------
 -- Whitespaces

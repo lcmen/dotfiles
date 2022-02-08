@@ -83,7 +83,8 @@ cmp.setup({
         format = lspkind.cmp_format(),
     };
     mapping = {
-        ['<CR>'] = cmp.mapping.confirm({ select = true })
+        ['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
+        ['<CR>'] = cmp.mapping.confirm({ select = false }),
     };
     sources = cmp.config.sources({
         { name = 'nvim_lsp' },
@@ -106,8 +107,13 @@ end)
 zk.setup({
     picker = "fzf";
 
-    auto_attach = {
-      enabled = true,
-      filetypes = { "markdown" },
+    lsp = {
+        config = {
+            on_attach = on_attach
+        },
+        auto_attach = {
+            enabled = true,
+            filetypes = { "markdown" },
+        }
     };
 })
