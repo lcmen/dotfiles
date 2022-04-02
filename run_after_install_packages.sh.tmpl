@@ -1,8 +1,27 @@
 {{ if eq .chezmoi.os "darwin" -}}
 #!/usr/bin/env bash
 
+brew tap homebrew/cask
+brew tap homebrew/cask-fonts
+brew tap uptech/oss
+
 brew update
 brew upgrade
+
+brew install -q alt
+brew install -q asdf
+brew install -q bash
+brew install -q git
+brew install -q openssh
+brew install -q ripgrep
+brew install -q tig
+
+brew install -q cryptomator
+brew install -q font-fira-code-nerd-font
+brew install -q vlc
+
+asdf plugin add nodejs
+asdf plugin add ruby
 {{ else if eq .chezmoi.os "linux" -}}
 #!/usr/bin/env bash
 if [ ! -d "$HOME/.asdf" ]; then
@@ -10,4 +29,6 @@ if [ ! -d "$HOME/.asdf" ]; then
 fi
 
 (cd $HOME/.asdf && git pull origin master)
+(cd $HOME/.asdf && asdf plugin add nodejs)
+(cd $HOME/.asdf && asdf plugin add ruby)
 {{ end -}}
