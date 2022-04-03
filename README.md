@@ -5,5 +5,5 @@ Dotfiles for applications I use on MacOS and Linux systems managed with [chezmoi
 ## Installation
 
 1. Install `chezmoi`
-2. `chezmoi init git@github.com:lowski/.files.git`
+2. `chezmoi init git@github.com:lcmen/.files.git`
 3. `chezmoi apply`
