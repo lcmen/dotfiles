@@ -3,10 +3,12 @@
 
 brew tap homebrew/cask
 brew tap homebrew/cask-fonts
+brew tap buo/cask-upgrade
 brew tap uptech/oss
 
 brew update
 brew upgrade
+brew cu -y
 
 brew install -q alt
 brew install -q asdf
@@ -16,9 +18,10 @@ brew install -q openssh
 brew install -q ripgrep
 brew install -q tig
 
-brew install -q cryptomator
-brew install -q font-fira-code-nerd-font
-brew install -q vlc
+brew install --cask -q cryptomator
+brew install --cask -q font-fira-code-nerd-font
+brew install --cask -q spotify
+brew install --cask -q vlc
 
 asdf plugin add golang
 asdf plugin add nodejs
