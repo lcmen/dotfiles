@@ -4,28 +4,33 @@
 brew tap homebrew/cask
 brew tap homebrew/cask-fonts
 brew tap buo/cask-upgrade
+brew tap petere/postgresql
 brew tap uptech/oss
 
 brew update
 brew upgrade
-brew cu -y
+brew cu -a -y
 
 brew install -q alt
 brew install -q asdf
 brew install -q bash
+brew install -q erlang
 brew install -q git
 brew install -q openssh
+brew install -q postgresql-common
 brew install -q ripgrep
 brew install -q tig
+brew install -q tmux
 
 brew install --cask -q cryptomator
 brew install --cask -q font-fira-code-nerd-font
 brew install --cask -q spotify
 brew install --cask -q vlc
 
-asdf plugin add golang
-asdf plugin add nodejs
-asdf plugin add ruby
+asdf plugin add elixir || true
+asdf plugin add golang || true
+asdf plugin add nodejs || true
+asdf plugin add ruby || true
 {{ else if eq .chezmoi.os "linux" -}}
 #!/usr/bin/env bash
 if [ ! -d "$HOME/.asdf" ]; then
@@ -33,6 +38,7 @@ if [ ! -d "$HOME/.asdf" ]; then
 fi
 
 (cd $HOME/.asdf && git pull origin master)
+(cd $HOME/.asdf && asdf plugin add elixir)
 (cd $HOME/.asdf && asdf plugin add golang)
 (cd $HOME/.asdf && asdf plugin add nodejs)
 (cd $HOME/.asdf && asdf plugin add ruby)
