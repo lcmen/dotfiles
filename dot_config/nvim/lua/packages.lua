@@ -40,7 +40,9 @@ Plug('docunext/closetag.vim')
 Plug('hrsh7th/cmp-nvim-lsp')
 Plug('hrsh7th/cmp-buffer')
 Plug('hrsh7th/cmp-path')
+Plug('hrsh7th/cmp-vsnip')
 Plug('hrsh7th/nvim-cmp')
+Plug('hrsh7th/vim-vsnip')
 Plug('janko-m/vim-test')
 Plug('jremmen/vim-ripgrep')
 Plug('junegunn/fzf', { ['do'] = vim.fn['fzf#install()'] })
@@ -49,6 +51,7 @@ Plug('mickael-menu/zk-nvim')
 Plug('neovim/nvim-lspconfig')
 Plug('ojroques/vim-oscyank')
 Plug('onsails/lspkind-nvim')
+Plug('rafamadriz/friendly-snippets')
 Plug('ryanoasis/vim-devicons')
 Plug('scrooloose/nerdtree')
 Plug('sheerun/vim-polyglot')
@@ -86,8 +89,15 @@ cmp.setup({
         ['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
         ['<CR>'] = cmp.mapping.confirm({ select = false }),
     };
+    snippet = {
+        expand = function(args)
+            vim.fn["vsnip#anonymous"](args.body)
+        end
+    };
     sources = cmp.config.sources({
         { name = 'nvim_lsp' },
+        { name = 'vsnip' },
+    }, {
         {
             name = 'buffer',
             option = {
