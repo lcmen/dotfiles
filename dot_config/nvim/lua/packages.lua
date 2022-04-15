@@ -47,7 +47,6 @@ Plug('janko-m/vim-test')
 Plug('jremmen/vim-ripgrep')
 Plug('junegunn/fzf', { ['do'] = vim.fn['fzf#install()'] })
 Plug('junegunn/fzf.vim')
-Plug('mickael-menu/zk-nvim')
 Plug('neovim/nvim-lspconfig')
 Plug('ojroques/vim-oscyank')
 Plug('onsails/lspkind-nvim')
@@ -78,17 +77,16 @@ g.NERDTreeShowHidden = 1                                     -- Show hidden file
 local cmp = require'cmp'
 local lsp_installer = require("nvim-lsp-installer")
 local lspkind = require('lspkind')
-local zk = require("zk")
 
 cmp.setup({
     enabled = true;
     formatting = {
         format = lspkind.cmp_format(),
     };
-    mapping = {
+    mapping = cmp.mapping.preset.insert({
         ['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
         ['<CR>'] = cmp.mapping.confirm({ select = false }),
-    };
+    });
     snippet = {
         expand = function(args)
             vim.fn["vsnip#anonymous"](args.body)
@@ -113,17 +111,3 @@ cmp.setup({
 lsp_installer.on_server_ready(function (server)
     server:setup { on_attach = on_attach }
 end)
-
-zk.setup({
-    picker = "fzf";
-
-    lsp = {
-        config = {
-            on_attach = on_attach
-        },
-        auto_attach = {
-            enabled = true,
-            filetypes = { "markdown" },
-        }
-    };
-})
