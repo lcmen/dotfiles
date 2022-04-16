@@ -22,15 +22,17 @@ map('n', '<leader>P', ':let @+=expand("%:p")<CR>', opts)     -- Copy buffer's ab
 
 map('n', 'k', 'gk', { silent = true })                       -- Move more sensibly when line wrapping enabled
 map('n', 'j', 'gj', { silent = true })
-
 map('v', '<', '<gv', opts)                                   -- Move block of codes left
 map('v', '>', '>gv', opts)                                   -- and right
-
 map('n', '[g', 'gT', opts)                                   -- Move tab left
 map('n', ']g', 'gt', opts)                                   -- and right
 
 map('n', 'D', 'd$', opts)                                    -- Delete to the end of line
 map('n', 'Y', 'y$', opts)                                    -- Yank to the end of line
+
+map('n', 'L', '<cmd>lua vim.diagnostic.open_float()<CR>', opts) -- Show line diagnostic
+map('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts) -- Move prev / next diagnostic errors
+map('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
 
 -----------------------------------------------------------
 -- Plugins Key bindings
