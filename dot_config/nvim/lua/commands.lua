@@ -4,18 +4,20 @@
 local api = vim.api
 local bo = vim.bo
 local cmd = vim.cmd
+local fn = vim.fn
 local wo = vim.wo
+
 -----------------------------------------------------------
 -- Functions
 -----------------------------------------------------------
 function AltCommand(command)
-    local path = api.nvim_buf_get_name(0)
+    local path = fn.expand('%')
     local alternate = vim.fn.system("alt " .. path)
     if alternate == nil or alternate == '' then
         local msg = 'No alternate file for ' .. path .. ' exists!'
         cmd('echo "' .. msg .. '"')
     else
-        cmd(command .. alternate)
+        cmd(command .. " " .. alternate)
     end
 end
 
