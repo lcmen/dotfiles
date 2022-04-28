@@ -19,18 +19,7 @@ function AltCommand(command)
     end
 end
 
-function CopyToOSC()
-    if vim.v.event.operator == 'y' then                      -- Copy yanks only
-        api.nvim_command('OSCYankReg +')
-    end
-end
-
 function SetupMarkdown()
-    local cmp = require('cmp')
-
-    cmp.setup.buffer({
-        sources = {{ name = 'nvim_lsp' }}
-    });
     bo.suffixesadd = '.md'
     wo.spell = true
     wo.wrap = true
@@ -60,7 +49,6 @@ cmd [[autocmd BufEnter,FocusGained * set relativenumber]]    -- Enable relative 
 cmd [[autocmd BufLeave,FocusLost * set norelativenumber]]    -- Disable relative numbers on blur
 cmd [[autocmd BufWritePre * lua StripTrailingWhiteSpace()]]  -- Strip trailing whitespaces on save
 cmd [[autocmd InsertLeave * set nopaste]]                    -- Disable paste mode on leaving insert mode
-cmd [[autocmd TextYankPost * lua CopyToOSC()]]               -- Copy to OSC sequence on yank
 
 -----------------------------------------------------------
 -- Syntax

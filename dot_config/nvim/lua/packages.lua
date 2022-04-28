@@ -46,6 +46,7 @@ Plug('jremmen/vim-ripgrep')
 Plug('junegunn/fzf', { ['do'] = vim.fn['fzf#install()'] })
 Plug('junegunn/fzf.vim')
 Plug('neovim/nvim-lspconfig')
+Plug('numtostr/BufOnly.nvim', { ['on'] = 'BufOnly' })
 Plug('onsails/lspkind-nvim')
 Plug('rafamadriz/friendly-snippets')
 Plug('ryanoasis/vim-devicons')
@@ -59,7 +60,6 @@ Plug('tpope/vim-repeat')
 Plug('tpope/vim-surround')
 Plug('tpope/vim-unimpaired')
 Plug('troydm/zoomwintab.vim')
-Plug('vim-scripts/BufOnly.vim')
 Plug('williamboman/nvim-lsp-installer')
 
 call('plug#end')
@@ -68,6 +68,7 @@ call('plug#end')
 -- Packages settings
 -----------------------------------------------------------
 
+g.bufonly_delete_non_modifiable = true                       -- Delete non-modifiable buffers
 g.fzf_preview_window = {'right:50%', 'ctrl-/'}               -- Show preview window for FZF
 g.NERDTreeShowHidden = 1                                     -- Show hidden files on NERDTree
 
@@ -106,5 +107,5 @@ cmp.setup({
 })
 
 lsp_installer.on_server_ready(function (server)
-    server:setup { on_attach = on_attach }
+    server:setup({ on_attach = on_attach })
 end)
