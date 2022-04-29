@@ -30,6 +30,8 @@ brew install --cask -q spotify
 brew install --cask -q the-unarchiver
 brew install --cask -q vlc
 
+asdf update
+asdf plugin update --all
 asdf plugin add elixir || true
 asdf plugin add golang || true
 asdf plugin add nodejs || true
@@ -41,8 +43,9 @@ if [ ! -d "$HOME/.asdf" ]; then
 fi
 
 (cd $HOME/.asdf && git pull origin master)
-(cd $HOME/.asdf && asdf plugin add elixir)
-(cd $HOME/.asdf && asdf plugin add golang)
-(cd $HOME/.asdf && asdf plugin add nodejs)
-(cd $HOME/.asdf && asdf plugin add ruby)
+(cd $HOME/.asdf && bin/asdf plugin update --all)
+(cd $HOME/.asdf && bin/asdf plugin add elixir || true)
+(cd $HOME/.asdf && bin/asdf plugin add golang || true)
+(cd $HOME/.asdf && bin/asdf plugin add nodejs || true)
+(cd $HOME/.asdf && bin/asdf plugin add ruby || true)
 {{ end -}}
