@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+# Script for controlling postgres.
+# Usage: `postgres.sh {up|down}`
+
+postgres-up() {
+  echo "Postgres: starting ${app_name}"
+  pg_ctlcluster ${app_name} main start
+}
+
+postgres-down() {
+  echo "Postgres: stopping ${app_name}"
+  pg_ctlcluster ${app_name} main stop
+}
+
+postgres-status() {
+  echo "Postgres: status of ${app_name}"
+  pg_ctlcluster ${app_name} main status
+}
+
+postgres-clean() {
+  if [ -n "${app_name}" ] ; then
+    where="where pg_stat_activity.datname = '${app_name}';"
+    echo "Postgres: killing all connections to database '${app_name}'"
+  else
+    where=";"
+    echo "Postgres: killing all connections to all databases"
+  fi
+
+  cat <<-EOF | psql -U postgres -d postgres
+  SELECT pg_terminate_backend(pg_stat_activity.pid)
+  FROM pg_stat_activity ${where}
+EOF
+}
+
+app_name=$2
+
+case $1 in
+  "up") postgres-up ;;
+  "down") postgres-down ;;
+  "status") postgres-status ;;
+  "clean") postgres-clean ;;
+esac
