@@ -4,24 +4,24 @@
 # Usage: `postgres.sh {up|down}`
 
 postgres-up() {
-  echo "Postgres: starting ${app_name}"
-  pg_ctlcluster ${app_name} main start
+  echo "Postgres - starting ${version}"
+  pg_ctlcluster ${version} main start
 }
 
 postgres-down() {
-  echo "Postgres: stopping ${app_name}"
-  pg_ctlcluster ${app_name} main stop
+  echo "Postgres - stopping ${version}"
+  pg_ctlcluster ${version} main stop
 }
 
 postgres-status() {
-  echo "Postgres: status of ${app_name}"
-  pg_ctlcluster ${app_name} main status
+  echo "Postgres - status of ${version}"
+  pg_ctlcluster ${version} main status
 }
 
 postgres-clean() {
-  if [ -n "${app_name}" ] ; then
-    where="where pg_stat_activity.datname = '${app_name}';"
-    echo "Postgres: killing all connections to database '${app_name}'"
+  if [ -n "${version}" ] ; then
+    where="where pg_stat_activity.datname = '${version}';"
+    echo "Postgres: killing all connections to database '${version}'"
   else
     where=";"
     echo "Postgres: killing all connections to all databases"
@@ -33,11 +33,21 @@ postgres-clean() {
 EOF
 }
 
-app_name=$2
+postgres-help() {
+  echo "Usage: postgres {up|down|status|clean} [version]"
+  exit 1
+}
+
+if [[ $1 != "clean" && $# != 2 ]]; then
+  postgres-help
+fi
+
+version=$2
 
 case $1 in
   "up") postgres-up ;;
   "down") postgres-down ;;
   "status") postgres-status ;;
   "clean") postgres-clean ;;
+  "*") postgres-help ;;
 esac

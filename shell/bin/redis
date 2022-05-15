@@ -1,71 +1,52 @@
-#!/usr/local/env bash
-
-redis-up() {
-  local app_name=$1
-  local cont_name="redis-${app_name}"
-  local socket_file="/tmp/redis/${app_name}.sock"
-
-  mkdir -p /tmp/redis
-  chmod 777 /tmp/redis
-  echo "Redis: starting ${app_name} on ${socket_file} in ${cont_name} container."
-
-  docker run \
-    --name "${cont_name}" \
-    -v "/tmp/redis:/tmp/redis" \
-    -d redis \
-    redis-server --port 0 --unixsocket "${socket_file}" --unixsocketperm 777
-}
-
-redis-down() {
-  docker stop $cont_name
-  docker rm $cont_name
-}
-
 #!/usr/bin/env bash
 
 # Script for managing redis.
-# Usage: `redis {up|down} app_name`
+# Usage: `redis {up|down} database`
 
 set -e
 
 redis-up() {
-  mkdir -p /tmp/redis
-
   config_file="/opt/homebrew/etc/redis.conf"
-  db_file="${app_name}.rdb"
+  db_file="${database}.rdb"
 
-  echo "Redis: starting ${app_name} with ${config_file} on ${socket_file}"
+  echo "Redis - starting ${database} with ${config_file} on ${socket_file}"
 
   redis-server ${config_file} --dbfilename ${db_file} --port 0 --unixsocket ${socket_file} --daemonize yes
 }
 
 redis-down() {
   if [ ! -e $socket_file ]; then
-    echo "Redis: ${app_name} is already shut downed"
+    echo "Redis: ${database} is already shut downed"
     exit 0
   fi
 
-  echo "Redis: shuting down ${app_name}"
+  echo "Redis - stopping ${database}"
   redis-cli -s ${socket_file} shutdown
   rm -rf ${socket_file}
 }
 
 redis-list() {
-  printf "Redis: running databases:\n\n"
+  printf "Redis - list databases:\n\n"
   ls /tmp/redis | grep ".socket" | sed -e 's/\.socket//' | sed -e 's/^/- /'
 }
 
-if (( $1 != "list" && $# != 2 )); then
-  echo "Usage: redis {up|down|list} [app_name]"
+redis-help() {
+  echo "Usage: redis {up|down|list} [database]"
   exit 1
+}
+
+if [[ $1 != "list" && $# != 2 ]]; then
+  redis-help
 fi
 
-app_name=$2
-socket_file="/tmp/redis/${app_name}.socket"
-log_file="/tmp/redis/${app_name}.log"
+database=$2
+socket_file="/tmp/redis/${database}.socket"
+log_file="/tmp/redis/${database}.log"
+mkdir -p /tmp/redis
 
 case "$1" in
   "up") redis-up ;;
   "down") redis-down ;;
   "list") redis-list ;;
+  "*") redis-help ;;
 esac
