@@ -3,6 +3,9 @@ shopt -s expand_aliases
 #===============================================================
 # Helpers
 #===============================================================
+WARNING="\033[1;33m"
+RESET="\033[m"
+
 parse_git_dirty () {
   if [[ $(git status 2> /dev/null | tail -n1 | cut -c 1-17) != "nothing to commit" ]]; then
     echo "✗"
@@ -16,11 +19,8 @@ parse_git_branch () {
 }
 
 #===============================================================
-# Variables
+# Envars
 #===============================================================
-WARNING="\033[1;33m"
-RESET="\033[m"
-
 export CLICOLOR=1
 export EDITOR=nvim
 export FZF_DEFAULT_COMMAND='rg --files --hidden --follow -g !.git'
@@ -29,21 +29,25 @@ export LC_ALL=en_US.UTF-8
 
 # Save iex history
 export ERL_AFLAGS="-kernel shell_history enabled -kernel shell_history_path '\"$HOME/.iex_history\"'"
+export PATH="$HOME/.bin:/usr/local/sbin:$PATH"
 
-if [[ -d /opt/homebrew/ ]]; then
-  eval "$(/opt/homebrew/bin/brew shellenv)"
-fi
-export PATH="$HOME/bin:/usr/local/sbin:$PATH"
-
+# Prompt
 PS1="\u in \w\$([[ -n \$(git branch 2> /dev/null) ]] && echo \" on \")\[$WARNING\]\$(parse_git_branch)\[$RESET\]\n\$ "
 
 #===============================================================
-# asdf
+# Components
 #===============================================================
+if [[ -d /opt/homebrew/ ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
 if [ -x "$(command -v asdf)" ]; then
   . $(brew --prefix asdf)/libexec/asdf.sh
 fi
 
+#===============================================================
+# Completions
+#===============================================================
 if [ -d $(brew --prefix)/etc/bash_completion.d ]; then
   for f in $(brew --prefix)/etc/bash_completion.d/*.{bash,sh}; do source $f; done
 fi
