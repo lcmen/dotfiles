@@ -1,3 +1,6 @@
+# Ignore caches
+ruby/.bundle/cache
+
 # Ignore neovim and tmux pluggins
 neovim/.config/nvim/plugged
 tmux/.config/tmux/plugins
