@@ -1,5 +1,5 @@
 # Ignore caches
-ruby/.bundle/cache
+ruby/dot-bundle/cache
 
 # Ignore neovim and tmux pluggins
 neovim/.config/nvim/plugged
