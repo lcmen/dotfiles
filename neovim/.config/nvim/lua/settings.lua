@@ -3,7 +3,6 @@
 -----------------------------------------------------------
 local cmd = vim.cmd
 local fn = vim.fn
-local lsp = vim.lsp
 local opt = vim.opt
 
 -----------------------------------------------------------
@@ -55,13 +54,3 @@ opt.cursorline = true                                        -- Show cursor line
 opt.laststatus = 2                                           -- Show status line
 opt.number = true                                            -- Show line numbers
 opt.relativenumber = true                                    -- Use relative line numbers
-
------------------------------------------------------------
--- Language Server Protocol
------------------------------------------------------------
-lsp.handlers['textDocument/publishDiagnostics'] = lsp.with(lsp.diagnostic.on_publish_diagnostics, {
-  virtual_text = false,                                      -- Disable displaying warnings / errors inline
-  signs = true,                                              -- Display warning / errors signs next to the line number
-  update_in_insert = false,                                  -- Wait with updating diagnostics for switch between modes
-  underline = true,                                          -- Underline affected code
-})
