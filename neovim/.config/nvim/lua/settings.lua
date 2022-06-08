@@ -48,8 +48,9 @@ opt.writebackup = false
 
 -----------------------------------------------------------
 -- UI
------------------------------------------------------------
-cmd [[colorscheme onehalflight]]
+-------------------------------------------------------
+opt.termguicolors = true
+vim.cmd[[colorscheme onehalflight]]
 opt.cursorline = true                                        -- Show cursor line
 opt.laststatus = 2                                           -- Show status line
 opt.number = true                                            -- Show line numbers

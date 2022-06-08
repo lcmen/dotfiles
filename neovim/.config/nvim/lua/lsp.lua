@@ -24,7 +24,7 @@ local on_attach = function(client, bufnr)
 end
 
 -----------------------------------------------------------
--- Language Servers
+-- Servers
 -----------------------------------------------------------
 local lsp_installer = require('nvim-lsp-installer')
 local lspconfig = require('lspconfig')
@@ -38,7 +38,7 @@ lspconfig.elixirls.setup({
 lspconfig.tsserver.setup({ on_attach = on_attach })
 
 -----------------------------------------------------------
--- LSP Settings
+-- UI
 -----------------------------------------------------------
 lsp.handlers['textDocument/publishDiagnostics'] = lsp.with(lsp.diagnostic.on_publish_diagnostics, {
   virtual_text = false,                                      -- Disable displaying warnings / errors inline
