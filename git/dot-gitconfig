@@ -22,3 +22,8 @@
   cob = checkout -b
   st = status
   wip = !git add -A && git commit -m "WIP"
+[filter "lfs"]
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
