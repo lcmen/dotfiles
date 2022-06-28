@@ -48,7 +48,8 @@ call('plug#end')
 -- Packages settings
 -----------------------------------------------------------
 g.bufonly_delete_non_modifiable = true                       -- Delete non-modifiable buffers
-g.fzf_preview_window = {'right:50%', 'ctrl-/'}               -- Show preview window for FZF
+g.fzf_layout = { window = { width = 0.9, height = 0.9 } }    -- Customize FZF size
+g.fzf_preview_window = {'right:50%:hidden', 'ctrl-p'}        -- Show preview window on Ctrl+P for FZF
 g.NERDTreeShowHidden = 1                                     -- Show hidden files on NERDTree
 
 local cmp = require('cmp')

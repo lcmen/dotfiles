@@ -4,10 +4,10 @@
 [user]
   name = Lucas Mendelowski
   email = lucas@mendelowski.com
-[fetch]
-  prune = true
 [init]
   defaultBranch = main
+[fetch]
+  prune = true
 [pull]
   ff = only
 [push]
