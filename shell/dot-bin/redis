@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# Script for managing redis.
-# Usage: `redis {up|down} database`
+# Script for managing redis databases.
+# Usage: `redis [l]ist | [u]p | [d]own database`
 
 set -e
 
@@ -35,18 +35,19 @@ redis-help() {
   exit 1
 }
 
-if [[ $1 != "list" && $# != 2 ]]; then
+if [[ $1 != "l" && $1 != "list" && $# != 2 ]]; then
   redis-help
 fi
 
+command=$1
 database=$2
 socket_file="/tmp/redis/${database}.socket"
 log_file="/tmp/redis/${database}.log"
 mkdir -p /tmp/redis
 
-case "$1" in
-  "up") redis-up ;;
-  "down") redis-down ;;
-  "list") redis-list ;;
-  "*") redis-help ;;
+case $command in
+  "u" | "up") redis-up ;;
+  "d" | "down") redis-down ;;
+  "l" | "list") redis-list ;;
+  *) redis-help ;;
 esac

@@ -6,14 +6,21 @@
   email = lucas@mendelowski.com
 [init]
   defaultBranch = main
+[branch]
+  sort = refname
 [fetch]
   prune = true
+[filter "lfs"]
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
 [pull]
   ff = only
 [push]
   default = upstream
 [alias]
-  br = branch --sort=committerdate
+  br = branch
   brc = "!f() { git br --merged | grep -v "master" | grep -v "staging" | xargs git br -D; }; f"
   cm = !git add -A && git commit
   cma = !git add -A && git commit --amend --no-edit
@@ -22,8 +29,3 @@
   cob = checkout -b
   st = status
   wip = !git add -A && git commit -m "WIP"
-[filter "lfs"]
-  clean = git-lfs clean -- %f
-  smudge = git-lfs smudge -- %f
-  process = git-lfs filter-process
-  required = true

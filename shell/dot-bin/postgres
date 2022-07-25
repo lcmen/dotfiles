@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 
-# Script for controlling postgres.
-# Usage: `postgres.sh {up|down}`
+# Script for managing local PosgtreSQL clusters.
+# Usage: `postgres [c]onsole | [u]p | [d]own| [s]tatus {version}`
+
+postgres-console() {
+  db=$1
+  echo "Postgres - launching psql for ${version}/${db}"
+  psql --cluster $version/main -U postgres -h localhost -d $db
+}
 
 postgres-up() {
   echo "Postgres - starting ${version}"
@@ -18,36 +24,18 @@ postgres-status() {
   pg_ctlcluster ${version} main status
 }
 
-postgres-clean() {
-  if [ -n "${version}" ] ; then
-    where="where pg_stat_activity.datname = '${version}';"
-    echo "Postgres: killing all connections to database '${version}'"
-  else
-    where=";"
-    echo "Postgres: killing all connections to all databases"
-  fi
-
-  cat <<-EOF | psql -U postgres -d postgres
-  SELECT pg_terminate_backend(pg_stat_activity.pid)
-  FROM pg_stat_activity ${where}
-EOF
-}
-
 postgres-help() {
-  echo "Usage: postgres {up|down|status|clean} [version]"
+  echo "Usage: postgres [c]onsole | [u]p | [d]own | [s]tatus {version}"
   exit 1
 }
 
-if [[ $1 != "clean" && $# != 2 ]]; then
-  postgres-help
-fi
-
+command=$1
 version=$2
 
-case $1 in
-  "up") postgres-up ;;
-  "down") postgres-down ;;
-  "status") postgres-status ;;
-  "clean") postgres-clean ;;
-  "*") postgres-help ;;
+case $command in
+  "c" | "console") postgres-console "${3:-postgres}";;
+  "u" | "up") postgres-up ;;
+  "d" | "down") postgres-down ;;
+  "s" | "status") postgres-status ;;
+  *) postgres-help ;;
 esac
