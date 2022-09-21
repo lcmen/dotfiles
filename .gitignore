@@ -1,2 +1,6 @@
-karabiner/assets
-karabiner/automatic_backups
+# Ignore caches
+ruby/dot-bundle/cache
+
+# Ignore neovim and tmux pluggins
+neovim/.config/nvim/plugged
+tmux/.config/tmux/plugins

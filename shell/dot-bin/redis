@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+# Script for managing redis databases.
+# Usage: `redis [l]ist | [u]p | [d]own database`
+
+set -e
+
+redis-up() {
+  config_file="/opt/homebrew/etc/redis.conf"
+  db_file="${database}.rdb"
+
+  echo "Redis - starting ${database} with ${config_file} on ${socket_file}"
+
+  redis-server ${config_file} --dbfilename ${db_file} --port 0 --unixsocket ${socket_file} --daemonize yes
+}
+
+redis-down() {
+  if [ ! -e $socket_file ]; then
+    echo "Redis: ${database} is already shut downed"
+    exit 0
+  fi
+
+  echo "Redis - stopping ${database}"
+  redis-cli -s ${socket_file} shutdown
+  rm -rf ${socket_file}
+}
+
+redis-list() {
+  printf "Redis - list databases:\n\n"
+  ls /tmp/redis | grep ".socket" | sed -e 's/\.socket//' | sed -e 's/^/- /'
+}
+
+redis-help() {
+  echo "Usage: redis {up|down|list} [database]"
+  exit 1
+}
+
+if [[ $1 != "l" && $1 != "list" && $# != 2 ]]; then
+  redis-help
+fi
+
+command=$1
+database=$2
+socket_file="/tmp/redis/${database}.socket"
+log_file="/tmp/redis/${database}.log"
+mkdir -p /tmp/redis
+
+case $command in
+  "u" | "up") redis-up ;;
+  "d" | "down") redis-down ;;
+  "l" | "list") redis-list ;;
+  *) redis-help ;;
+esac

@@ -1,9 +1,12 @@
 # .files
 
-Dotfiles for applications I use on MacOS and Linux systems managed with [chezmoi](https://www.chezmoi.io/).
+Dotfiles for applications I use on MacOS and Linux systems managed with [stow](https://www.gnu.org/software/stow/).
 
-## Installation
+## Install
 
-1. Install `chezmoi`
-2. `chezmoi init git@github.com:lcmen/.files.git`
-3. `chezmoi apply`
+1. Install `stow`
+2. Run `make`
+
+## Uninstall
+
+Run `make delete`

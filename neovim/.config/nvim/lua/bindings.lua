@@ -6,6 +6,18 @@ local map = vim.api.nvim_set_keymap
 local opts = { noremap = true, silent = true }
 
 -----------------------------------------------------------
+-- Neovim API aliases
+-----------------------------------------------------------
+function MergeOpts(t1, t2)
+    local res = {}
+
+    for k, v in pairs(t1) do res[k] = v end
+    for k, v in pairs(t2) do res[k] = v end
+
+    return res
+end
+
+-----------------------------------------------------------
 -- Key bindings
 -----------------------------------------------------------
 map('n', '<leader>R', ':source ~/.config/nvim/init.lua<CR>', {})
@@ -52,3 +64,9 @@ map('n', '<leader>rh', ':SidewaysLeft<cr>', opts)            -- Move arguments l
 map('n', '<leader>rl', ':SidewaysRight<cr>', opts)           -- Move argument right
 map('n', '<leader>rj', ':SplitjoinJoin<cr>', opts)           -- Join block
 map('n', '<leader>rk', ':SplitjoinSplit<cr>', opts)          -- Split block
+
+-- Jump forward or backward in snippets
+map('i', '<Tab>',   "vsnip#jumpable(1)  ? '<Plug>(vsnip-jump-next)' : '<Tab>'",   MergeOpts(opts, { expr = true }))
+map('s', '<Tab>',   "vsnip#jumpable(1)  ? '<Plug>(vsnip-jump-next)' : '<Tab>'",   MergeOpts(opts, { expr = true }))
+map('i', '<S-Tab>', "vsnip#jumpable(-1) ? '<Plug>(vsnip-jump-prev)' : '<S-Tab>'", MergeOpts(opts, { expr = true }))
+map('s', '<S-Tab>', "vsnip#jumpable(-1) ? '<Plug>(vsnip-jump-prev)' : '<S-Tab>'", MergeOpts(opts, { expr = true }))

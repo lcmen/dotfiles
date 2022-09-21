@@ -3,27 +3,7 @@
 -----------------------------------------------------------
 local call = vim.call
 local g = vim.g
-local opts = { noremap = true }
 local Plug = vim.fn['plug#']
-
------------------------------------------------------------
--- Functions
------------------------------------------------------------
-local on_attach = function(client, bufnr)
-    local map = vim.api.nvim_buf_set_keymap
-    local ion = vim.api.nvim_buf_set_option
-
-    ion(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-    ion(bufnr, 'formatexpr', 'v:lua.vim.lsp.formatexpr()')
-
-    -- Configure keybindings for LSP
-    map(bufnr, 'n', 'g0', '<cmd>lua vim.lsp.buf.document_symbol()<CR>', opts)
-    map(bufnr, 'n', 'gf', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
-    map(bufnr, 'n', 'gt', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-    map(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-    map(bufnr, 'n', 'g=', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
-    map(bufnr, 'n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
-end
 
 -----------------------------------------------------------
 -- External packages
@@ -67,20 +47,17 @@ call('plug#end')
 -----------------------------------------------------------
 -- Packages settings
 -----------------------------------------------------------
-
 g.bufonly_delete_non_modifiable = true                       -- Delete non-modifiable buffers
-g.fzf_preview_window = {'right:50%', 'ctrl-/'}               -- Show preview window for FZF
+g.fzf_layout = { window = { width = 0.9, height = 0.9 } }    -- Customize FZF size
+g.fzf_preview_window = {'right:50%:hidden', 'ctrl-p'}        -- Show preview window on Ctrl+P for FZF
 g.NERDTreeShowHidden = 1                                     -- Show hidden files on NERDTree
 
-local cmp = require'cmp'
-local lsp_installer = require("nvim-lsp-installer")
+local cmp = require('cmp')
 local lspkind = require('lspkind')
 
 cmp.setup({
     enabled = true;
-    formatting = {
-        format = lspkind.cmp_format(),
-    };
+    formatting = { format = lspkind.cmp_format() };
     mapping = cmp.mapping.preset.insert({
         ['<C-Space>'] = cmp.mapping(cmp.mapping.complete(), { 'i', 'c' }),
         ['<CR>'] = cmp.mapping.confirm({ select = false }),
@@ -105,7 +82,3 @@ cmp.setup({
         { name = 'path' }
     });
 })
-
-lsp_installer.on_server_ready(function (server)
-    server:setup({ on_attach = on_attach })
-end)

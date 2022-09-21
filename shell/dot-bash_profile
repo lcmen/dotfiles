@@ -1,0 +1,73 @@
+shopt -s expand_aliases
+
+#===============================================================
+# Helpers
+#===============================================================
+WARNING="\033[1;33m"
+RESET="\033[m"
+
+parse_git_dirty () {
+  if [[ $(git status 2> /dev/null | tail -n1 | cut -c 1-17) != "nothing to commit" ]]; then
+    echo "✗"
+  else
+    echo "ツ"
+  fi
+}
+
+parse_git_branch () {
+  git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e "s/* \(.*\)/\1 $(parse_git_dirty)/"
+}
+
+#===============================================================
+# Envars
+#===============================================================
+export CLICOLOR=1
+export EDITOR=nvim
+export FZF_DEFAULT_COMMAND='rg --files --hidden --follow -g !.git'
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
+# Save iex history
+export ERL_AFLAGS="-kernel shell_history enabled -kernel shell_history_path '\"$HOME/.iex_history\"'"
+export PATH="$HOME/.bin:/usr/local/sbin:$PATH"
+
+# Prompt
+PS1="\u in \w\$([[ -n \$(git branch 2> /dev/null) ]] && echo \" on \")\[$WARNING\]\$(parse_git_branch)\[$RESET\]\n\$ "
+
+#===============================================================
+# Components
+#===============================================================
+if [[ -d /opt/homebrew/ ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
+if [ -x "$(command -v asdf)" ]; then
+  . $(brew --prefix asdf)/libexec/asdf.sh
+fi
+
+#===============================================================
+# Completions
+#===============================================================
+if [ -d $(brew --prefix)/etc/bash_completion.d ]; then
+  for f in $(brew --prefix)/etc/bash_completion.d/*.{bash,sh}; do source $f; done
+fi
+
+#===============================================================
+# Aliases
+#===============================================================
+# Bundler
+alias bi="bundle install"
+alias bl="bundle list"
+alias bu="bundle update"
+alias be="bundle exec"
+alias br="bundle exec gem remove"
+
+# Misc
+alias c=clear
+alias bat=batcat
+alias vim=nvim
+
+# Tmux
+alias txj="tmux attach-session -dt "
+alias txl="tmux ls"
+alias txk="tmux kill-session -t "
