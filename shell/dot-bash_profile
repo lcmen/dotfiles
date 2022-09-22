@@ -42,13 +42,14 @@ if [[ -d /opt/homebrew/ ]]; then
 fi
 
 if [ -x "$(command -v asdf)" ]; then
-  . $(brew --prefix asdf)/libexec/asdf.sh
+  asdf_path=$(realpath $(which asdf))
+  . $(dirname $asdf_path)/../libexec/asdf.sh
 fi
 
 #===============================================================
 # Completions
 #===============================================================
-if [ -d $(brew --prefix)/etc/bash_completion.d ]; then
+if [[ -x "$(command -v brew)" && -d $(brew --prefix)/etc/bash_completion.d ]]; then
   for f in $(brew --prefix)/etc/bash_completion.d/*.{bash,sh}; do source $f; done
 fi
 
