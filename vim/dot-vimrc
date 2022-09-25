@@ -1,0 +1,248 @@
+set nocompatible
+set encoding=UTF-8
+
+if !filereadable(expand('~/.vim/autoload/plug.vim'))
+  if !executable("curl")
+    echoerr "You have to install curl or first install vim-plug yourself!"
+    execute "q!"
+  endif
+  echo "Installing Vim-Plug..."
+  echo ""
+  silent !\curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+  autocmd VimEnter * PlugInstall
+endif
+
+call plug#begin('~/.vim/plugged')
+  Plug 'AndrewRadev/sideways.vim'
+  Plug 'AndrewRadev/splitjoin.vim'
+  Plug 'airblade/vim-gitgutter'
+  Plug 'breuckelen/vim-resize'
+  Plug 'christoomey/vim-tmux-navigator'
+  Plug 'ctrlpvim/ctrlp.vim'
+  Plug 'docunext/closetag.vim'
+  Plug 'janko-m/vim-test'
+  Plug 'jremmen/vim-ripgrep'
+  Plug 'jszakmeister/vim-togglecursor'
+  Plug 'numtostr/BufOnly.nvim', { 'on': 'BufOnly' }
+  Plug 'ryanoasis/vim-devicons', { 'branch': 'master' }
+  Plug 'scrooloose/nerdtree'
+  Plug 'sheerun/vim-polyglot'
+  Plug 'sonph/onehalf', {'rtp': 'vim/'}
+  Plug 'tpope/vim-commentary'
+  Plug 'tpope/vim-dispatch'
+  Plug 'tpope/vim-rails'
+  Plug 'tpope/vim-rake'
+  Plug 'tpope/vim-repeat'
+  Plug 'tpope/vim-surround'
+  Plug 'tpope/vim-unimpaired'
+  Plug 'troydm/zoomwintab.vim'
+
+  Plug 'prabirshrestha/vim-lsp'
+  Plug 'mattn/vim-lsp-settings'
+call plug#end()
+
+let mapleader=" "
+
+" Misc {{{
+  set clipboard=unnamedplus           " Use system clipboard
+  set belloff=all                     " Disable all sounds
+  set nospell                         " Spell checking off
+  set noswapfile                      " Disable swap
+  set scrolloff=5                     " Start scrolling 5 lines away from y margin
+  set sidescrolloff=15                " Start scrolling 15 lines away from x margin
+  set splitbelow                      " Split below
+  set splitright                      " Split on the right side
+" }}}
+
+" Whitespace, tabs & spaces {{{
+  set nowrap
+  set linebreak
+  set textwidth=120
+  set wrapmargin=0
+  set expandtab                     " Indent with spaces
+  set softtabstop=2                 " Number of spaces per <tab> when inserting
+  set shiftwidth=2                  " Number of spaces per <tab> when indenting
+  set tabstop=4                     " Number of spaces <tab> counts for
+" }}}
+
+" Search {{{
+  set ignorecase                    " Ignore case when searching
+  set smartcase                     " unless there is a capital letter in the query
+  set incsearch                     " Enable incremental search
+" }}}
+
+" Backups {{{
+  set nobackup
+  set nowritebackup
+  set undofile
+  set undolevels=1000               " Maximum number of changes that can be undone
+  set undoreload=10000              " Maximum number lines to save for undo on a buffer reload
+  set undodir=$HOME/.vim/tmp/undo   " Set persistent undo directory
+" }}}
+
+" UI {{{
+  set t_Co=256
+  colorscheme onehalflight
+  set completeopt+=popup            " Display completion info in a popup
+  set cursorline                    " Show cursor line
+  set laststatus=2                  " Show status bar
+  set list                          " Show invisible characters
+  set listchars=tab:▸\ ,eol:¬,trail:·
+  set number                        " Show line numbers
+  set relativenumber                " Use relative line numbers
+
+  "let g:DevIconsEnableFoldersOpenClose=1
+  "let g:webdevicons_conceal_nerdtree_brackets=0
+" }}}
+
+" CtrlP {{{
+   " Always open files in new buffers
+   let g:ctrlp_switch_buffer = 0
+   " Respect current working directory during Vim session
+   let g:ctrlp_working_path_mode = 0
+" }}}
+
+" File browser {{{
+  let g:NERDTreeDirArrows=0
+  let g:NERDTreeShowHidden = 1
+  let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols = {}
+  let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['vue'] = '﵂'
+" }}}
+
+if executable('rg')
+   " Disable caching
+  let g:ctrlp_use_caching = 0
+  let g:ctrlp_user_command = 'rg %s --files --color=never -g "!vendor/bundle/*"'
+  set grepprg=rg\ --color=never
+endif
+
+" Mappings {{{
+  nnoremap , :
+
+  " Switch between buffers
+  nnoremap <silent> <leader><leader> :b#<CR>
+
+  " Copy current buffer's path (relative / absolute) to clipboard
+  nnoremap <silent> <leader>p :let @+=expand('%')<CR>
+  nnoremap <silent> <leader>P :let @+=expand('%:p')<CR>
+
+  " Move more senibly when line wrapping enabled
+  nmap <silent> k gk
+  nmap <silent> j gj
+
+  " Select all text
+  nnoremap <silent> va ggVG
+
+  " Disable hl
+  nnoremap <silent> <leader><cr> :noh<cr>
+
+  " Moving block of codes
+  vnoremap < <gv
+  vnoremap > >gv
+
+  " Tabs
+  nnoremap [g gT
+  nnoremap ]g gt
+
+  " Alt files
+  nnoremap <leader>. :call AltCommand(expand('%'), ':e')<cr>
+  command! AE :call AltCommand(expand('%'), ':e')<cr>
+  command! AS :call AltCommand(expand('%'), ':sp')<cr>
+  command! AT :call AltCommand(expand('%'), ':tabnew')<cr>
+  command! AV :call AltCommand(expand('%'), ':vs')<cr>
+
+  " NERDTree
+  nnoremap <silent> <C-e>     :NERDTreeToggle<CR>
+  nnoremap <silent> <leader>e :NERDTreeFind<CR>
+
+  " Window resizes
+  let g:vim_resize_disable_auto_mappings = 1
+  nnoremap <silent> <left>  :CmdResizeLeft<cr>
+  nnoremap <silent> <down>  :CmdResizeDown<cr>
+  nnoremap <silent> <up>    :CmdResizeUp<cr>
+  nnoremap <silent> <right> :CmdResizeRight<cr>
+
+  " Delete and Yank to the end of line
+  nnoremap D d$
+  nnoremap Y y$
+
+  " Enable hlserch on start
+  nnoremap / :set hlsearch<cr>/
+
+  " Close location, quickfix list with single keystroke
+  nnoremap <silent> x :cclose<CR> :lclose<CR> :pclose<CR>
+
+  " Tests
+  nmap <silent> <leader>t. :TestLast<CR>
+  nmap <silent> <leader>ta :TestSuite<CR>
+  nmap <silent> <leader>tf :TestFile<CR>
+  nmap <silent> <leader>tt :TestNearest<CR>
+  nmap <silent> <leader>tv :TestVisit<CR>
+
+  " Refactoring
+  let g:splitjoin_split_mapping = ''
+  let g:splitjoin_join_mapping = ''
+  nmap <silent> <leader>rh :SidewaysLeft<cr>
+  nmap <silent> <leader>rl :SidewaysRight<cr>
+  nmap <silent> <leader>rj :SplitjoinJoin<cr>
+  nmap <silent> <leader>rk :SplitjoinSplit<cr>
+
+  " Reload config file
+  nmap <silent> <leader>R :source ~/.vimrc<CR>
+" }}}
+
+" Functions {{{
+  function! AltCommand(path, vim_command)
+    let l:alternate = system("alt " . a:path)
+    if empty(l:alternate)
+      echo "No alternate file for " . a:path . " exists!"
+    else
+      exec a:vim_command . " " . l:alternate
+    endif
+  endfunction
+
+
+  function! ConfigureBufferLSP() abort
+      setlocal omnifunc=lsp#complete
+      setlocal signcolumn=yes
+      if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
+      nmap <buffer> gf <plug>(lsp-definition)
+      nmap <buffer> g0 <plug>(lsp-document-symbol-search)
+      nmap <buffer> gr <plug>(lsp-references)
+      nmap <buffer> gi <plug>(lsp-implementation)
+      nmap <buffer> gt <plug>(lsp-type-definition)
+      nmap <buffer> <leader>rn <plug>(lsp-rename)
+      nmap <buffer> [d <plug>(lsp-previous-diagnostic)
+      nmap <buffer> ]d <plug>(lsp-next-diagnostic)
+      nmap <buffer> K <plug>(lsp-hover)
+  endfunction
+
+  function! StripTrailingWhiteSpace()
+    " Ignore for markdown and slim
+    if &filetype =~ 'markdown' || &filetype =~ 'slim'
+      return
+    endif
+    %s/\s\+$//e
+  endfunction
+" }}}
+
+" Commands {{{
+  cnoreabbrev bo BufOnly
+
+  augroup hooks
+    autocmd BufEnter,FocusGained * set relativenumber
+    autocmd BufLeave,FocusLost * set norelativenumber
+    autocmd BufNewFile,BufReadPost *.md,*.mdown,*.mdwn,*.mmd set filetype=markdown
+    autocmd BufNewFile,BufReadPost Rakefile,Vagrantfile set filetype=ruby
+    autocmd BufWritePre * call StripTrailingWhiteSpace()
+
+    autocmd Filetype gitcommit setl spell textwidth=72
+    autocmd Filetype go setl softtabstop=4 shiftwidth=4 noexpandtab
+    autocmd Filetype markdown setl spell colorcolumn=0 wrap linebreak
+
+    autocmd InsertLeave * set nopaste
+
+    autocmd User lsp_buffer_enabled call ConfigureBufferLSP()
+  augroup END
+" }}}
