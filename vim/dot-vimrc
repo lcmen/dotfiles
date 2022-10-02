@@ -24,9 +24,12 @@ call plug#begin('~/.vim/plugged')
   Plug 'janko-m/vim-test'
   Plug 'jremmen/vim-ripgrep'
   Plug 'jszakmeister/vim-togglecursor'
-  Plug 'numtostr/BufOnly.nvim', { 'on': 'BufOnly' }
+  Plug 'lambdalisue/fern-renderer-devicons.vim'
+  Plug 'lambdalisue/fern.vim'
+  Plug 'mattn/vim-lsp-settings'
+  Plug 'prabirshrestha/vim-lsp'
   Plug 'ryanoasis/vim-devicons', { 'branch': 'master' }
-  Plug 'scrooloose/nerdtree'
+  Plug 'schickling/vim-bufonly'
   Plug 'sheerun/vim-polyglot'
   Plug 'sonph/onehalf', {'rtp': 'vim/'}
   Plug 'tpope/vim-commentary'
@@ -37,15 +40,12 @@ call plug#begin('~/.vim/plugged')
   Plug 'tpope/vim-surround'
   Plug 'tpope/vim-unimpaired'
   Plug 'troydm/zoomwintab.vim'
-
-  Plug 'prabirshrestha/vim-lsp'
-  Plug 'mattn/vim-lsp-settings'
 call plug#end()
 
 let mapleader=" "
 
 " Misc {{{
-  set clipboard=unnamedplus           " Use system clipboard
+  set clipboard=unnamed               " Use system clipboard
   set belloff=all                     " Disable all sounds
   set nospell                         " Spell checking off
   set noswapfile                      " Disable swap
@@ -91,31 +91,39 @@ let mapleader=" "
   set listchars=tab:▸\ ,eol:¬,trail:·
   set number                        " Show line numbers
   set relativenumber                " Use relative line numbers
-
-  "let g:DevIconsEnableFoldersOpenClose=1
-  "let g:webdevicons_conceal_nerdtree_brackets=0
 " }}}
 
-" CtrlP {{{
-   " Always open files in new buffers
-   let g:ctrlp_switch_buffer = 0
-   " Respect current working directory during Vim session
-   let g:ctrlp_working_path_mode = 0
-" }}}
+" Plugins {{{
+  " CtrlP {{{
+    " Always open files in new buffers and respect current working directory
+    let g:ctrlp_switch_buffer = 0
+    let g:ctrlp_working_path_mode = 0
 
-" File browser {{{
-  let g:NERDTreeDirArrows=0
-  let g:NERDTreeShowHidden = 1
-  let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols = {}
-  let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['vue'] = '﵂'
-" }}}
+    " Use RipGrep if available
+    if executable('rg')
+      " Disable caching
+      let g:ctrlp_use_caching = 0
+      let g:ctrlp_user_command = 'rg %s --files --color=never -g "!vendor/bundle/*" -g "!deps/*"'
+      set grepprg=rg\ --color=never
+    endif
+  " }}}
 
-if executable('rg')
-   " Disable caching
-  let g:ctrlp_use_caching = 0
-  let g:ctrlp_user_command = 'rg %s --files --color=never -g "!vendor/bundle/*"'
-  set grepprg=rg\ --color=never
-endif
+  " Fern {{{
+    " Disable default Fern mappings
+    let g:fern#disable_default_mappings = 1
+    " Show hidden files
+    let g:fern#default_hidden = 1
+    " Add support for devicons
+    let g:fern#renderer = "devicons"
+  " }}}
+
+  " LSP {{{
+    let g:lsp_settings_filetype_ruby = []
+    let g:lsp_settings = {
+      \ 'typeprof': { 'disabled': v:true }
+      \ }
+  " }}}
+" }}}
 
 " Mappings {{{
   nnoremap , :
@@ -152,9 +160,9 @@ endif
   command! AT :call AltCommand(expand('%'), ':tabnew')<cr>
   command! AV :call AltCommand(expand('%'), ':vs')<cr>
 
-  " NERDTree
-  nnoremap <silent> <C-e>     :NERDTreeToggle<CR>
-  nnoremap <silent> <leader>e :NERDTreeFind<CR>
+  " Fern
+  nnoremap <silent> <C-e>     :Fern . -drawer -reveal=% -toggle<CR>
+  nnoremap <silent> <leader>e :Fern . -drawer -reveal=%<CR>
 
   " Window resizes
   let g:vim_resize_disable_auto_mappings = 1
@@ -202,20 +210,44 @@ endif
     endif
   endfunction
 
-
   function! ConfigureBufferLSP() abort
-      setlocal omnifunc=lsp#complete
-      setlocal signcolumn=yes
-      if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
-      nmap <buffer> gf <plug>(lsp-definition)
-      nmap <buffer> g0 <plug>(lsp-document-symbol-search)
-      nmap <buffer> gr <plug>(lsp-references)
-      nmap <buffer> gi <plug>(lsp-implementation)
-      nmap <buffer> gt <plug>(lsp-type-definition)
-      nmap <buffer> <leader>rn <plug>(lsp-rename)
-      nmap <buffer> [d <plug>(lsp-previous-diagnostic)
-      nmap <buffer> ]d <plug>(lsp-next-diagnostic)
-      nmap <buffer> K <plug>(lsp-hover)
+    setlocal omnifunc=lsp#complete
+    setlocal signcolumn=yes
+    " if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
+    nmap <buffer> gf <plug>(lsp-definition)
+    nmap <buffer> g0 <plug>(lsp-document-symbol-search)
+    nmap <buffer> gr <plug>(lsp-references)
+    nmap <buffer> gi <plug>(lsp-implementation)
+    nmap <buffer> gt <plug>(lsp-type-definition)
+    nmap <buffer> <leader>rn <plug>(lsp-rename)
+    nmap <buffer> [d <plug>(lsp-previous-diagnostic)
+    nmap <buffer> ]d <plug>(lsp-next-diagnostic)
+    nmap <buffer> K <plug>(lsp-hover)
+    nmap <buffer> L :LspDocumentDiagnostics<CR>
+  endfunction
+
+  function! ConfigureFern()
+    nmap <buffer><expr>
+      \ <Plug>(fern-my-open-expand-collapse)
+      \ fern#smart#leaf(
+      \   "\<Plug>(fern-action-open:select)",
+      \   "\<Plug>(fern-action-expand)",
+      \   "\<Plug>(fern-action-collapse)",
+      \ )
+    nmap <buffer> <CR> <Plug>(fern-my-open-expand-collapse)
+    nmap <buffer> <2-LeftMouse> <Plug>(fern-my-open-expand-collapse)
+    nmap <buffer><nowait> c <Plug>(fern-action-copy)
+    nmap <buffer><nowait> d <Plug>(fern-action-remove)
+    nmap <buffer><nowait> b <Plug>(fern-action-mark:toggle)
+    nmap <buffer><nowait> m <Plug>(fern-action-move)
+    nmap <buffer><nowait> n <Plug>(fern-action-new-path)
+    nmap <buffer><nowait> p <Plug>(fern-action-focus:parent)
+    nmap <buffer><nowait> r <Plug>(fern-action-rename)
+    nmap <buffer><nowait> s <Plug>(fern-action-open:split)
+    nmap <buffer><nowait> t <Plug>(fern-action-open:tabedit)
+    nmap <buffer><nowait> v <Plug>(fern-action-open:vsplit)
+    nmap <buffer><nowait> < <Plug>(fern-action-leave)
+    nmap <buffer><nowait> > <Plug>(fern-action-enter)
   endfunction
 
   function! StripTrailingWhiteSpace()
@@ -240,6 +272,7 @@ endif
     autocmd Filetype gitcommit setl spell textwidth=72
     autocmd Filetype go setl softtabstop=4 shiftwidth=4 noexpandtab
     autocmd Filetype markdown setl spell colorcolumn=0 wrap linebreak
+    autocmd FileType fern call ConfigureFern()
 
     autocmd InsertLeave * set nopaste
 

@@ -51,10 +51,10 @@ cmd [[autocmd BufEnter,FocusGained * set relativenumber]]    -- Enable relative 
 cmd [[autocmd BufLeave,FocusLost * set norelativenumber]]    -- Disable relative numbers on blur
 cmd [[autocmd BufWritePre * lua StripTrailingWhiteSpace()]]  -- Strip trailing whitespaces on save
 cmd [[autocmd InsertLeave * set nopaste]]                    -- Disable paste mode on leaving insert mode
+cmd [[autocmd Filetype markdown lua SetupMarkdown()]]        -- Customize settings for Markdown
 
 -----------------------------------------------------------
 -- Syntax
 -----------------------------------------------------------
 cmd [[autocmd Filetype gitcommit setl spell textwidth=72]]
 cmd [[autocmd Filetype go setl softtabstop=4 shiftwidth=4 noexpandtab]]
-cmd [[autocmd Filetype markdown lua SetupMarkdown()]]

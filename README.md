@@ -5,8 +5,8 @@ Dotfiles for applications I use on MacOS and Linux systems managed with [stow](h
 ## Install
 
 1. Install `stow`
-2. Run `make`
+2. Run `make install`
 
 ## Uninstall
 
-Run `make delete`
+Run `make uninstall`

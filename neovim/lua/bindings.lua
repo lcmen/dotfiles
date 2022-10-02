@@ -6,18 +6,6 @@ local map = vim.api.nvim_set_keymap
 local opts = { noremap = true, silent = true }
 
 -----------------------------------------------------------
--- Neovim API aliases
------------------------------------------------------------
-function MergeOpts(t1, t2)
-    local res = {}
-
-    for k, v in pairs(t1) do res[k] = v end
-    for k, v in pairs(t2) do res[k] = v end
-
-    return res
-end
-
------------------------------------------------------------
 -- Key bindings
 -----------------------------------------------------------
 map('n', '<leader>R', ':source ~/.config/nvim/init.lua<CR>', {})
@@ -49,8 +37,13 @@ map('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
 -----------------------------------------------------------
 -- Plugins Key bindings
 -----------------------------------------------------------
-map('n', '<leader>ff', ':Files<CR>', opts)                   -- FZF files
-map('n', '<leader>fb', ':Buffers<CR>', opts)                 -- FZF buffers
+function SetFZFBindings()
+    local map = vim.api.nvim_buf_set_keymap
+    local bufnr = vim.api.nvim_get_current_buf()
+    map(bufnr, 't', '<C-f>', '<C-\\><C-n>:close<CR>:sleep 100m<CR>:Files<CR>', opts)
+    map(bufnr, 't', '<C-b>', '<C-\\><C-n>:close<CR>:sleep 100m<CR>:Buffers<CR>', opts)
+    map(bufnr, 't', '<C-l>', '<C-\\><C-n>:close<CR>:sleep 100m<CR>:BLines<CR>', opts)
+end
 
 map('n', '<C-e>', ':NERDTreeToggle<CR>', opts)               -- Toggle NERDTree
 map('n', '<leader>e', ':NERDTreeFind<CR>', opts)             -- Focus current buffer in NERDTree
@@ -65,8 +58,4 @@ map('n', '<leader>rl', ':SidewaysRight<cr>', opts)           -- Move argument ri
 map('n', '<leader>rj', ':SplitjoinJoin<cr>', opts)           -- Join block
 map('n', '<leader>rk', ':SplitjoinSplit<cr>', opts)          -- Split block
 
--- Jump forward or backward in snippets
-map('i', '<Tab>',   "vsnip#jumpable(1)  ? '<Plug>(vsnip-jump-next)' : '<Tab>'",   MergeOpts(opts, { expr = true }))
-map('s', '<Tab>',   "vsnip#jumpable(1)  ? '<Plug>(vsnip-jump-next)' : '<Tab>'",   MergeOpts(opts, { expr = true }))
-map('i', '<S-Tab>', "vsnip#jumpable(-1) ? '<Plug>(vsnip-jump-prev)' : '<S-Tab>'", MergeOpts(opts, { expr = true }))
-map('s', '<S-Tab>', "vsnip#jumpable(-1) ? '<Plug>(vsnip-jump-prev)' : '<S-Tab>'", MergeOpts(opts, { expr = true }))
+cmd [[autocmd FileType fzf lua SetFZFBindings()]]

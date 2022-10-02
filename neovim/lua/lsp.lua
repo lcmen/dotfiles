@@ -2,13 +2,13 @@
 -- Neovim API aliases
 -----------------------------------------------------------
 local lsp = vim.lsp
+local map = vim.api.nvim_buf_set_keymap
+local ion = vim.api.nvim_buf_set_option
 
 -----------------------------------------------------------
 -- Functions
 -----------------------------------------------------------
 local on_attach = function(client, bufnr)
-    local map = vim.api.nvim_buf_set_keymap
-    local ion = vim.api.nvim_buf_set_option
     local opts = { noremap = true }
 
     ion(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
@@ -26,16 +26,18 @@ end
 -----------------------------------------------------------
 -- Servers
 -----------------------------------------------------------
-local lsp_installer = require('nvim-lsp-installer')
+require('lspkind').init()
+
 local lspconfig = require('lspconfig')
+local lspinstall = require('lspinstall')
 
-lsp_installer.setup({ ensure_installed = { "elixirls", "tsserver" } })
-
-lspconfig.elixirls.setup({
-    on_attach = on_attach;
-    settings = { elixirLS = { dialyzerEnabled = false } };
-})
-lspconfig.tsserver.setup({ on_attach = on_attach })
+for server, config in pairs(lspinstall.installed_servers()) do
+    config.on_attach = on_attach
+    if server == 'elixirls' then
+        config.settings = { elixirLS = { dialyzerEnabled = false } }
+    end
+    lspconfig[server].setup(config)
+end
 
 -----------------------------------------------------------
 -- UI
