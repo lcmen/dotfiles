@@ -1,5 +1,6 @@
 # Ignore vendors
 .bundle
+deps
 node_modules
 vendor/bundle/
 

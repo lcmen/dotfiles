@@ -43,6 +43,6 @@ call('plug#end')
 g.bufonly_delete_non_modifiable = true                       -- Delete non-modifiable buffers
 g.ctrlp_switch_buffer = 0                                    -- Open files in new buffers
 g.ctrlp_use_caching = 0                                      -- Disable caching and use Ripgrep instead
-g.ctrlp_user_command = 'rg %s --files --hidden --no-require-git -g "!.git" -g "!vendor/bundle"'
+g.ctrlp_user_command = 'rg %s --files'
 g.ctrlp_working_path_mode = 0                                -- Respect current working directory
 g.NERDTreeShowHidden = 1                                     -- Show hidden files on NERDTree
