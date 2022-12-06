@@ -28,8 +28,10 @@ export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 export RIPGREP_CONFIG_PATH=$HOME/.config/ripgrep/config
 
-# Save iex history
+# Save iex history and include Erlang docs
 export ERL_AFLAGS="-kernel shell_history enabled -kernel shell_history_path '\"$HOME/.iex_history\"'"
+export KERL_BUILD_DOCS=yes
+
 export PATH="$HOME/.bin:/usr/local/sbin:$PATH"
 
 # Prompt
