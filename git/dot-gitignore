@@ -2,7 +2,7 @@
 .bundle
 deps
 node_modules
-vendor/bundle/
+vendor
 
 # Temp files
 .sass-cache
