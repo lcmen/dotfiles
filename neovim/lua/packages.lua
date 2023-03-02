@@ -46,3 +46,9 @@ g.ctrlp_use_caching = 0                                      -- Disable caching 
 g.ctrlp_user_command = 'rg %s --files'
 g.ctrlp_working_path_mode = 0                                -- Respect current working directory
 g.NERDTreeShowHidden = 1                                     -- Show hidden files on NERDTree
+g.fzf_action = {                                             -- Override Global FZF bindings to be VIM specific
+    ['enter']  = 'edit',
+    ['ctrl-t'] = 'tabedit',
+    ['ctrl-s'] = 'split',
+    ['ctrl-v'] = 'vsplit',
+}

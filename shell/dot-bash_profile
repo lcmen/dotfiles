@@ -23,7 +23,6 @@ parse_git_branch () {
 #===============================================================
 export CLICOLOR=1
 export EDITOR=nvim
-export FZF_DEFAULT_COMMAND='rg --files'
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 export RIPGREP_CONFIG_PATH=$HOME/.config/ripgrep/config
@@ -37,8 +36,39 @@ export PATH="$HOME/.bin:/usr/local/sbin:$PATH"
 # Prompt
 PS1="\u in \w\$([[ -n \$(git branch 2> /dev/null) ]] && echo \" on \")\[$WARNING\]\$(parse_git_branch)\[$RESET\]\n\$ "
 
+# FZF
+export FZF_DEFAULT_COMMAND='rg --files'
+export FZF_DEFAULT_OPTS="--multi --tiebreak=begin \
+  --bind 'ctrl-y:execute-silent(echo {} | pbcopy)' \
+  --bind 'alt-right:change-preview-window(right|hidden|)'
+  --bind 'alt-down:change-preview-window(down|hidden|)' \
+  --bind \"enter:execute-silent[ \
+    tmux send-keys -t \{left\} Escape :e Space && \
+    tmux send-keys -t \{left\} -l {} && \
+    tmux send-keys -t \{left\} Enter && \
+    tmux select-pane -t \{left\} \
+  ]\"
+  --bind \"ctrl-v:execute-silent[ \
+    tmux send-keys -t \{left\} Escape :vs Space && \
+    tmux send-keys -t \{left\} -l {} && \
+    tmux send-keys -t \{left\} Enter && \
+    tmux select-pane -t \{left\} \
+  ]\"
+  --bind \"ctrl-x:execute-silent[ \
+    tmux send-keys -t \{left\} Escape :sp Space && \
+    tmux send-keys -t \{left\} -l {} && \
+    tmux send-keys -t \{left\} Enter && \
+    tmux select-pane -t \{left\} \
+  ]\"
+  --bind \"ctrl-o:execute-silent[ \
+    tmux send-keys -t \{left\} Escape :read Space ! Space echo Space && \
+    tmux send-keys -t \{left\} -l \\\"{}\\\" && \
+    tmux send-keys -t \{left\} Enter && \
+    tmux select-pane -t \{left\} \
+  ]\""
+
 #===============================================================
-# Components
+# Extras
 #===============================================================
 if [[ -d /opt/homebrew/ ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
