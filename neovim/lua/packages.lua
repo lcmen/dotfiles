@@ -20,6 +20,7 @@ Plug('janko-m/vim-test')
 Plug('junegunn/fzf', { ['do'] = vim.fn['fzf#install()'] })
 Plug('junegunn/fzf.vim')
 Plug('lcmen/nvim-lspinstall')
+Plug('mhartington/formatter.nvim')
 Plug('neovim/nvim-lspconfig')
 Plug('numtostr/BufOnly.nvim', { ['on'] = 'BufOnly' })
 Plug('onsails/lspkind-nvim')
@@ -51,4 +52,48 @@ g.fzf_action = {                                             -- Override Global 
     ['ctrl-t'] = 'tabedit',
     ['ctrl-s'] = 'split',
     ['ctrl-v'] = 'vsplit',
+}
+
+-----------------------------------------------------------
+-- Packages setup
+-----------------------------------------------------------
+local util = require('formatter.util')
+require('formatter').setup {
+    filetype = {
+        javascript = {
+            require('formatter.filetypes.javascript').eslint_d,
+            function (parser)
+                return vim.tbl_extend('force', require('formatter.filetypes.javascript').prettier(parser), {
+                    exe = 'npx prettier',
+                })
+            end,
+        },
+        javascriptreact = {
+            require('formatter.filetypes.javascriptreact').eslint_d,
+            function (parser)
+                return vim.tbl_extend('force', require('formatter.filetypes.javascriptreact').prettier(parser), {
+                    exe = 'npx prettier',
+                })
+            end,
+        },
+        typescript = {
+            require('formatter.filetypes.typescript').eslint_d,
+            function (parser)
+                return vim.tbl_extend('force', require('formatter.filetypes.typescript').prettier(parser), {
+                    exe = 'npx prettier',
+                })
+            end,
+        },
+        typescriptreact = {
+            require('formatter.filetypes.typescriptreact').eslint_d,
+            function (parser)
+                return vim.tbl_extend('force', require('formatter.filetypes.typescriptreact').prettier(parser), {
+                    exe = 'npx prettier',
+                })
+            end,
+        },
+        ruby = {
+            require('formatter.filetypes.ruby').rubocop
+        }
+    }
 }

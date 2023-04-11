@@ -53,6 +53,8 @@ map('n', '<leader>ta', ':TestSuite<CR>', opts)               -- Test the whole s
 map('n', '<leader>tf', ':TestFile<CR>', opts)                -- Test current file
 map('n', '<leader>tt', ':TestNearest<CR>', opts)             -- Test nearest code
 
+map('n', '<leader>rf', ':Format<cr>', opts)                  -- Format file without save
+map('n', '<leader>rF', ':FormatWrite<cr>', opts)             -- Format file and save changes
 map('n', '<leader>rh', ':SidewaysLeft<cr>', opts)            -- Move arguments left
 map('n', '<leader>rl', ':SidewaysRight<cr>', opts)           -- Move argument right
 map('n', '<leader>rj', ':SplitjoinJoin<cr>', opts)           -- Join block

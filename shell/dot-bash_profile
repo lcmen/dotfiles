@@ -40,9 +40,9 @@ PS1="\u in \w\$([[ -n \$(git branch 2> /dev/null) ]] && echo \" on \")\[$WARNING
 export FZF_DEFAULT_COMMAND='rg --files'
 export FZF_DEFAULT_OPTS="--multi --tiebreak=begin \
   --bind 'ctrl-y:execute-silent(echo {} | pbcopy)' \
-  --bind 'alt-right:change-preview-window(right|hidden|)'
+  --bind 'alt-right:change-preview-window(right|hidden|)' \
   --bind 'alt-down:change-preview-window(down|hidden|)' \
-  --bind \"enter:execute-silent[ \
+  --bind \"ctrl-o:execute-silent[ \
     tmux send-keys -t \{left\} Escape :e Space && \
     tmux send-keys -t \{left\} -l {} && \
     tmux send-keys -t \{left\} Enter && \
@@ -60,7 +60,7 @@ export FZF_DEFAULT_OPTS="--multi --tiebreak=begin \
     tmux send-keys -t \{left\} Enter && \
     tmux select-pane -t \{left\} \
   ]\"
-  --bind \"ctrl-o:execute-silent[ \
+  --bind \"ctrl-p:execute-silent[ \
     tmux send-keys -t \{left\} Escape :read Space ! Space echo Space && \
     tmux send-keys -t \{left\} -l \\\"{}\\\" && \
     tmux send-keys -t \{left\} Enter && \
