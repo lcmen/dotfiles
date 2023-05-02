@@ -16,11 +16,13 @@ Plug('airblade/vim-gitgutter')
 Plug('christoomey/vim-tmux-navigator')
 Plug('ctrlpvim/ctrlp.vim')
 Plug('docunext/closetag.vim')
+Plug('github/copilot.vim')
 Plug('janko-m/vim-test')
 Plug('junegunn/fzf', { ['do'] = vim.fn['fzf#install()'] })
 Plug('junegunn/fzf.vim')
 Plug('lcmen/nvim-lspinstall')
 Plug('mhartington/formatter.nvim')
+Plug('mickael-menu/zk-nvim')
 Plug('neovim/nvim-lspconfig')
 Plug('numtostr/BufOnly.nvim', { ['on'] = 'BufOnly' })
 Plug('onsails/lspkind-nvim')
@@ -97,3 +99,6 @@ require('formatter').setup {
         }
     }
 }
+require("zk").setup({
+    picker = 'fzf'
+})
