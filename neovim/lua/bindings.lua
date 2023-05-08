@@ -24,8 +24,8 @@ map('n', 'k', 'gk', { silent = true })                       -- Move more sensib
 map('n', 'j', 'gj', { silent = true })
 map('v', '<', '<gv', opts)                                   -- Move block of codes left
 map('v', '>', '>gv', opts)                                   -- and right
-map('n', '[g', 'gT', opts)                                   -- Move tab left
-map('n', ']g', 'gt', opts)                                   -- and right
+map('n', '[g', 'gT', opts)                                   -- Move to tab on the left
+map('n', ']g', 'gt', opts)                                   -- Move to tab on the right
 
 map('n', 'D', 'd$', opts)                                    -- Delete to the end of line
 map('n', 'Y', 'y$', opts)                                    -- Yank to the end of line
@@ -53,8 +53,6 @@ map('n', '<leader>ta', ':TestSuite<CR>', opts)               -- Test the whole s
 map('n', '<leader>tf', ':TestFile<CR>', opts)                -- Test current file
 map('n', '<leader>tt', ':TestNearest<CR>', opts)             -- Test nearest code
 
-map('n', '<leader>rf', ':Format<cr>', opts)                  -- Format file without save
-map('n', '<leader>rF', ':FormatWrite<cr>', opts)             -- Format file and save changes
 map('n', '<leader>rh', ':SidewaysLeft<cr>', opts)            -- Move arguments left
 map('n', '<leader>rl', ':SidewaysRight<cr>', opts)           -- Move argument right
 map('n', '<leader>rj', ':SplitjoinJoin<cr>', opts)           -- Join block

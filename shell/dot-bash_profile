@@ -31,7 +31,7 @@ export RIPGREP_CONFIG_PATH=$HOME/.config/ripgrep/config
 export ERL_AFLAGS="-kernel shell_history enabled -kernel shell_history_path '\"$HOME/.iex_history\"'"
 export KERL_BUILD_DOCS=yes
 
-export PATH="$HOME/.bin:/usr/local/sbin:$PATH"
+export PATH="./node_modules/.bin:$HOME/.bin:/usr/local/sbin:$PATH"
 
 # Prompt
 PS1="\u in \w\$([[ -n \$(git branch 2> /dev/null) ]] && echo \" on \")\[$WARNING\]\$(parse_git_branch)\[$RESET\]\n\$ "

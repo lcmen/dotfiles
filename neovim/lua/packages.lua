@@ -21,7 +21,6 @@ Plug('janko-m/vim-test')
 Plug('junegunn/fzf', { ['do'] = vim.fn['fzf#install()'] })
 Plug('junegunn/fzf.vim')
 Plug('lcmen/nvim-lspinstall')
-Plug('mhartington/formatter.nvim')
 Plug('mickael-menu/zk-nvim')
 Plug('neovim/nvim-lspconfig')
 Plug('numtostr/BufOnly.nvim', { ['on'] = 'BufOnly' })
@@ -48,57 +47,10 @@ g.ctrlp_switch_buffer = 0                                    -- Open files in ne
 g.ctrlp_use_caching = 0                                      -- Disable caching and use Ripgrep instead
 g.ctrlp_user_command = 'rg %s --files'
 g.ctrlp_working_path_mode = 0                                -- Respect current working directory
-g.NERDTreeShowHidden = 1                                     -- Show hidden files on NERDTree
 g.fzf_action = {                                             -- Override Global FZF bindings to be VIM specific
     ['enter']  = 'edit',
     ['ctrl-t'] = 'tabedit',
     ['ctrl-s'] = 'split',
     ['ctrl-v'] = 'vsplit',
 }
-
------------------------------------------------------------
--- Packages setup
------------------------------------------------------------
-local util = require('formatter.util')
-require('formatter').setup {
-    filetype = {
-        javascript = {
-            require('formatter.filetypes.javascript').eslint_d,
-            function (parser)
-                return vim.tbl_extend('force', require('formatter.filetypes.javascript').prettier(parser), {
-                    exe = 'npx prettier',
-                })
-            end,
-        },
-        javascriptreact = {
-            require('formatter.filetypes.javascriptreact').eslint_d,
-            function (parser)
-                return vim.tbl_extend('force', require('formatter.filetypes.javascriptreact').prettier(parser), {
-                    exe = 'npx prettier',
-                })
-            end,
-        },
-        typescript = {
-            require('formatter.filetypes.typescript').eslint_d,
-            function (parser)
-                return vim.tbl_extend('force', require('formatter.filetypes.typescript').prettier(parser), {
-                    exe = 'npx prettier',
-                })
-            end,
-        },
-        typescriptreact = {
-            require('formatter.filetypes.typescriptreact').eslint_d,
-            function (parser)
-                return vim.tbl_extend('force', require('formatter.filetypes.typescriptreact').prettier(parser), {
-                    exe = 'npx prettier',
-                })
-            end,
-        },
-        ruby = {
-            require('formatter.filetypes.ruby').rubocop
-        }
-    }
-}
-require("zk").setup({
-    picker = 'fzf'
-})
+g.NERDTreeShowHidden = 1                                     -- Show hidden files on NERDTree

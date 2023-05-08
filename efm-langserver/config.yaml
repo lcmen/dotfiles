@@ -1,0 +1,23 @@
+version: 2
+root-markers:
+  - .git/
+lint-debounce: 1s
+
+tools:
+  rubocop: &ruby-rubocop
+    prefix: rubocop
+    format-command: 'bundle exec rubocop -A -f quiet --stderr -s ${INPUT}'
+    format-stdin: true
+    lint-command: 'bundle exec rubocop --format emacs --force-exclusion --stdin ${INPUT}'
+    lint-ignore-exit-code: true
+    lint-stdin: true
+    lint-formats:
+      - '%f:%l:%c: W:%m'
+    root-markers:
+      - .rubocop.yml
+      - Gemfile
+      - Rakefile
+
+languages:
+  ruby:
+    - <<: *ruby-rubocop

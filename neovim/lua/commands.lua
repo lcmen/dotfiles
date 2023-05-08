@@ -5,7 +5,6 @@ local api = vim.api
 local bo = vim.bo
 local cmd = vim.cmd
 local fn = vim.fn
-local wo = vim.wo
 
 -----------------------------------------------------------
 -- Functions
@@ -19,12 +18,6 @@ function AltCommand(command)
     else
         cmd(command .. " " .. alternate)
     end
-end
-
-function SetupMarkdown()
-    bo.suffixesadd = '.md'
-    wo.spell = true
-    wo.wrap = true
 end
 
 function StripTrailingWhiteSpace()
@@ -51,7 +44,6 @@ cmd [[autocmd BufEnter,FocusGained * set relativenumber]]    -- Enable relative 
 cmd [[autocmd BufLeave,FocusLost * set norelativenumber]]    -- Disable relative numbers on blur
 cmd [[autocmd BufWritePre * lua StripTrailingWhiteSpace()]]  -- Strip trailing whitespaces on save
 cmd [[autocmd InsertLeave * set nopaste]]                    -- Disable paste mode on leaving insert mode
-cmd [[autocmd Filetype markdown lua SetupMarkdown()]]        -- Customize settings for Markdown
 
 -----------------------------------------------------------
 -- Syntax

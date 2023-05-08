@@ -2,8 +2,8 @@
   excludesfile = ~/.gitignore
   editor = nvim
 [user]
-  name = Lucas Mendelowski
   email = lucas@mendelowski.com
+  name = Lucas Mendelowski
 [init]
   defaultBranch = main
 [branch]
@@ -12,9 +12,9 @@
   prune = true
 [filter "lfs"]
   clean = git-lfs clean -- %f
-  smudge = git-lfs smudge -- %f
   process = git-lfs filter-process
   required = true
+  smudge = git-lfs smudge -- %f
 [pull]
   ff = only
 [push]
