@@ -2,13 +2,14 @@
 -- Neovim API aliases
 -----------------------------------------------------------
 local cmd = vim.cmd
+local g = vim.g
 local fn = vim.fn
 local opt = vim.opt
 
 -----------------------------------------------------------
 -- General
 -----------------------------------------------------------
-vim.g.mapleader = " "                                        -- Change leader to space
+g.mapleader = " "                                        -- Change leader to space
 
 opt.clipboard = 'unnamedplus'                                -- Use System clipboard
 opt.mouse = 'a'                                              -- Enable mouse support
@@ -49,7 +50,7 @@ opt.writebackup = false
 -----------------------------------------------------------
 -- UI
 -------------------------------------------------------
-vim.cmd[[colorscheme onehalflight]]
+cmd[[colorscheme onehalflight]]
 opt.cursorline = true                                        -- Show cursor line
 opt.laststatus = 2                                           -- Show status line
 opt.number = true                                            -- Show line numbers
