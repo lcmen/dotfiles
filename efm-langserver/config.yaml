@@ -4,6 +4,10 @@ root-markers:
 lint-debounce: 1s
 
 tools:
+  prettier: &js-prettier
+    format-command: 'npx --no prettier --stdin-filepath ${INPUT}'
+    format-stdin: true
+
   rubocop: &ruby-rubocop
     prefix: rubocop
     format-command: 'bundle exec rubocop -A -f quiet --stderr -s ${INPUT}'
@@ -19,5 +23,13 @@ tools:
       - Rakefile
 
 languages:
+  javascript:
+    - <<: *js-prettier
+  javascriptreact:
+    - <<: *js-prettier
   ruby:
     - <<: *ruby-rubocop
+  typescript:
+    - <<: *js-prettier
+  typescriptreact:
+    - <<: *js-prettier
