@@ -3,6 +3,7 @@
 -----------------------------------------------------------
 local bo = vim.bo
 local cmd = vim.cmd
+local fn = vim.fn
 local lsp = vim.lsp
 local map = vim.api.nvim_buf_set_keymap
 local ion = vim.api.nvim_buf_set_option
@@ -13,7 +14,9 @@ local ion = vim.api.nvim_buf_set_option
 function FixCode()
     if bo.readonly then return end
 
-    cmd('EslintFixAll')
+    if fn.exists(':EslintFixAll') > 0 then
+        cmd('EslintFixAll')
+    end
     lsp.buf.format({ timeout_ms = 2000 })
 end
 
