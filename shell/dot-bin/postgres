@@ -6,22 +6,23 @@
 postgres-console() {
   db=$1
   echo "Postgres - launching psql for ${version}/${db}"
-  psql --cluster $version/main -U postgres -h localhost -d $db
+  psql --cluster "$version"/main -U postgres -h localhost -d "$db"
 }
 
 postgres-up() {
   echo "Postgres - starting ${version}"
-  pg_ctlcluster ${version} main start
+  mkdir -p "$(brew --prefix)/etc/postgresql/14/main/conf.d"
+  pg_ctlcluster "${version}" main start
 }
 
 postgres-down() {
   echo "Postgres - stopping ${version}"
-  pg_ctlcluster ${version} main stop
+  pg_ctlcluster "${version}" main stop
 }
 
 postgres-status() {
   echo "Postgres - status of ${version}"
-  pg_ctlcluster ${version} main status
+  pg_ctlcluster "${version}" main status
 }
 
 postgres-help() {

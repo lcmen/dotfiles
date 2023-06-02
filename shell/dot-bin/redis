@@ -11,18 +11,18 @@ redis-up() {
 
   echo "Redis - starting ${database} with ${config_file} on ${socket_file}"
 
-  redis-server ${config_file} --dbfilename ${db_file} --port 0 --unixsocket ${socket_file} --daemonize yes
+  redis-server "$config_file" --dbfilename "$db_file" --port 0 --unixsocket "$socket_file" --daemonize yes
 }
 
 redis-down() {
-  if [ ! -e $socket_file ]; then
+  if [ ! -e "$socket_file" ]; then
     echo "Redis: ${database} is already shut downed"
     exit 0
   fi
 
   echo "Redis - stopping ${database}"
-  redis-cli -s ${socket_file} shutdown
-  rm -rf ${socket_file}
+  redis-cli -s "$socket_file" shutdown
+  rm -rf "$socket_file"
 }
 
 redis-list() {
@@ -42,7 +42,6 @@ fi
 command=$1
 database=$2
 socket_file="/tmp/redis/${database}.socket"
-log_file="/tmp/redis/${database}.log"
 mkdir -p /tmp/redis
 
 case $command in
