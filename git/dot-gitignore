@@ -19,6 +19,7 @@ Icon
 # Ignore Project dev environment specific
 .direnv
 .envrc
+.projections.json
 .vscode
 Procfile.dev
 Procfile.local

@@ -1,52 +1,61 @@
+" vim: foldmethod=marker
 set nocompatible
 set encoding=UTF-8
 
-if !filereadable(expand('~/.vim/autoload/plug.vim'))
-  if !executable("curl")
-    echoerr "You have to install curl or first install vim-plug yourself!"
-    execute "q!"
-  endif
-  echo "Installing Vim-Plug..."
-  echo ""
-  silent !\curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+" Plugins {{{
+  " Install Vim-plug {{{
+    if !filereadable(expand('~/.vim/autoload/plug.vim'))
+      if !executable("curl")
+        echoerr "You have to install curl or first install vim-plug yourself!"
+        execute "q!"
+      endif
+      echo "Installing Vim-Plug..."
+      echo ""
+      silent !\curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
-  autocmd VimEnter * PlugInstall
-endif
+      autocmd VimEnter * PlugInstall
+    endif
+  " }}}
 
-call plug#begin('~/.vim/plugged')
-  Plug 'AndrewRadev/sideways.vim'
-  Plug 'AndrewRadev/splitjoin.vim'
-  Plug 'airblade/vim-gitgutter'
-  Plug 'breuckelen/vim-resize'
-  Plug 'christoomey/vim-tmux-navigator'
-  Plug 'ctrlpvim/ctrlp.vim'
-  Plug 'docunext/closetag.vim'
-  Plug 'janko-m/vim-test'
-  Plug 'jremmen/vim-ripgrep'
-  Plug 'jszakmeister/vim-togglecursor'
-  Plug 'lambdalisue/fern-renderer-devicons.vim'
-  Plug 'lambdalisue/fern.vim'
-  Plug 'mattn/vim-lsp-settings'
-  Plug 'prabirshrestha/vim-lsp'
-  Plug 'ryanoasis/vim-devicons', { 'branch': 'master' }
-  Plug 'schickling/vim-bufonly'
-  Plug 'sheerun/vim-polyglot'
-  Plug 'sonph/onehalf', {'rtp': 'vim/'}
-  Plug 'tpope/vim-commentary'
-  Plug 'tpope/vim-dispatch'
-  Plug 'tpope/vim-rails'
-  Plug 'tpope/vim-rake'
-  Plug 'tpope/vim-repeat'
-  Plug 'tpope/vim-surround'
-  Plug 'tpope/vim-unimpaired'
-  Plug 'troydm/zoomwintab.vim'
-call plug#end()
+  " Install plugins {{{
+  call plug#begin('~/.vim/plugged')
+    Plug 'AndrewRadev/sideways.vim'
+    Plug 'AndrewRadev/splitjoin.vim'
+    Plug 'airblade/vim-gitgutter'
+    Plug 'breuckelen/vim-resize'
+    Plug 'christoomey/vim-tmux-navigator'
+    Plug 'ctrlpvim/ctrlp.vim'
+    Plug 'dense-analysis/ale'
+    Plug 'docunext/closetag.vim'
+    Plug 'janko-m/vim-test'
+    Plug 'jremmen/vim-ripgrep'
+    Plug 'ryanoasis/vim-devicons'
+    Plug 'schickling/vim-bufonly'
+    Plug 'sheerun/vim-polyglot'
+    Plug 'sonph/onehalf', {'rtp': 'vim/'}
+    Plug 'tpope/vim-commentary'
+    Plug 'tpope/vim-dispatch'
+    Plug 'tpope/vim-rails'
+    Plug 'tpope/vim-rake'
+    Plug 'tpope/vim-repeat'
+    Plug 'tpope/vim-surround'
+    Plug 'tpope/vim-unimpaired'
+    Plug 'troydm/zoomwintab.vim'
+
+    Plug 'preservim/nerdtree'
+    Plug 'lifepillar/vim-outlaw'
+
+  call plug#end()
+  " }}}
+"}}}
 
 let mapleader=" "
 
 " Misc {{{
   set clipboard=unnamed               " Use system clipboard
   set belloff=all                     " Disable all sounds
+  set modeline                        " Enable modelines (modes set by comments in the file)
+  set modelines=5                     " by searching the top 5 lines for magic comment
   set nospell                         " Spell checking off
   set noswapfile                      " Disable swap
   set scrolloff=5                     " Start scrolling 5 lines away from y margin
@@ -82,7 +91,9 @@ let mapleader=" "
 " }}}
 
 " UI {{{
-  set t_Co=256
+  let &t_SI = "\e[6 q"
+  let &t_EI = "\e[2 q"
+  " set t_Co=256
   colorscheme onehalflight
   set completeopt+=popup            " Display completion info in a popup
   set cursorline                    " Show cursor line
@@ -108,20 +119,8 @@ let mapleader=" "
     endif
   " }}}
 
-  " Fern {{{
-    " Disable default Fern mappings
-    let g:fern#disable_default_mappings = 1
-    " Show hidden files
-    let g:fern#default_hidden = 1
-    " Add support for devicons
-    let g:fern#renderer = "devicons"
-  " }}}
-
-  " LSP {{{
-    let g:lsp_settings_filetype_ruby = []
-    let g:lsp_settings = {
-      \ 'typeprof': { 'disabled': v:true }
-      \ }
+  " Outlaw {{{
+    let g:outlaw_indent = 4
   " }}}
 " }}}
 
@@ -153,16 +152,9 @@ let mapleader=" "
   nnoremap [g gT
   nnoremap ]g gt
 
-  " Alt files
-  nnoremap <leader>. :call AltCommand(expand('%'), ':e')<cr>
-  command! AE :call AltCommand(expand('%'), ':e')<cr>
-  command! AS :call AltCommand(expand('%'), ':sp')<cr>
-  command! AT :call AltCommand(expand('%'), ':tabnew')<cr>
-  command! AV :call AltCommand(expand('%'), ':vs')<cr>
-
-  " Fern
-  nnoremap <silent> <C-e>     :Fern . -drawer -reveal=% -toggle<CR>
-  nnoremap <silent> <leader>e :Fern . -drawer -reveal=%<CR>
+  " NERDTree
+  nnoremap <silent> <C-e>     :NERDTreeToggle<CR>
+  nnoremap <silent> <leader>e :NERDTreeFind<CR>
 
   " Window resizes
   let g:vim_resize_disable_auto_mappings = 1
@@ -201,15 +193,6 @@ let mapleader=" "
 " }}}
 
 " Functions {{{
-  function! AltCommand(path, vim_command)
-    let l:alternate = system("alt " . a:path)
-    if empty(l:alternate)
-      echo "No alternate file for " . a:path . " exists!"
-    else
-      exec a:vim_command . " " . l:alternate
-    endif
-  endfunction
-
   function! ConfigureBufferLSP() abort
     setlocal omnifunc=lsp#complete
     setlocal signcolumn=yes
@@ -224,30 +207,6 @@ let mapleader=" "
     nmap <buffer> ]d <plug>(lsp-next-diagnostic)
     nmap <buffer> K <plug>(lsp-hover)
     nmap <buffer> L :LspDocumentDiagnostics<CR>
-  endfunction
-
-  function! ConfigureFern()
-    nmap <buffer><expr>
-      \ <Plug>(fern-my-open-expand-collapse)
-      \ fern#smart#leaf(
-      \   "\<Plug>(fern-action-open:select)",
-      \   "\<Plug>(fern-action-expand)",
-      \   "\<Plug>(fern-action-collapse)",
-      \ )
-    nmap <buffer> <CR> <Plug>(fern-my-open-expand-collapse)
-    nmap <buffer> <2-LeftMouse> <Plug>(fern-my-open-expand-collapse)
-    nmap <buffer><nowait> c <Plug>(fern-action-copy)
-    nmap <buffer><nowait> d <Plug>(fern-action-remove)
-    nmap <buffer><nowait> b <Plug>(fern-action-mark:toggle)
-    nmap <buffer><nowait> m <Plug>(fern-action-move)
-    nmap <buffer><nowait> n <Plug>(fern-action-new-path)
-    nmap <buffer><nowait> p <Plug>(fern-action-focus:parent)
-    nmap <buffer><nowait> r <Plug>(fern-action-rename)
-    nmap <buffer><nowait> s <Plug>(fern-action-open:split)
-    nmap <buffer><nowait> t <Plug>(fern-action-open:tabedit)
-    nmap <buffer><nowait> v <Plug>(fern-action-open:vsplit)
-    nmap <buffer><nowait> < <Plug>(fern-action-leave)
-    nmap <buffer><nowait> > <Plug>(fern-action-enter)
   endfunction
 
   function! StripTrailingWhiteSpace()
@@ -272,10 +231,18 @@ let mapleader=" "
     autocmd Filetype gitcommit setl spell textwidth=72
     autocmd Filetype go setl softtabstop=4 shiftwidth=4 noexpandtab
     autocmd Filetype markdown setl spell colorcolumn=0 wrap linebreak
-    autocmd FileType fern call ConfigureFern()
 
     autocmd InsertLeave * set nopaste
 
-    autocmd User lsp_buffer_enabled call ConfigureBufferLSP()
+    " autocmd User lsp_buffer_enabled call ConfigureBufferLSP()
   augroup END
 " }}}
+
+set omnifunc=ale#completion#OmniFunc
+let g:ale_floating_preview = 1
+let g:ale_fixers = {
+\   'typescriptreact': ['eslint', 'prettier']
+\}
+
+nmap <silent> [d <Plug>(ale_previous_wrap)
+nmap <silent> ]d <Plug>(ale_next_wrap)

@@ -28,4 +28,5 @@
   co = checkout
   cob = checkout -b
   st = status
+  sw = !git checkout $(git br --all | fzf)
   wip = !git add -A && git commit -m "WIP"
