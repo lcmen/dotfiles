@@ -77,21 +77,8 @@ local Plug = vim.fn['plug#']
     -- FZF {{{
     g.fzf_command_prefix = 'Fz'
     g.fzf_history_dir = '~/.local/share/fzf-history'
-    map('n', '<C-p>', ':FzFiles<CR>', opts)                      -- Launch FZF
-
-    function SetupFZF()
-        local bufnr = vim.api.nvim_get_current_buf()
-        mapb(bufnr, 't', '<C-f>', '<C-\\><C-n>:close<CR>:sleep 100m<CR>:FzFiles<CR>', opts)
-        mapb(bufnr, 't', '<C-b>', '<C-\\><C-n>:close<CR>:sleep 100m<CR>:FzBuffers<CR>', opts)
-        mapb(bufnr, 't', '<C-l>', '<C-\\><C-n>:close<CR>:sleep 100m<CR>:FzBLines<CR>', opts)
-    end
-
-    cmd [[
-    augroup FZF
-        autocmd!
-        autocmd FileType fzf lua SetupFZF()
-    augroup END
-    ]]
+    map("n", "<C-p>", ":FzFiles<CR>", opts)                      -- Launch FZF for Files
+    map("n", "<C-\\>", ":FzBuffers<CR>", opts)                   -- Launch FZF for Buffers
     -- }}}
 
     -- NERDTree {{{
@@ -107,6 +94,14 @@ local Plug = vim.fn['plug#']
     map('n', '<leader>rj', ':SplitjoinJoin<cr>', opts)           -- Join block
     map('n', '<leader>rk', ':SplitjoinSplit<cr>', opts)          -- Split block
     -- }}}
+
+    -- Tmux Navigator {{{
+    g.tmux_navigator_no_mappings = 1
+    map('n', '<C-h>', ':TmuxNavigateLeft<CR>', opts)             -- Move to the left pane
+    map('n', '<C-j>', ':TmuxNavigateDown<CR>', opts)             -- Move to the bottom pane
+    map('n', '<C-k>', ':TmuxNavigateUp<CR>', opts)               -- Move to the top pane
+    map('n', '<C-l>', ':TmuxNavigateRight<CR>', opts)            -- Move to the right pane
+    -- }}
 -- }}}
 
 -- Settings {{{

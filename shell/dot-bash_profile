@@ -38,34 +38,7 @@ PS1="\u in \w\$([[ -n \$(git branch 2> /dev/null) ]] && echo \" on \")\[$WARNING
 
 # FZF
 export FZF_DEFAULT_COMMAND='rg --files'
-# export FZF_DEFAULT_OPTS="--multi --tiebreak=begin \
-#   --bind 'ctrl-y:execute-silent(echo {} | pbcopy)' \
-#   --bind 'alt-right:change-preview-window(right|hidden|)' \
-#   --bind 'alt-down:change-preview-window(down|hidden|)' \
-#   --bind \"ctrl-o:execute-silent[ \
-#     tmux send-keys -t \{left\} Escape :e Space && \
-#     tmux send-keys -t \{left\} -l {} && \
-#     tmux send-keys -t \{left\} Enter && \
-#     tmux select-pane -t \{left\} \
-#   ]\"
-#   --bind \"ctrl-v:execute-silent[ \
-#     tmux send-keys -t \{left\} Escape :vs Space && \
-#     tmux send-keys -t \{left\} -l {} && \
-#     tmux send-keys -t \{left\} Enter && \
-#     tmux select-pane -t \{left\} \
-#   ]\"
-#   --bind \"ctrl-x:execute-silent[ \
-#     tmux send-keys -t \{left\} Escape :sp Space && \
-#     tmux send-keys -t \{left\} -l {} && \
-#     tmux send-keys -t \{left\} Enter && \
-#     tmux select-pane -t \{left\} \
-#   ]\"
-#   --bind \"ctrl-p:execute-silent[ \
-#     tmux send-keys -t \{left\} Escape :read Space ! Space echo Space && \
-#     tmux send-keys -t \{left\} -l \\\"{}\\\" && \
-#     tmux send-keys -t \{left\} Enter && \
-#     tmux select-pane -t \{left\} \
-#   ]\""
+export FZF_DEFAULT_OPTS='--bind ctrl-n:preview-down,ctrl-p:preview-up,ctrl-f:preview-page-down,ctrl-b:preview-page-up'
 
 #===============================================================
 # Extras
