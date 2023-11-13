@@ -25,6 +25,14 @@ export CLICOLOR=1
 export EDITOR=nvim
 export LANG=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:=$HOME/.config}"
+
+# Specify config paths to use XDG_CONFIG_HOME
+export ASDF_CONFIG_FILE=$HOME/.config/asdf/config
+export ASDF_DEFAULT_TOOL_VERSIONS_FILENAME=$HOME/.config/asdf/tool-versions
+export BUNDLE_USER_HOME=$HOME/.config/bundle
+export GEMRC=$HOME/.config/gem/config
+export PSQLRC=$HOME/.config/psql/config
 export RIPGREP_CONFIG_PATH=$HOME/.config/ripgrep/config
 
 # Save iex history and include Erlang docs

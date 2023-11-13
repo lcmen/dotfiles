@@ -1,6 +1,5 @@
 # Ignore caches
-ruby/dot-bundle/cache
+bundle/cache
+psql/history
 
-# Ignore neovim and tmux pluggins
-neovim/.config/nvim/plugged
-tmux/.config/tmux/plugins
+tmux/plugins

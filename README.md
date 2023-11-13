@@ -4,8 +4,10 @@ Dotfiles for applications I use on MacOS and Linux systems managed with [stow](h
 
 ## Install
 
-1. Install `stow`
-2. Run `make install`
+1. Clone repo
+2. Init submodules `git submodule update --init --recursive`
+3. Install `stow`
+4. Run `make install`
 
 ## Uninstall
 

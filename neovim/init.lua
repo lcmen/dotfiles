@@ -1,20 +1,15 @@
 -- vim:fileencoding=utf-8:foldmethod=marker
 
 -- Neovim API aliases {{{
-
-local bo = vim.bo
 local call = vim.call
 local cmd = vim.cmd
 local g = vim.g
 local fn = vim.fn
 local lsp = vim.lsp
 local map = vim.api.nvim_set_keymap
-local mapb = vim.api.nvim_buf_set_keymap
-local ionb = vim.api.nvim_buf_set_option
 local opt = vim.opt
 local opts = { noremap = true, silent = true }
 local Plug = vim.fn['plug#']
-
 -- }}}
 
 -- Packages {{{
@@ -44,6 +39,9 @@ local Plug = vim.fn['plug#']
     Plug('tpope/vim-surround')
     Plug('tpope/vim-unimpaired')
     Plug('troydm/zoomwintab.vim')
+
+    Plug('mfussenegger/nvim-fzy')
+    Plug('mfussenegger/nvim-qwahl')
 
     call('plug#end')
 
@@ -152,17 +150,20 @@ local Plug = vim.fn['plug#']
 
 -- LSP {{{
 local on_attach = function(client, bufnr)
-    ionb(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-    ionb(bufnr, 'formatexpr', 'v:lua.vim.lsp.formatexpr()')
+    local map = vim.api.nvim_buf_set_keymap
+    local ion = vim.api.nvim_buf_set_option
+    local opts = { noremap = true }
+
+    ion(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+    ion(bufnr, 'formatexpr', 'v:lua.vim.lsp.formatexpr()')
 
     -- Configure keybindings for LSP
-    mapb(bufnr, 'n', 'g=', '<Cmd>lua vim.lsp.buf.format({ timeout_ms = 20000 })<CR>', opts)
-    mapb(bufnr, 'n', 'g0', '<Cmd>lua vim.lsp.buf.document_symbol()<CR>', opts)
-    mapb(bufnr, 'n', 'gf', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
-    mapb(bufnr, 'n', 'gi', '<Cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-    mapb(bufnr, 'n', 'gt', '<Cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-    mapb(bufnr, 'n', 'gr', '<Cmd>lua vim.lsp.buf.references()<CR>', opts)
-    mapb(bufnr, 'n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
+    map(bufnr, 'n', 'g0', '<Cmd>lua vim.lsp.buf.document_symbol()<CR>', opts)
+    map(bufnr, 'n', 'gf', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
+    map(bufnr, 'n', 'gi', '<Cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+    map(bufnr, 'n', 'gt', '<Cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+    map(bufnr, 'n', 'gr', '<Cmd>lua vim.lsp.buf.references()<CR>', opts)
+    map(bufnr, 'n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
 end
 
 require('lspkind').init()
@@ -216,7 +217,6 @@ require('lspkind').init()
 -- }}}
 
 -- Commands {{{
-
     -- Abbreviations {{{
     cmd [[cnoreabbrev bo BufOnly]]                               -- Alias bo to BufOnly
     -- }}}
