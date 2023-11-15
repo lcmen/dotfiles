@@ -2,4 +2,7 @@
 bundle/cache
 psql/history
 
+# Ignore plugins
+nvim/plugged/*
+!nvim/plugged/plug.vim
 tmux/plugins
