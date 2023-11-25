@@ -40,9 +40,6 @@ local Plug = vim.fn['plug#']
     Plug('tpope/vim-unimpaired')
     Plug('troydm/zoomwintab.vim')
 
-    Plug('mfussenegger/nvim-fzy')
-    Plug('mfussenegger/nvim-qwahl')
-
     call('plug#end')
 
     g.mapleader = " "                                        -- Change leader to space
