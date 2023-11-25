@@ -9,12 +9,24 @@ local lsp = vim.lsp
 local map = vim.api.nvim_set_keymap
 local opt = vim.opt
 local opts = { noremap = true, silent = true }
-local Plug = vim.fn['plug#']
 -- }}}
 
 -- Packages {{{
+    -- Install vim-plug if not present {{{
+    local data_dir = fn.stdpath('data')
+    local plug_path = fn.stdpath('data') .. '/site/autoload/plug.vim'
+    if fn.filereadable(plug_path) ~= 1 then
+        print('Installing vim-plug')
+        fn.system({'curl', '-fLo', plug_path, '--create-dirs', 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'})
+        print('Installing all plugins')
+        cmd([[autocmd VimEnter * PlugInstall --sync | source $MYVIMRC]])
+    end
+    -- }}}
+
+    -- Plugins {{{
     call('plug#begin', '~/.config/nvim/plugged')
 
+    local Plug = vim.fn['plug#']
     Plug('AndrewRadev/sideways.vim')
     Plug('AndrewRadev/splitjoin.vim')
     Plug('airblade/vim-gitgutter')
@@ -41,6 +53,7 @@ local Plug = vim.fn['plug#']
     Plug('troydm/zoomwintab.vim')
 
     call('plug#end')
+    -- }}}
 
     g.mapleader = " "                                        -- Change leader to space
 
@@ -97,6 +110,8 @@ local Plug = vim.fn['plug#']
     map('n', '<C-k>', ':TmuxNavigateUp<CR>', opts)               -- Move to the top pane
     map('n', '<C-l>', ':TmuxNavigateRight<CR>', opts)            -- Move to the right pane
     -- }}
+-- }}}
+
 -- }}}
 
 -- Settings {{{
