@@ -3,6 +3,8 @@ bundle/cache
 psql/history
 
 # Ignore plugins
+vim/autoload/plug.vim
+vim/plugged/*
 nvim/plugged/*
 !nvim/plugged/plug.vim
 tmux/plugins

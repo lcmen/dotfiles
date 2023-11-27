@@ -1,24 +1,25 @@
 " vim: foldmethod=marker
 set nocompatible
 set encoding=UTF-8
+set runtimepath=~/.config/vim,/usr/share/vim/vimfiles,/usr/share/vim/vim90,/usr/share/vim/vimfiles/after,~/.config/vim/after
 
 " Plugins {{{
   " Install Vim-plug {{{
-    if !filereadable(expand('~/.vim/autoload/plug.vim'))
+    if !filereadable(expand('~/.config/vim/autoload/plug.vim'))
       if !executable("curl")
         echoerr "You have to install curl or first install vim-plug yourself!"
         execute "q!"
       endif
       echo "Installing Vim-Plug..."
       echo ""
-      silent !\curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+      silent !\curl -fLo ~/.config/vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
       autocmd VimEnter * PlugInstall
     endif
   " }}}
 
   " Install plugins {{{
-  call plug#begin('~/.vim/plugged')
+  call plug#begin('~/.config/vim/plugged')
     Plug 'AndrewRadev/sideways.vim'
     Plug 'AndrewRadev/splitjoin.vim'
     Plug 'airblade/vim-gitgutter'
@@ -27,6 +28,7 @@ set encoding=UTF-8
     Plug 'ctrlpvim/ctrlp.vim'
     Plug 'dense-analysis/ale'
     Plug 'docunext/closetag.vim'
+    Plug 'github/copilot.vim'
     Plug 'janko-m/vim-test'
     Plug 'jremmen/vim-ripgrep'
     Plug 'preservim/nerdtree'
@@ -36,7 +38,6 @@ set encoding=UTF-8
     Plug 'sonph/onehalf', {'rtp': 'vim/'}
     Plug 'tpope/vim-commentary'
     Plug 'tpope/vim-dispatch'
-    Plug 'tpope/vim-rails'
     Plug 'tpope/vim-rake'
     Plug 'tpope/vim-repeat'
     Plug 'tpope/vim-surround'
@@ -46,10 +47,10 @@ set encoding=UTF-8
   " }}}
 "}}}
 
-let mapleader=" "
-
 " Misc {{{
+  let mapleader=" "                   " Set leader key to space
   set clipboard=unnamed               " Use system clipboard
+  set backspace=indent,eol,start      " Allow backspacing over everything in insert mode
   set belloff=all                     " Disable all sounds
   set modeline                        " Enable modelines (modes set by comments in the file)
   set modelines=5                     " by searching the top 5 lines for magic comment
@@ -82,15 +83,14 @@ let mapleader=" "
   set nobackup
   set nowritebackup
   set undofile
-  set undolevels=1000               " Maximum number of changes that can be undone
-  set undoreload=10000              " Maximum number lines to save for undo on a buffer reload
-  set undodir=$HOME/.vim/tmp/undo   " Set persistent undo directory
+  set undolevels=1000                     " Maximum number of changes that can be undone
+  set undoreload=10000                    " Maximum number lines to save for undo on a buffer reload
+  set undodir=$HOME/.config/vim/tmp/undo  " Set persistent undo directory
 " }}}
 
 " UI {{{
   let &t_SI = "\e[6 q"
   let &t_EI = "\e[2 q"
-  " set t_Co=256
   colorscheme onehalflight
   set completeopt+=popup            " Display completion info in a popup
   set cursorline                    " Show cursor line
@@ -102,6 +102,23 @@ let mapleader=" "
 " }}}
 
 " Plugins {{{
+  " ALE {{{
+  set omnifunc=ale#completion#OmniFunc
+  let g:ale_completion_autoimport = 1
+  let g:ale_completion_enabled = 1
+  let g:ale_floating_preview = 1
+  let g:ale_fix_on_save = 1
+  let g:ale_fixers = {
+  \   '*': ['remove_trailing_lines', 'trim_whitespace'],
+  \   'javascript': ['eslint', 'prettier'],
+  \   'javascriptreact': ['eslint', 'prettier'],
+  \   'ruby': ['rubocop', 'remove_trailing_lines', 'trim_whitespace'],
+  \   'terraform': ['terraform'],
+  \   'typescript': ['eslint', 'prettier'],
+  \   'typescriptreact': ['eslint', 'prettier']
+  \ }
+  " }}}
+
   " CtrlP {{{
     " Always open files in new buffers and respect current working directory
     let g:ctrlp_switch_buffer = 0
@@ -116,8 +133,8 @@ let mapleader=" "
     endif
   " }}}
 
-  " Outlaw {{{
-    let g:outlaw_indent = 4
+  " NERDTree {{{
+  let g:NERDTreeShowHidden = 1                          " Show hidden files on NERDTree
   " }}}
 " }}}
 
@@ -148,6 +165,10 @@ let mapleader=" "
   " Tabs
   nnoremap [g gT
   nnoremap ]g gt
+
+  " ALE
+  nmap <silent> [d <Plug>(ale_previous_wrap)
+  nmap <silent> ]d <Plug>(ale_next_wrap)
 
   " NERDTree
   nnoremap <silent> <C-e>     :NERDTreeToggle<CR>
@@ -189,32 +210,6 @@ let mapleader=" "
   nmap <silent> <leader>R :source ~/.vimrc<CR>
 " }}}
 
-" Functions {{{
-  function! ConfigureBufferLSP() abort
-    setlocal omnifunc=lsp#complete
-    setlocal signcolumn=yes
-    " if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
-    nmap <buffer> gf <plug>(lsp-definition)
-    nmap <buffer> g0 <plug>(lsp-document-symbol-search)
-    nmap <buffer> gr <plug>(lsp-references)
-    nmap <buffer> gi <plug>(lsp-implementation)
-    nmap <buffer> gt <plug>(lsp-type-definition)
-    nmap <buffer> <leader>rn <plug>(lsp-rename)
-    nmap <buffer> [d <plug>(lsp-previous-diagnostic)
-    nmap <buffer> ]d <plug>(lsp-next-diagnostic)
-    nmap <buffer> K <plug>(lsp-hover)
-    nmap <buffer> L :LspDocumentDiagnostics<CR>
-  endfunction
-
-  function! StripTrailingWhiteSpace()
-    " Ignore for markdown and slim
-    if &filetype =~ 'markdown' || &filetype =~ 'slim'
-      return
-    endif
-    %s/\s\+$//e
-  endfunction
-" }}}
-
 " Commands {{{
   cnoreabbrev bo BufOnly
 
@@ -223,29 +218,11 @@ let mapleader=" "
     autocmd BufLeave,FocusLost * set norelativenumber
     autocmd BufNewFile,BufReadPost *.md,*.mdown,*.mdwn,*.mmd set filetype=markdown
     autocmd BufNewFile,BufReadPost Rakefile,Vagrantfile set filetype=ruby
-    autocmd BufWritePre * call StripTrailingWhiteSpace()
 
     autocmd Filetype gitcommit setl spell textwidth=72
     autocmd Filetype go setl softtabstop=4 shiftwidth=4 noexpandtab
     autocmd Filetype markdown setl spell colorcolumn=0 wrap linebreak
 
     autocmd InsertLeave * set nopaste
-
-    " autocmd User lsp_buffer_enabled call ConfigureBufferLSP()
   augroup END
 " }}}
-
-set omnifunc=ale#completion#OmniFunc
-let g:ale_floating_preview = 1
-let g:ale_fixers = {
-\   '*': ['remove_trailing_lines', 'trim_whitespace'],
-\   'javascript': ['eslint', 'prettier'],
-\   'javascriptreact': ['eslint', 'prettier'],
-\   'ruby': ['rubocop', 'remove_trailing_lines', 'trim_whitespace'],
-\   'terraform': ['terraform'],
-\   'typescript': ['eslint', 'prettier'],
-\   'typescriptreact': ['eslint', 'prettier']
-\ }
-
-nmap <silent> [d <Plug>(ale_previous_wrap)
-nmap <silent> ]d <Plug>(ale_next_wrap)

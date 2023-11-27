@@ -83,6 +83,7 @@ alias br="bundle exec gem remove"
 # Misc
 alias c=clear
 alias bat=batcat
+alias vim="vim -u ~/.config/vim/vimrc"
 
 # Tmux
 alias txj="tmux attach-session -dt "

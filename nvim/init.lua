@@ -38,9 +38,11 @@ local opts = { noremap = true, silent = true }
     Plug('junegunn/fzf')
     Plug('junegunn/fzf.vim')
     Plug('lcmen/nvim-lspinstall')
+    Plug('L3MON4D3/LuaSnip', { ['tag'] = 'v2.*', ['do'] = 'make install_jsregexp' })
     Plug('neovim/nvim-lspconfig')
     Plug('numtostr/BufOnly.nvim', { ['on'] = 'BufOnly' })
     Plug('onsails/lspkind-nvim')
+    Plug('rafamadriz/friendly-snippets')
     Plug('ryanoasis/vim-devicons')
     Plug('scrooloose/nerdtree')
     Plug('sheerun/vim-polyglot')
@@ -89,6 +91,17 @@ local opts = { noremap = true, silent = true }
     map("n", "<C-\\>", ":FzBuffers<CR>", opts)                   -- Launch FZF for Buffers
     -- }}}
 
+    -- LuaSnip {{{
+    local luasnip = require('luasnip')
+    require('luasnip.loaders.from_vscode').lazy_load()
+    luasnip.config.setup {}
+    luasnip.filetype_extend('ruby', { 'rails' })
+
+    map('i', '<C-k>', '<Plug>luasnip-expand-or-jump', { noremap = true })
+    map("i", '<C-l>', '<Plug>luasnip-next-choice', { noremap = true })
+    map("i", '<C-j>', '<Plug>luasnip-prev-choice', { noremap = true })
+    -- }}}
+
     -- NERDTree {{{
     g.NERDTreeShowHidden = 1                                     -- Show hidden files on NERDTree
 
@@ -110,8 +123,6 @@ local opts = { noremap = true, silent = true }
     map('n', '<C-k>', ':TmuxNavigateUp<CR>', opts)               -- Move to the top pane
     map('n', '<C-l>', ':TmuxNavigateRight<CR>', opts)            -- Move to the right pane
     -- }}
--- }}}
-
 -- }}}
 
 -- Settings {{{
@@ -170,6 +181,7 @@ local on_attach = function(client, bufnr)
     ion(bufnr, 'formatexpr', 'v:lua.vim.lsp.formatexpr()')
 
     -- Configure keybindings for LSP
+    map(bufnr, 'n', 'C-y', '<Cmd>lua vim.lsp.buf.code_action()<CR>', opts)
     map(bufnr, 'n', 'g0', '<Cmd>lua vim.lsp.buf.document_symbol()<CR>', opts)
     map(bufnr, 'n', 'gf', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
     map(bufnr, 'n', 'gi', '<Cmd>lua vim.lsp.buf.implementation()<CR>', opts)
@@ -183,9 +195,12 @@ require('lspkind').init()
     -- LSP servers {{{
     local lspconfig = require('lspconfig')
     local lspinstall = require('lspinstall')
+    local capabilities = vim.lsp.protocol.make_client_capabilities()
+    capabilities.textDocument.completion.completionItem.snippetSupport = true
 
     for server, config in pairs(lspinstall.installed_servers()) do
         config.on_attach = on_attach
+        config.capabilities = capabilities
         lspconfig[server].setup(config)
     end
     -- }}}
