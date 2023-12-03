@@ -24,6 +24,7 @@ set runtimepath=~/.config/vim,/usr/share/vim/vimfiles,/usr/share/vim/vim90,/usr/
     Plug 'AndrewRadev/splitjoin.vim'
     Plug 'airblade/vim-gitgutter'
     Plug 'breuckelen/vim-resize'
+    Plug 'casonadams/nord.vim'
     Plug 'christoomey/vim-tmux-navigator'
     Plug 'ctrlpvim/ctrlp.vim'
     Plug 'dense-analysis/ale'
@@ -31,6 +32,7 @@ set runtimepath=~/.config/vim,/usr/share/vim/vimfiles,/usr/share/vim/vim90,/usr/
     Plug 'github/copilot.vim'
     Plug 'janko-m/vim-test'
     Plug 'jremmen/vim-ripgrep'
+    Plug 'junegunn/seoul256.vim'
     Plug 'preservim/nerdtree'
     Plug 'ryanoasis/vim-devicons'
     Plug 'schickling/vim-bufonly'
@@ -91,7 +93,7 @@ set runtimepath=~/.config/vim,/usr/share/vim/vimfiles,/usr/share/vim/vim90,/usr/
 " UI {{{
   let &t_SI = "\e[6 q"
   let &t_EI = "\e[2 q"
-  colorscheme onehalflight
+  colorscheme seoul256-light
   set completeopt+=popup            " Display completion info in a popup
   set cursorline                    " Show cursor line
   set laststatus=2                  " Show status bar
@@ -207,7 +209,7 @@ set runtimepath=~/.config/vim,/usr/share/vim/vimfiles,/usr/share/vim/vim90,/usr/
   nmap <silent> <leader>rk :SplitjoinSplit<cr>
 
   " Reload config file
-  nmap <silent> <leader>R :source ~/.vimrc<CR>
+  nmap <silent> <leader>R :source ~/.config/vim/vimrc<CR>
 " }}}
 
 " Commands {{{
