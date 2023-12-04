@@ -8,11 +8,8 @@ export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
 
 # ZSH
+export SHELL_SESSIONS_DISABLE=1         # Disable .zsh_sessions on MacOS
 export ZDOTDIR="$XDG_CONFIG_HOME/zsh"   # Keep zsh files in ~/.config
-setopt HIST_SAVE_NO_DUPS                # Do not write a duplicate event to the history file.
-export HISTFILE="$ZDOTDIR/.zhistory"    # History filepath
-export HISTSIZE=10000                   # Maximum events for internal history
-export SAVEHIST=10000                   # Maximum events in history file
 
 # Specify config paths to use XDG_CONFIG_HOME
 export PSQLRC="$XDG_CONFIG_HOME/psql/config"

@@ -4,6 +4,12 @@
 fpath=($ZDOTDIR/functions $fpath)
 autoload -Uz prompt && prompt
 
+# History
+export HISTFILE="$ZDOTDIR/.zhistory"    # History filepath
+setopt HIST_SAVE_NO_DUPS                # Do not write a duplicate event to the history file.
+export HISTSIZE=10000                   # Maximum events for internal history
+export SAVEHIST=10000                   # Maximum events in history file
+
 # Load files
 source $ZDOTDIR/aliases.zsh
 source $ZDOTDIR/completions.zsh
