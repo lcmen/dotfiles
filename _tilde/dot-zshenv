@@ -18,11 +18,7 @@ export SAVEHIST=10000                   # Maximum events in history file
 export PSQLRC="$XDG_CONFIG_HOME/psql/config"
 export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/config"
 
-# Load functions
-fpath=($ZDOTDIR/functions $fpath)
-autoload -Uz prompt && prompt
-
-# Load files
-source "$ZDOTDIR/aliases.zsh"
-source "$ZDOTDIR/completions.zsh"
-source "$ZDOTDIR/plugins.zsh"
+# PATHs
+export PATH="./node_modules/.bin:$PATH" # Local node_modules binaries
+export PATH="$HOME/.bin:$PATH"          # Local binaries
+export PATH="/usr/local/sbin:$PATH"     # Homebrew binaries (if installed)

@@ -31,6 +31,7 @@ set runtimepath=~/.config/vim,/usr/share/vim/vimfiles,/usr/share/vim/vim90,/usr/
     Plug 'docunext/closetag.vim'
     Plug 'github/copilot.vim'
     Plug 'janko-m/vim-test'
+    Plug 'jeffkreeftmeijer/vim-numbertoggle'
     Plug 'jremmen/vim-ripgrep'
     Plug 'junegunn/seoul256.vim'
     Plug 'preservim/nerdtree'
@@ -93,6 +94,7 @@ set runtimepath=~/.config/vim,/usr/share/vim/vimfiles,/usr/share/vim/vim90,/usr/
 " UI {{{
   let &t_SI = "\e[6 q"
   let &t_EI = "\e[2 q"
+
   colorscheme seoul256-light
   set completeopt+=popup            " Display completion info in a popup
   set cursorline                    " Show cursor line
@@ -137,6 +139,7 @@ set runtimepath=~/.config/vim,/usr/share/vim/vimfiles,/usr/share/vim/vim90,/usr/
 
   " NERDTree {{{
   let g:NERDTreeShowHidden = 1                          " Show hidden files on NERDTree
+  let g:NERDTreeShowLineNumbers=0                       " Disable line numbers on NERDTree
   " }}}
 " }}}
 
@@ -216,8 +219,6 @@ set runtimepath=~/.config/vim,/usr/share/vim/vimfiles,/usr/share/vim/vim90,/usr/
   cnoreabbrev bo BufOnly
 
   augroup hooks
-    autocmd BufEnter,FocusGained * set relativenumber
-    autocmd BufLeave,FocusLost * set norelativenumber
     autocmd BufNewFile,BufReadPost *.md,*.mdown,*.mdwn,*.mmd set filetype=markdown
     autocmd BufNewFile,BufReadPost Rakefile,Vagrantfile set filetype=ruby
 
