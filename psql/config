@@ -7,7 +7,7 @@
 \pset pager off
 
 \set COMP_KEYWORD_CASE upper
-\set HISTFILE $HOME/config/psql/history
+\set HISTFILE ~/.config/psql/history
 \set PROMPT1 '%[%033[33;1m%]%x%[%033[0m%]%[%033[1m%]%/%[%033[0m%]%R%# '
 \set VERBOSITY verbose
 

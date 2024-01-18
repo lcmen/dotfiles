@@ -37,6 +37,7 @@ local opts = { noremap = true, silent = true }
     Plug('github/copilot.vim')
     Plug('junegunn/fzf')
     Plug('junegunn/fzf.vim')
+    Plug('junegunn/seoul256.vim')
     Plug('lcmen/nvim-lspinstall')
     Plug('L3MON4D3/LuaSnip', { ['tag'] = 'v2.*', ['do'] = 'make install_jsregexp' })
     Plug('neovim/nvim-lspconfig')
@@ -163,7 +164,7 @@ local opts = { noremap = true, silent = true }
     -- }}}
 
     -- UI {{{
-    cmd[[colorscheme onehalflight]]
+    cmd[[colorscheme seoul256-light]]                            -- Set color scheme
     opt.cursorline = true                                        -- Show cursor line
     opt.laststatus = 2                                           -- Show status line
     opt.number = true                                            -- Show line numbers

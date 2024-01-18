@@ -18,4 +18,3 @@ compdef _asdf asdf
 
 # ENV variables
 export ASDF_CONFIG_FILE="$XDG_CONFIG_HOME/asdf/config"
-export ASDF_DEFAULT_TOOL_VERSIONS_FILENAME=".config/asdf/tool-versions"

@@ -6,6 +6,9 @@ psql/history
 zsh/.zcompdump
 zsh/.zhistory
 
+# Ignore passwords
+psql/pgpass
+
 # Ignore plugins
 vim/autoload/plug.vim
 vim/plugged/*

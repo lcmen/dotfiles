@@ -6,9 +6,10 @@ autoload -Uz prompt && prompt
 
 # History
 export HISTFILE="$ZDOTDIR/.zhistory"    # History filepath
-setopt HIST_SAVE_NO_DUPS                # Do not write a duplicate event to the history file.
 export HISTSIZE=10000                   # Maximum events for internal history
+export LISTMAX=100000                   # Increase number of files to list.
 export SAVEHIST=10000                   # Maximum events in history file
+setopt HIST_IGNORE_ALL_DUPS             # Do not write a duplicate event to the history file.
 
 # Load files
 source $ZDOTDIR/aliases.zsh

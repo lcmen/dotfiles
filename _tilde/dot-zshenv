@@ -13,6 +13,7 @@ export ZDOTDIR="$XDG_CONFIG_HOME/zsh"   # Keep zsh files in ~/.config
 
 # Specify config paths to use XDG_CONFIG_HOME
 export PSQLRC="$XDG_CONFIG_HOME/psql/config"
+export PGPASSFILE="$XDG_CONFIG_HOME/psql/pgpass"
 export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/config"
 
 # PATHs

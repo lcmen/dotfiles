@@ -1,0 +1,58 @@
+[colors.bright]
+black = "0x3a3a3a"
+blue = "0x0087af"
+cyan = "0x008787"
+green = "0x005f00"
+magenta = "0x87025f"
+red = "0x870100"
+white = "0xeeeeee"
+yellow = "0xd8865f"
+
+[colors.normal]
+black = "0x4e4e4e"
+blue = "0x5f87ae"
+cyan = "0x5f8787"
+green = "0x5f885f"
+magenta = "0x875f87"
+red = "0xaf5f5f"
+white = "0xe4e4e4"
+yellow = "0xaf8760"
+
+[colors.primary]
+background = "0xdadada"
+foreground = "0x4e4e4e"
+
+[font]
+size = 13
+
+[font.bold]
+family = "FiraCode Nerd Font Mono"
+style = "Bold"
+
+[font.bold_italic]
+family = "FiraCode Nerd Font Mono"
+style = "Bold Italic"
+
+[font.italic]
+family = "FiraCode Nerd Font Mono"
+style = "Italic"
+
+[font.normal]
+family = "FiraCode Nerd Font Mono"
+style = "Regular"
+
+[[keyboard.bindings]]
+chars = "\u001BF"
+key = "Right"
+mods = "Alt"
+
+[[keyboard.bindings]]
+chars = "\u001BB"
+key = "Left"
+mods = "Alt"
+
+[window]
+option_as_alt = "OnlyRight"
+
+[shell]
+program = "/bin/zsh"

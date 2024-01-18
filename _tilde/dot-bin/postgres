@@ -11,7 +11,7 @@ postgres-console() {
 
 postgres-up() {
   echo "Postgres - starting ${version}"
-  mkdir -p "$(brew --prefix)/etc/postgresql/14/main/conf.d"
+  mkdir -p "$(brew --prefix)/etc/postgresql/${version}/main/conf.d"
   pg_ctlcluster "${version}" main start
 }
 

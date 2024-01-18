@@ -1,11 +1,11 @@
 autoload -U compinit; compinit          # Enable auto completion
 _comp_options+=(globdots)               # With hidden files
 
-setopt GLOB_COMPLETE                    # Show autocompletion menu with globs
-setopt MENU_COMPLETE                    # Automatically highlight first element of completion menu
 setopt AUTO_LIST                        # Automatically list choices on ambiguous completion.
-setopt COMPLETE_IN_WORD                 # Complete from both ends of a word.
+setopt AUTO_MENU                        # Automatically use menu completion.
 setopt AUTO_PARAM_SLASH                 # Add trailing slash for directories.
+setopt COMPLETE_IN_WORD                 # Complete from both ends of a word.
+setopt GLOB_COMPLETE                    # Show autocompletion menu with globs
 
 # Custom completion functions and widgets
 function expand-alias-with-space {
