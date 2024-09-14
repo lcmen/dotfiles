@@ -1,32 +1,78 @@
 #!/usr/bin/env bash
 
-# Script for managing local PosgtreSQL clusters.
-# Usage: `postgres [c]onsole | [u]p | [d]own| [s]tatus {version}`
+# Script for managing local PosgtreSQL clusters that allows to run multiple version in parllel without port conflicts.
+# It relies on on [postgresql-common](https://github.com/petere/postgresql-common) tool for managing PostgreSQL clusters.
+# PostgreSQL is also installed from [peter's formulas](https://github.com/petere/homebrew-postgresql).
+#
+# Usage: `postgres [c]onsole | [i]nit | [u]p | [d]own | [s]tatus {version}` | setup
+
+# Exit on error
+set -e
+
+# Different IPs for PostgreSQL version (127.0.0.10 for 10.x, 127.0.0.11 for 11.x, etc.)
+HOSTS=("127.0.0.10" "127.0.0.11" "127.0.0.12" "127.0.0.13" "127.0.0.14" "127.0.0.15" "127.0.0.16" "127.0.0.17")
+
+postgres-setup() {
+  echo "Postgres - installing postgresql-common"
+  brew tap petere/postgresql
+  HOMEBREW_NO_VERIFY_ATTESTATIONS=1 brew install postgresql-common
+
+  echo "Postgres - creating aliases for localhost interface"
+
+  for ((i=10;i<17;i++)); do
+    echo "Creating loccalhost alias (127.0.0.${i}) for version: ${i}"
+    sudo ifconfig lo0 alias 127.0.0.$i up
+  done
+}
 
 postgres-console() {
-  db=$1
+  db=${1:-postgres}
   echo "Postgres - launching psql for ${version}/${db}"
-  psql --cluster "$version"/main -U postgres -h localhost -d "$db"
+  PGHOST=/tmp/${version} psql -d "${db}"
+}
+
+postgres-init() {
+  # echo "Postgres - installing version: ${version}"
+  HOMEBREW_NO_VERIFY_ATTESTATIONS=1 brew install "petere/postgresql/postgresql@${version}"
+
+  # echo "Postgres - creating cluster for version: ${version}"
+  local index=$((version - 10))
+  local host=${HOSTS[$index]}
+  pg_createcluster "${version}" main
+  sed -i '' "s/^port = [0-9]\{4\}/port = 5432/" "/opt/homebrew/etc/postgresql/${version}/main/postgresql.conf"
+  sed -i '' "s/^#listen_addresses = 'localhost'/listen_addresses = '${host}'/" "/opt/homebrew/etc/postgresql/${version}/main/postgresql.conf"
+  sed -i '' "s|unix_socket_directories = '/tmp'|unix_socket_directories = '/tmp/${version}'|" "/opt/homebrew/etc/postgresql/${version}/main/postgresql.conf"
+  sed -i '' "s/127.0.0.1/${host}/" "/opt/homebrew/etc/postgresql/${version}/main/pg_hba.conf"
 }
 
 postgres-up() {
-  echo "Postgres - starting ${version}"
+  echo "Postgres - starting cluster for version: ${version}"
   mkdir -p "$(brew --prefix)/etc/postgresql/${version}/main/conf.d"
   pg_ctlcluster "${version}" main start
 }
 
 postgres-down() {
-  echo "Postgres - stopping ${version}"
+  echo "Postgres - stopping cluster for version: ${version}"
   pg_ctlcluster "${version}" main stop
 }
 
+postgres-remove() {
+  echo "Postgres - removing installation: ${version}"
+  brew remove "postgresql@${version}"
+  echo "Postgres - removing cluster for version: ${version}"
+  rm -rf "/opt/homebrew/etc/postgresql/${version}"
+}
+
 postgres-status() {
-  echo "Postgres - status of ${version}"
+  local index=$((version - 10))
+  local host=${HOSTS[$index]}
+
+  echo "Postgres - status of cluster for version: ${version} (${host})"
   pg_ctlcluster "${version}" main status
 }
 
 postgres-help() {
-  echo "Usage: postgres [c]onsole | [u]p | [d]own | [s]tatus {version}"
+  echo "Usage: postgres [c]onsole | [i] init | [u]p | [d]own | [s]tatus {version} | setup"
   exit 1
 }
 
@@ -35,8 +81,11 @@ version=$2
 
 case $command in
   "c" | "console") postgres-console "${3:-postgres}";;
+  "i" | "init") postgres-init ;;
   "u" | "up") postgres-up ;;
   "d" | "down") postgres-down ;;
+  "r" | "remove") postgres-remove ;;
   "s" | "status") postgres-status ;;
+  "setup") postgres-setup ;;
   *) postgres-help ;;
 esac

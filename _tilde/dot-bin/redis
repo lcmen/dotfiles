@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Script for managing redis databases.
-# Usage: `redis [l]ist | [u]p | [d]own database`
+# Usage: `redis [l]ist | [u]p | [d]own database [socket_file] [-f]`
 
 set -e
 
@@ -11,7 +11,7 @@ redis-up() {
 
   echo "Redis - starting ${database} with ${config_file} on ${socket_file}"
 
-  redis-server "$config_file" --dbfilename "$db_file" --port 0 --unixsocket "$socket_file" --daemonize yes
+  redis-server "$config_file" --dbfilename "$db_file" --port 0 --unixsocket "$socket_file" --daemonize "$daemonize"
 }
 
 redis-down() {
@@ -31,18 +31,26 @@ redis-list() {
 }
 
 redis-help() {
-  echo "Usage: redis {up|down|list} [database]"
+  echo "Usage: redis {up|down|list} database [socket_file] [-f]"
   exit 1
 }
 
-if [[ $1 != "l" && $1 != "list" && $# != 2 ]]; then
+if [[ $1 != "l" && $1 != "list" && $# -lt 2 ]]; then
   redis-help
 fi
 
 command=$1
 database=$2
-socket_file="/tmp/redis/${database}.socket"
+daemonize="yes"
+socket_file=${3:-"/tmp/redis/${database}.socket"}
 mkdir -p /tmp/redis
+
+while getopts ":f" opt; do
+  case $opt in
+    f) daemonize="no" ;;
+    \?) ;;
+  esac
+done
 
 case $command in
   "u" | "up") redis-up ;;

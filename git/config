@@ -8,6 +8,8 @@
   defaultBranch = main
 [branch]
   sort = refname
+[diff "rails_credentials"]
+  textconv = "bin/rails credentials:diff"
 [fetch]
   prune = true
 [filter "lfs"]
@@ -15,6 +17,8 @@
   process = git-lfs filter-process
   required = true
   smudge = git-lfs smudge -- %f
+[merge]
+  conflictstyle = zdiff3
 [pull]
   ff = only
 [push]

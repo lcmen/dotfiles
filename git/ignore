@@ -5,6 +5,7 @@ node_modules
 vendor
 
 # Temp files
+*.rdb
 .sass-cache
 
 # Ignore OS related files
@@ -15,6 +16,7 @@ vendor
 .Trashes
 Icon
 *.savedSearch
+*.socket
 
 # Ignore Project dev environment specific
 .direnv

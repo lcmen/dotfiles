@@ -31,7 +31,6 @@ local opts = { noremap = true, silent = true }
     Plug('AndrewRadev/splitjoin.vim')
     Plug('airblade/vim-gitgutter')
     Plug('christoomey/vim-tmux-navigator')
-    Plug('christoomey/vim-sort-motion')
     Plug('dense-analysis/ale')
     Plug('docunext/closetag.vim')
     Plug('github/copilot.vim')
@@ -39,11 +38,9 @@ local opts = { noremap = true, silent = true }
     Plug('junegunn/fzf.vim')
     Plug('junegunn/seoul256.vim')
     Plug('lcmen/nvim-lspinstall')
-    Plug('L3MON4D3/LuaSnip', { ['tag'] = 'v2.*', ['do'] = 'make install_jsregexp' })
     Plug('neovim/nvim-lspconfig')
     Plug('numtostr/BufOnly.nvim', { ['on'] = 'BufOnly' })
     Plug('onsails/lspkind-nvim')
-    Plug('rafamadriz/friendly-snippets')
     Plug('ryanoasis/vim-devicons')
     Plug('scrooloose/nerdtree')
     Plug('sheerun/vim-polyglot')
@@ -61,6 +58,13 @@ local opts = { noremap = true, silent = true }
     g.mapleader = " "                                        -- Change leader to space
 
     -- Ale {{{
+    vim.fn.system('bundle exec standardrb -v > /dev/null 2>&1')
+    if vim.v.shell_error == 0 then
+        ruby_linter = 'standardrb'
+    else
+        ruby_linter = 'rubocop'
+    end
+
     g.ale_disable_lsp = 1
     g.ale_fix_on_save = 1
     g.ale_lint_on_text_changed = 'never'
@@ -70,15 +74,20 @@ local opts = { noremap = true, silent = true }
        ['*'] = { 'remove_trailing_lines', 'trim_whitespace' },
        ['javascript'] = { 'eslint', 'prettier' },
        ['javascriptreact'] = { 'eslint', 'prettier' },
-       ['ruby'] = { 'rubocop', 'remove_trailing_lines', 'trim_whitespace' },
+       ['eruby'] = { 'rustywind' },
+       ['ruby'] = { ruby_linter, 'remove_trailing_lines', 'trim_whitespace' },
        ['terraform'] = { 'terraform' },
        ['typescript'] = { 'eslint', 'prettier' },
        ['typescriptreact'] = { 'eslint', 'prettier' },
+    }
+    g.ale_linters = {
+       ['ruby'] = { ruby_linter, 'brakeman' },
     }
     g.ale_haml_hamllint_executable = 'bundle'
     g.ale_ruby_brakeman_executable = 'bundle'
     g.ale_ruby_rubocop_auto_correct_all = 1
     g.ale_ruby_rubocop_executable = 'bundle'
+    g.ale_ruby_standardrb_executable = 'bundle'
     -- }}}
 
     -- BufOnly {{{
@@ -90,17 +99,6 @@ local opts = { noremap = true, silent = true }
     g.fzf_history_dir = '~/.local/share/fzf-history'
     map("n", "<C-p>", ":FzFiles<CR>", opts)                      -- Launch FZF for Files
     map("n", "<C-\\>", ":FzBuffers<CR>", opts)                   -- Launch FZF for Buffers
-    -- }}}
-
-    -- LuaSnip {{{
-    local luasnip = require('luasnip')
-    require('luasnip.loaders.from_vscode').lazy_load()
-    luasnip.config.setup {}
-    luasnip.filetype_extend('ruby', { 'rails' })
-
-    map('i', '<C-k>', '<Plug>luasnip-expand-or-jump', { noremap = true })
-    map("i", '<C-l>', '<Plug>luasnip-next-choice', { noremap = true })
-    map("i", '<C-j>', '<Plug>luasnip-prev-choice', { noremap = true })
     -- }}}
 
     -- NERDTree {{{
@@ -204,6 +202,8 @@ require('lspkind').init()
         config.capabilities = capabilities
         lspconfig[server].setup(config)
     end
+
+    -- lspconfig['ruby_lsp'].setup({ cmd = { 'bin/ruby-lsp' }, on_attach = on_attach })
     -- }}}
 
     -- Diagnostics UI {{{
@@ -229,6 +229,7 @@ require('lspkind').init()
     map('n', '<leader>p', ':let @+=expand("%")<CR>', opts)       -- Copy buffer's relative path to clipboard
     map('n', '<leader>P', ':let @+=expand("%:p")<CR>', opts)     -- Copy buffer's absolute path to clipboard
 
+    map('i', '<S-Tab>', '<C-d>', opts)                           -- Tab backwards with Shift+Tab
     map('n', 'k', 'gk', { silent = true })                       -- Move more sensibly when line wrapping enabled
     map('n', 'j', 'gj', { silent = true })
     map('v', '<', '<gv', opts)                                   -- Move block of codes left
