@@ -2,7 +2,7 @@
 .bundle
 deps
 node_modules
-vendor
+vendor/bundle
 
 # Temp files
 *.rdb
@@ -21,6 +21,7 @@ Icon
 # Ignore Project dev environment specific
 .direnv
 .envrc
+.lspinstall
 .projections.json
 .vscode
 Procfile.dev

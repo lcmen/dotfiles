@@ -34,15 +34,17 @@ local opts = { noremap = true, silent = true }
     Plug('dense-analysis/ale')
     Plug('docunext/closetag.vim')
     Plug('github/copilot.vim')
-    Plug('junegunn/fzf')
-    Plug('junegunn/fzf.vim')
+    Plug('ibhagwan/fzf-lua')
     Plug('junegunn/seoul256.vim')
     Plug('lcmen/nvim-lspinstall')
     Plug('neovim/nvim-lspconfig')
+    Plug('nvim-lua/plenary.nvim')
+    Plug('nvim-treesitter/nvim-treesitter')
+    Plug('nvim-tree/nvim-tree.lua')
+    Plug('nvim-tree/nvim-web-devicons')
     Plug('numtostr/BufOnly.nvim', { ['on'] = 'BufOnly' })
+    Plug('olimorris/codecompanion.nvim')
     Plug('onsails/lspkind-nvim')
-    Plug('ryanoasis/vim-devicons')
-    Plug('scrooloose/nerdtree')
     Plug('sheerun/vim-polyglot')
     Plug('sonph/onehalf', { ['rtp'] = 'vim' })
     Plug('tpope/vim-commentary')
@@ -54,8 +56,6 @@ local opts = { noremap = true, silent = true }
 
     call('plug#end')
     -- }}}
-
-    g.mapleader = " "                                        -- Change leader to space
 
     -- Ale {{{
     vim.fn.system('bundle exec standardrb -v > /dev/null 2>&1')
@@ -94,18 +94,96 @@ local opts = { noremap = true, silent = true }
     g.bufonly_delete_non_modifiable = true                       -- Delete non-modifiable buffers
     -- }}}
 
-    -- FZF {{{
-    g.fzf_command_prefix = 'Fz'
-    g.fzf_history_dir = '~/.local/share/fzf-history'
-    map("n", "<C-p>", ":FzFiles<CR>", opts)                      -- Launch FZF for Files
-    map("n", "<C-\\>", ":FzBuffers<CR>", opts)                   -- Launch FZF for Buffers
+    -- CodeCompanion{{{
+    require("codecompanion").setup({
+        strategies = {
+            chat = {
+                adapter = "copilot",
+                keymaps = {
+                    completion = {
+                        modes = {
+                            i = '<C-x>'
+                        }
+                    }
+                },
+                slash_commands = {
+                    ['buffer'] = { opts = { provider = 'fzf_lua' } },
+                    ['file'] = { opts = { provider = 'fzf_lua' } },
+                    ['help'] = { opts = { provider = 'fzf_lua' } },
+                    ['symbols'] = { opts = { provider = 'fzf_lua' } },
+                },
+            },
+            inline = { adapter = "copilot" },
+        }
+    })
     -- }}}
 
-    -- NERDTree {{{
-    g.NERDTreeShowHidden = 1                                     -- Show hidden files on NERDTree
+    -- FZF {{{
+    map("n", "<C-p>", ":FzfLua files<CR>", opts)                 -- Launch FZF for Files
+    map("n", "<C-\\>", ":FzfLua buffers<CR>", opts)              -- Launch FZF for Buffers
+    require('fzf-lua').setup({
+        winopts = {
+            cursorline = false,
+            cursorcolumn = false,
+            width = 0.9,
+            height = 0.9,
+            border = 'none',
+            preview = {
+                default = 'bat',
+                border = 'border',
+                wrap = 'nowrap',
+                scrolloff = 5,
+                winopts = {
+                    number = true,
+                }
+            },
+        },
+        fzf_opts = {
+            ['--border'] = 'none',
+            ['--info'] = 'hidden',
+            ['--header'] = ' ',
+            ['--padding'] = '3%,3%,3%,3%',
+            ['--prompt'] = '🔍 ',
+            ['--no-scrollbar'] = '',
+            ['--no-separator'] = '',
+        },
+        previewers = {
+            bat = {
+                cmd = 'bat',
+                theme = 'OneHalfLight',
+            },
+        },
+        buffers = {
+            file_icons = true,
+            formatter = "path.filename_first",
+            git_icons = true,
+            prompt = "🔍 Buffers: ",
+        },
+        files = {
+            cwd_prompt = false,
+            file_icons = true,
+            formatter = "path.filename_first",
+            git_icons = true,
+            prompt = "🔍 Files: ",
+        },
+    })
+    -- }}}
 
-    map('n', '<C-e>', ':NERDTreeToggle<CR>', opts)               -- Toggle NERDTree
-    map('n', '<leader>e', ':NERDTreeFind<CR>', opts)             -- Focus current buffer in NERDTree
+    -- NvimTree {{{
+    local function tree_on_attach(bufnr)
+        local map = vim.api.nvim_buf_set_keymap
+        local opts = { noremap = true }
+        map(bufnr, 'n', '<C-e>', ':NvimTreeClose<CR>', opts)     -- Close NERDTree
+    end
+
+    require("nvim-tree").setup({
+        on_attach = tree_on_attach,
+        sort = { sorter = "case_sensitive" },
+        view = { width = 30 },
+        renderer = { group_empty = true },
+    })
+    map('n', '<C-e>', ':NvimTreeToggle<CR>', opts)               -- Toggle NERDTree
+    map('n', '<leader>e', ':NvimTreeFocus<CR>', opts)            -- Focus current buffer in NERDTree
     -- }}}
 
     -- Sideways & Splitjoin {{{
@@ -162,7 +240,7 @@ local opts = { noremap = true, silent = true }
     -- }}}
 
     -- UI {{{
-    cmd[[colorscheme seoul256-light]]                            -- Set color scheme
+    cmd[[colorscheme OneHalfLight]]                              -- Set color scheme
     opt.cursorline = true                                        -- Show cursor line
     opt.laststatus = 2                                           -- Show status line
     opt.number = true                                            -- Show line numbers
@@ -171,7 +249,7 @@ local opts = { noremap = true, silent = true }
 -- }}}
 
 -- LSP {{{
-local on_attach = function(client, bufnr)
+local lsp_on_attach = function(client, bufnr)
     local map = vim.api.nvim_buf_set_keymap
     local ion = vim.api.nvim_buf_set_option
     local opts = { noremap = true }
@@ -198,13 +276,10 @@ require('lspkind').init()
     capabilities.textDocument.completion.completionItem.snippetSupport = true
 
     for server, config in pairs(lspinstall.installed_servers()) do
-        config.on_attach = on_attach
+        config.on_attach = lsp_on_attach
         config.capabilities = capabilities
         lspconfig[server].setup(config)
     end
-
-    -- lspconfig['ruby_lsp'].setup({ cmd = { 'bin/ruby-lsp' }, on_attach = on_attach })
-    -- }}}
 
     -- Diagnostics UI {{{
     lsp.handlers['textDocument/publishDiagnostics'] = lsp.with(lsp.diagnostic.on_publish_diagnostics, {

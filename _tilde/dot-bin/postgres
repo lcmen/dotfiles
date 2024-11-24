@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# Script for managing local PosgtreSQL clusters that allows to run multiple version in parllel without port conflicts.
-# It relies on on [postgresql-common](https://github.com/petere/postgresql-common) tool for managing PostgreSQL clusters.
+# Script for managing local PostgreSQL clusters that allows to run multiple versions in parallel without port conflicts.
+# It relies on [postgresql-common](https://github.com/petere/postgresql-common) tool for managing PostgreSQL clusters.
 # PostgreSQL is also installed from [peter's formulas](https://github.com/petere/homebrew-postgresql).
 #
 # Usage: `postgres [c]onsole | [i]nit | [u]p | [d]own | [s]tatus {version}` | setup
@@ -12,17 +12,31 @@ set -e
 # Different IPs for PostgreSQL version (127.0.0.10 for 10.x, 127.0.0.11 for 11.x, etc.)
 HOSTS=("127.0.0.10" "127.0.0.11" "127.0.0.12" "127.0.0.13" "127.0.0.14" "127.0.0.15" "127.0.0.16" "127.0.0.17")
 
+PLIST_CONTENT=$(cat <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.user.lo0-IP_ADDRESS.plist</string>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>ProgramArguments</key>
+    <array>
+      <string>/sbin/ifconfig</string>
+      <string>lo0</string>
+      <string>alias</string>
+      <string>IP_ADDRESS</string>
+    </array>
+</dict>
+</plist>
+EOF
+)
+
 postgres-setup() {
   echo "Postgres - installing postgresql-common"
   brew tap petere/postgresql
   HOMEBREW_NO_VERIFY_ATTESTATIONS=1 brew install postgresql-common
-
-  echo "Postgres - creating aliases for localhost interface"
-
-  for ((i=10;i<17;i++)); do
-    echo "Creating loccalhost alias (127.0.0.${i}) for version: ${i}"
-    sudo ifconfig lo0 alias 127.0.0.$i up
-  done
 }
 
 postgres-console() {
@@ -32,17 +46,33 @@ postgres-console() {
 }
 
 postgres-init() {
-  # echo "Postgres - installing version: ${version}"
-  HOMEBREW_NO_VERIFY_ATTESTATIONS=1 brew install "petere/postgresql/postgresql@${version}"
+  echo "Postgres - installing version: ${version}"
+  HOMEBREW_NO_VERIFY_ATTESTATIONS=1 brew install -q "petere/postgresql/postgresql@${version}"
 
-  # echo "Postgres - creating cluster for version: ${version}"
+  echo "Postgres - creating cluster for version: ${version}"
   local index=$((version - 10))
   local host=${HOSTS[$index]}
   pg_createcluster "${version}" main
+
+  # Reset port to default
   sed -i '' "s/^port = [0-9]\{4\}/port = 5432/" "/opt/homebrew/etc/postgresql/${version}/main/postgresql.conf"
+  # Assign lo0 alias as listen address and unix socket directory
   sed -i '' "s/^#listen_addresses = 'localhost'/listen_addresses = '${host}'/" "/opt/homebrew/etc/postgresql/${version}/main/postgresql.conf"
   sed -i '' "s|unix_socket_directories = '/tmp'|unix_socket_directories = '/tmp/${version}'|" "/opt/homebrew/etc/postgresql/${version}/main/postgresql.conf"
   sed -i '' "s/127.0.0.1/${host}/" "/opt/homebrew/etc/postgresql/${version}/main/pg_hba.conf"
+
+  echo "Postgres - creating alias for localhost interface (${host})"
+  local file="/Library/LaunchDaemons/com.user.lo0-${host}.plist"
+
+  if [ -f "${file}" ]; then
+    sudo launchctl unload "${file}"
+    sudo rm "${file}"
+  fi
+
+  echo "${PLIST_CONTENT//IP_ADDRESS/${host}}" | sudo tee "${file}" > /dev/null
+  sudo chmod 644 "${file}"
+  sudo chown root:wheel "${file}"
+  sudo launchctl load "${file}"
 }
 
 postgres-up() {

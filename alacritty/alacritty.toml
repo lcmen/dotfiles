@@ -1,26 +1,26 @@
-[colors.bright]
-black = "0x3a3a3a"
-blue = "0x0087af"
-cyan = "0x008787"
-green = "0x005f00"
-magenta = "0x87025f"
-red = "0x870100"
-white = "0xeeeeee"
-yellow = "0xd8865f"
-
 [colors.normal]
-black = "0x4e4e4e"
-blue = "0x5f87ae"
-cyan = "0x5f8787"
-green = "0x5f885f"
-magenta = "0x875f87"
-red = "0xaf5f5f"
-white = "0xe4e4e4"
-yellow = "0xaf8760"
+black ='0x383a42'
+red ='0xe45649'
+green ='0x50a14f'
+yellow ='0xc18401'
+blue ='0x0184bc'
+magenta ='0xa626a4'
+cyan ='0x0997b3'
+white ='0xfafafa'
+
+[colors.bright]
+black = '0x383a42'
+red = '0xe45649'
+green = '0x50a14f'
+yellow = '0xc18401'
+blue = '0x0184bc'
+magenta = '0xa626a4'
+cyan = '0x0997b3'
+white = '0xfafafa'
 
 [colors.primary]
-background = "0xdadada"
-foreground = "0x4e4e4e"
+background = '0xfafafa'
+foreground = '0x383a42'
 
 [font]
 size = 13
