@@ -35,7 +35,6 @@ local opts = { noremap = true, silent = true }
     Plug('docunext/closetag.vim')
     Plug('github/copilot.vim')
     Plug('ibhagwan/fzf-lua')
-    Plug('junegunn/seoul256.vim')
     Plug('lcmen/nvim-lspinstall')
     Plug('neovim/nvim-lspconfig')
     Plug('nvim-lua/plenary.nvim')
@@ -45,8 +44,8 @@ local opts = { noremap = true, silent = true }
     Plug('numtostr/BufOnly.nvim', { ['on'] = 'BufOnly' })
     Plug('olimorris/codecompanion.nvim')
     Plug('onsails/lspkind-nvim')
+    Plug('sainnhe/edge')
     Plug('sheerun/vim-polyglot')
-    Plug('sonph/onehalf', { ['rtp'] = 'vim' })
     Plug('tpope/vim-commentary')
     Plug('tpope/vim-projectionist')
     Plug('tpope/vim-repeat')
@@ -56,7 +55,56 @@ local opts = { noremap = true, silent = true }
 
     call('plug#end')
     -- }}}
+-- }}}
 
+-- Settings {{{
+    -- General {{{
+    g.mapleader = " "                                            -- Change leader to space
+    opt.clipboard = 'unnamedplus'                                -- Use System clipboard
+    opt.mouse = 'a'                                              -- Enable mouse support
+    opt.swapfile = false                                         -- No swapfile
+    opt.scrolloff = 5                                            -- Start scrolling 5 lines away from margin
+    opt.sidescrolloff = 15                                       -- Start scrolling 15 lines away from side margin
+    opt.spell = false                                            -- Spell checking off
+    opt.splitbelow = true                                        -- Split below
+    opt.splitright = true                                        -- Split on the right side
+    opt.completeopt = { 'menu', 'menuone', 'noselect' }          -- Don't select completion menu
+    -- }}}
+
+    -- Whitespaces {{{
+    opt.wrap = false
+    opt.linebreak = true
+    opt.expandtab = true                                         -- Indent with spaces
+    opt.list = true                                              -- Show invisible characters
+    opt.listchars = { eol = '↲', tab = '▸ ', trail = '·' }
+    opt.softtabstop = 2                                          -- Number of spaces per <tab> when inserting
+    opt.shiftwidth = 2                                           -- Number of spaces per <tab> when indenting
+    opt.tabstop = 4                                              -- Number of spaces <tab> counts for
+    opt.textwidth = 120
+    -- }}}
+
+    -- Search {{{
+    opt.incsearch = true                                         -- Enable incremental search
+    opt.ignorecase = true                                        -- Ignore case when searching
+    opt.smartcase = true                                         -- unless there is a capital letter in the query
+    -- }}}
+
+    -- Backups {{{
+    opt.backup = false                                           --  Disable backup
+    opt.writebackup = false
+    -- }}}
+
+    -- UI {{{
+    g.edge_transparent_background = true                         -- Enable transparent background
+    cmd[[colorscheme edge]]
+    opt.cursorline = true                                        -- Show cursor line
+    opt.laststatus = 2                                           -- Show status line
+    opt.number = true                                            -- Show line numbers
+    opt.relativenumber = true                                    -- Use relative line numbers
+    --}}}
+-- }}}
+
+-- Packages configuration {{{
     -- Ale {{{
     vim.fn.system('bundle exec standardrb -v > /dev/null 2>&1')
     if vim.v.shell_error == 0 then
@@ -129,13 +177,10 @@ local opts = { noremap = true, silent = true }
             height = 0.9,
             border = 'none',
             preview = {
-                default = 'bat',
                 border = 'border',
                 wrap = 'nowrap',
                 scrolloff = 5,
-                winopts = {
-                    number = true,
-                }
+                winopts = { number = true }
             },
         },
         fzf_opts = {
@@ -145,24 +190,15 @@ local opts = { noremap = true, silent = true }
             ['--padding'] = '3%,3%,3%,3%',
             ['--prompt'] = '🔍 ',
             ['--no-scrollbar'] = '',
-            ['--no-separator'] = '',
-        },
-        previewers = {
-            bat = {
-                cmd = 'bat',
-                theme = 'OneHalfLight',
-            },
         },
         buffers = {
             file_icons = true,
-            formatter = "path.filename_first",
             git_icons = true,
             prompt = "🔍 Buffers: ",
         },
         files = {
             cwd_prompt = false,
             file_icons = true,
-            formatter = "path.filename_first",
             git_icons = true,
             prompt = "🔍 Files: ",
         },
@@ -170,10 +206,23 @@ local opts = { noremap = true, silent = true }
     -- }}}
 
     -- NvimTree {{{
+    g.loaded_netrw = 1
+    g.loaded_netrwPlugin = 1
+
     local function tree_on_attach(bufnr)
-        local map = vim.api.nvim_buf_set_keymap
-        local opts = { noremap = true }
-        map(bufnr, 'n', '<C-e>', ':NvimTreeClose<CR>', opts)     -- Close NERDTree
+        local api = require('nvim-tree.api')
+        local map = vim.keymap.set
+        local opts = { buffer = bufnr, noremap = true }
+
+        map('n', '<C-]>', api.tree.change_root_to_node, opts)
+        map('n', '<C-e>', api.tree.close, opts)
+        map('n', '<C-t>', api.node.open.tab, opts)
+        map('n', '<CR>', api.node.open.edit, opts)
+        map('n', 'a', api.fs.create, opts)
+        map('n', 'd', api.fs.remove, opts)
+        map('n', 'r', api.fs.rename, opts)
+        map('n', 's', api.node.open.horizontal, opts)
+        map('n', 'v', api.node.open.vertical, opts)
     end
 
     require("nvim-tree").setup({
@@ -183,7 +232,7 @@ local opts = { noremap = true, silent = true }
         renderer = { group_empty = true },
     })
     map('n', '<C-e>', ':NvimTreeToggle<CR>', opts)               -- Toggle NERDTree
-    map('n', '<leader>e', ':NvimTreeFocus<CR>', opts)            -- Focus current buffer in NERDTree
+    map('n', '<leader>e', ':NvimTreeFindFile<CR>', opts)         -- Focus current buffer in NERDTree
     -- }}}
 
     -- Sideways & Splitjoin {{{
@@ -200,52 +249,6 @@ local opts = { noremap = true, silent = true }
     map('n', '<C-k>', ':TmuxNavigateUp<CR>', opts)               -- Move to the top pane
     map('n', '<C-l>', ':TmuxNavigateRight<CR>', opts)            -- Move to the right pane
     -- }}
--- }}}
-
--- Settings {{{
-    -- General {{{
-    g.mapleader = " "                                            -- Change leader to space
-    opt.clipboard = 'unnamedplus'                                -- Use System clipboard
-    opt.mouse = 'a'                                              -- Enable mouse support
-    opt.swapfile = false                                         -- No swapfile
-    opt.scrolloff = 5                                            -- Start scrolling 5 lines away from margin
-    opt.sidescrolloff = 15                                       -- Start scrolling 15 lines away from side margin
-    opt.spell = false                                            -- Spell checking off
-    opt.splitbelow = true                                        -- Split below
-    opt.splitright = true                                        -- Split on the right side
-    opt.completeopt = { 'menu', 'menuone', 'noselect' }          -- Don't select completion menu
-    -- }}}
-
-    -- Whitespaces {{{
-    opt.wrap = false
-    opt.linebreak = true
-    opt.expandtab = true                                         -- Indent with spaces
-    opt.list = true                                              -- Show invisible characters
-    opt.listchars = { eol = '↲', tab = '▸ ', trail = '·' }
-    opt.softtabstop = 2                                          -- Number of spaces per <tab> when inserting
-    opt.shiftwidth = 2                                           -- Number of spaces per <tab> when indenting
-    opt.tabstop = 4                                              -- Number of spaces <tab> counts for
-    opt.textwidth = 120
-    -- }}}
-
-    -- Search {{{
-    opt.incsearch = true                                         -- Enable incremental search
-    opt.ignorecase = true                                        -- Ignore case when searching
-    opt.smartcase = true                                         -- unless there is a capital letter in the query
-    -- }}}
-
-    -- Backups {{{
-    opt.backup = false                                           --  Disable backup
-    opt.writebackup = false
-    -- }}}
-
-    -- UI {{{
-    cmd[[colorscheme OneHalfLight]]                              -- Set color scheme
-    opt.cursorline = true                                        -- Show cursor line
-    opt.laststatus = 2                                           -- Show status line
-    opt.number = true                                            -- Show line numbers
-    opt.relativenumber = true                                    -- Use relative line numbers
-    --}}}
 -- }}}
 
 -- LSP {{{

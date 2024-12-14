@@ -1,22 +1,17 @@
 [core]
   excludesfile = ~/.config/git/ignore
   editor = nvim
+[init]
+  defaultBranch = main
 [user]
   email = lucas@mendelowski.com
   name = Lucas Mendelowski
-[init]
-  defaultBranch = main
 [branch]
   sort = refname
 [diff "rails_credentials"]
   textconv = "bin/rails credentials:diff"
 [fetch]
   prune = true
-[filter "lfs"]
-  clean = git-lfs clean -- %f
-  process = git-lfs filter-process
-  required = true
-  smudge = git-lfs smudge -- %f
 [merge]
   conflictstyle = zdiff3
 [pull]
@@ -25,12 +20,12 @@
   default = upstream
 [alias]
   br = branch
-  brc = "!f() { git br --merged | grep -v "master" | grep -v "staging" | xargs git br -D; }; f"
   cm = !git add -A && git commit
   cma = !git add -A && git commit --amend --no-edit
   cmar = !git add -A && git commit --amend --no-edit --reset-author
   co = checkout
   cob = checkout -b
+  fe = "!f() { git fetch -p && git branch -vv | awk '/: gone]/{print $1}' | xargs git br -D; }; f"
   st = status
   sw = !git checkout $(git br --all | fzf)
   wip = !git add -A && git commit -m "WIP"

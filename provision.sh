@@ -19,6 +19,7 @@ HOMEBREW_NO_VERIFY_ATTESTATIONS=1 brew install -q bat \
                                                   stow \
                                                   tig \
                                                   tmux
+
 HOMEBREW_NO_VERIFY_ATTESTATIONS=1 brew install --cask -q alacritty \
                                                          android-file-transfer \
                                                          appcleaner \
@@ -38,3 +39,7 @@ HOMEBREW_NO_VERIFY_ATTESTATIONS=1 brew install --cask -q alacritty \
 HOMEBREW_NO_VERIFY_ATTESTATIONS=1 brew upgrade --greedy
 
 sudo brew services start docker-mac-net-connect
+
+brew cleanup
+
+echo "Done!"
