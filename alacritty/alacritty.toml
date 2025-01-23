@@ -1,26 +1,26 @@
-[colors.bright]
-black = "0x4b505b"
-red = "0xd05858"
-green = "0x608e32"
-yellow = "0xbe7e05"
-blue = "0x5079be"
-magenta = "0xb05ccc"
-cyan = "0x3a8b84"
-white = "0xbac3cb"
-
-[colors.normal]
-black = "0x8790a0"
-red = "0xd05858"
-green = "0x608e32"
-yellow = "0xbe7e05"
-blue = "0x5079be"
-magenta = "0xb05ccc"
-cyan = "0x3a8b84"
-white = "0xdde2e7"
-
 [colors.primary]
 background = "0xfafafa"
-foreground = "0x4b505b"
+foreground = "0x383a42"
+
+[colors.normal]
+black = "0x383a42"
+red = "0xe45649"
+green = "0x50a14f"
+yellow = "0xc18401"
+blue = "0x0184bc"
+magenta = "0xa626a4"
+cyan = "0x0997b3"
+white = "0xfafafa"
+
+[colors.bright]
+black = "0x383a42"
+red = "0xe45649"
+green = "0x50a14f"
+yellow = "0xc18401"
+blue = "0x0184bc"
+magenta = "0xa626a4"
+cyan = "0x0997b3"
+white = "0xfafafa"
 
 [font]
 size = 13
@@ -50,6 +50,16 @@ mods = "Alt"
 chars = "\u001BB"
 key = "Left"
 mods = "Alt"
+
+[[keyboard.bindings]]
+key = "Tab"
+mods = "Control"
+chars = "\u001b[9;5u"
+
+# [[keyboard.bindings]]
+# chars = "\u001f"
+# key = "Slash"
+# mods = "Control"
 
 [window]
 option_as_alt = "OnlyRight"

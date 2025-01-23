@@ -36,18 +36,21 @@ EOF
 postgres-setup() {
   echo "Postgres - installing postgresql-common"
   brew tap petere/postgresql
-  HOMEBREW_NO_VERIFY_ATTESTATIONS=1 brew install postgresql-common
+  brew install postgresql-common
 }
 
 postgres-console() {
-  db=${1:-postgres}
+  local version=$1
+  local db=${2:-postgres}
   echo "Postgres - launching psql for ${version}/${db}"
   PGHOST=/tmp/${version} psql -d "${db}"
 }
 
 postgres-init() {
+  local version=$1
+
   echo "Postgres - installing version: ${version}"
-  HOMEBREW_NO_VERIFY_ATTESTATIONS=1 brew install -q "petere/postgresql/postgresql@${version}"
+  brew install -q "petere/postgresql/postgresql@${version}"
 
   echo "Postgres - creating cluster for version: ${version}"
   local index=$((version - 10))
@@ -58,7 +61,9 @@ postgres-init() {
   sed -i '' "s/^port = [0-9]\{4\}/port = 5432/" "/opt/homebrew/etc/postgresql/${version}/main/postgresql.conf"
   # Assign lo0 alias as listen address and unix socket directory
   sed -i '' "s/^#listen_addresses = 'localhost'/listen_addresses = '${host}'/" "/opt/homebrew/etc/postgresql/${version}/main/postgresql.conf"
+  # Set socket directory to /tmp/${version}
   sed -i '' "s|unix_socket_directories = '/tmp'|unix_socket_directories = '/tmp/${version}'|" "/opt/homebrew/etc/postgresql/${version}/main/postgresql.conf"
+  # Set listen address to ${host}
   sed -i '' "s/127.0.0.1/${host}/" "/opt/homebrew/etc/postgresql/${version}/main/pg_hba.conf"
 
   echo "Postgres - creating alias for localhost interface (${host})"
@@ -76,29 +81,35 @@ postgres-init() {
 }
 
 postgres-up() {
+  local version=$1
   echo "Postgres - starting cluster for version: ${version}"
   mkdir -p "$(brew --prefix)/etc/postgresql/${version}/main/conf.d"
   pg_ctlcluster "${version}" main start
 }
 
 postgres-down() {
+  local version=$1
   echo "Postgres - stopping cluster for version: ${version}"
   pg_ctlcluster "${version}" main stop
 }
 
 postgres-remove() {
+  local version=$1
+
   echo "Postgres - removing installation: ${version}"
   brew remove "postgresql@${version}"
+
   echo "Postgres - removing cluster for version: ${version}"
   rm -rf "/opt/homebrew/etc/postgresql/${version}"
 }
 
 postgres-status() {
+  local version=$1
   local index=$((version - 10))
   local host=${HOSTS[$index]}
 
-  echo "Postgres - status of cluster for version: ${version} (${host})"
-  pg_ctlcluster "${version}" main status
+  echo -n "Postgres - status of cluster for version: ${version} (${host}): "
+  pg_ctlcluster "${version}" main status | head -n 1 | sed "s/^pg_ctl: //"
 }
 
 postgres-help() {
@@ -106,16 +117,13 @@ postgres-help() {
   exit 1
 }
 
-command=$1
-version=$2
-
-case $command in
-  "c" | "console") postgres-console "${3:-postgres}";;
-  "i" | "init") postgres-init ;;
-  "u" | "up") postgres-up ;;
-  "d" | "down") postgres-down ;;
-  "r" | "remove") postgres-remove ;;
-  "s" | "status") postgres-status ;;
+case $1 in
+  "c" | "console") postgres-console "${2}" "${3:-postgres}";;
+  "i" | "init") postgres-init "${2}";;
+  "u" | "up") postgres-up "${2}";;
+  "d" | "down") postgres-down "${2}";;
+  "r" | "remove") postgres-remove "${2}";;
+  "s" | "status") postgres-status "${2}";;
   "setup") postgres-setup ;;
   *) postgres-help ;;
 esac

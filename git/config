@@ -7,7 +7,9 @@
   email = lucas@mendelowski.com
   name = Lucas Mendelowski
 [branch]
-  sort = refname
+  # Automatically track remote branches when checking out to a branch
+  autoSetupMerge = true
+  sort = -committerdate
 [diff "rails_credentials"]
   textconv = "bin/rails credentials:diff"
 [fetch]
@@ -17,15 +19,19 @@
 [pull]
   ff = only
 [push]
+  # Automatically track remote branches when pushing to remote
+  autoSetupRemote = true
   default = upstream
 [alias]
   br = branch
   cm = !git add -A && git commit
-  cma = !git add -A && git commit --amend --no-edit
-  cmar = !git add -A && git commit --amend --no-edit --reset-author
+  cma = !git add -A && git commit --amend --no-edit --reset-author
   co = checkout
   cob = checkout -b
+  # Fetch and delete branches that have been deleted on the remote
   fe = "!f() { git fetch -p && git branch -vv | awk '/: gone]/{print $1}' | xargs git br -D; }; f"
+  pl = pull --rebase
+  ps = push
   st = status
   sw = !git checkout $(git br --all | fzf)
   wip = !git add -A && git commit -m "WIP"
