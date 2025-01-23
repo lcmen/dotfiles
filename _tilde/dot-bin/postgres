@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-# Script for managing local PostgreSQL clusters that allows to run multiple versions in parallel without port conflicts.
+# Script for managing local PostgreSQL clusters on Mac that allows to run multiple versions in parallel without port conflicts.
 # It relies on [postgresql-common](https://github.com/petere/postgresql-common) tool for managing PostgreSQL clusters.
-# PostgreSQL is also installed from [peter's formulas](https://github.com/petere/homebrew-postgresql).
+# PostgreSQL needs to also be installed from [peter's formulas](https://github.com/petere/homebrew-postgresql).
 #
 # Usage: `postgres [c]onsole | [i]nit | [u]p | [d]own | [s]tatus {version}` | setup
 
@@ -117,13 +117,33 @@ postgres-help() {
   exit 1
 }
 
+verify-version() {
+  local version=$1
+  if [ -z "${version}" ]; then
+    echo "Postgres - version is required" >&2
+    exit 1
+  fi
+
+  if ! [[ "${version}" =~ ^[0-9]+$ ]]; then
+    echo "Postgres - version must be a number" >&2
+    exit 1
+  fi
+
+  if [ "${version}" -lt 10 ] || [ "${version}" -gt 17 ]; then
+    echo "Postgres - version must be between 10 and 17" >&2
+    exit 1
+  fi
+
+  echo "${version}"
+}
+
 case $1 in
-  "c" | "console") postgres-console "${2}" "${3:-postgres}";;
-  "i" | "init") postgres-init "${2}";;
-  "u" | "up") postgres-up "${2}";;
-  "d" | "down") postgres-down "${2}";;
-  "r" | "remove") postgres-remove "${2}";;
-  "s" | "status") postgres-status "${2}";;
-  "setup") postgres-setup ;;
-  *) postgres-help ;;
+  "c" | "console") verify-version "$2" && postgres-console "$2" "${3:-postgres}";;
+  "i" | "init") verify-version "$2" && postgres-init "$2";;
+  "u" | "up") verify-version "$2" && postgres-up "$2";;
+  "d" | "down") verify-version "$2" && postgres-down "$2";;
+  "r" | "remove") verify-version "$2" && postgres-remove "$2";;
+  "s" | "status") verify-version "$2" && postgres-status "$2";;
+  "setup") postgres-setup;;
+  *) postgres-help;;
 esac
