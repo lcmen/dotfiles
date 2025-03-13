@@ -33,5 +33,6 @@
   pl = pull --rebase
   ps = push
   st = status
-  sw = !git checkout $(git br --all | fzf)
+  sw = !git checkout $(git br | fzf)
+  swa = !git checkout $(git br --all | fzf)
   wip = !git add -A && git commit -m "WIP"

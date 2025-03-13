@@ -61,8 +61,8 @@ chars = "\u001b[9;5u"
 # key = "Slash"
 # mods = "Control"
 
+[terminal.shell]
+program = "/bin/zsh"
+
 [window]
 option_as_alt = "OnlyRight"
-
-[shell]
-program = "/bin/zsh"

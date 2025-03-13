@@ -29,6 +29,7 @@ local opts = { noremap = true, silent = true }
     local Plug = vim.fn['plug#']
     Plug('AndrewRadev/sideways.vim')
     Plug('AndrewRadev/splitjoin.vim')
+    Plug('CopilotC-Nvim/CopilotChat.nvim')
     Plug('airblade/vim-gitgutter')
     Plug('christoomey/vim-tmux-navigator')
     Plug('dense-analysis/ale')
@@ -42,10 +43,9 @@ local opts = { noremap = true, silent = true }
     Plug('nvim-tree/nvim-tree.lua')
     Plug('nvim-tree/nvim-web-devicons')
     Plug('numtostr/BufOnly.nvim', { ['on'] = 'BufOnly' })
-    Plug('olimorris/codecompanion.nvim')
     Plug('onsails/lspkind-nvim')
-    Plug('sainnhe/edge')
     Plug('sheerun/vim-polyglot')
+    Plug('sonph/onehalf', { ['rtp'] = 'vim' })
     Plug('tpope/vim-commentary')
     Plug('tpope/vim-projectionist')
     Plug('tpope/vim-repeat')
@@ -95,8 +95,7 @@ local opts = { noremap = true, silent = true }
     -- }}}
 
     -- UI {{{
-    g.edge_transparent_background = true                         -- Enable transparent background
-    cmd[[colorscheme edge]]
+    cmd[[colorscheme onehalflight]]
     opt.cursorline = true                                        -- Show cursor line
     opt.laststatus = 2                                           -- Show status line
     opt.number = true                                            -- Show line numbers
@@ -142,33 +141,16 @@ local opts = { noremap = true, silent = true }
     g.bufonly_delete_non_modifiable = true                       -- Delete non-modifiable buffers
     -- }}}
 
-    -- CodeCompanion{{{
-    require("codecompanion").setup({
-        strategies = {
-            chat = {
-                adapter = "copilot",
-                keymaps = {
-                    completion = {
-                        modes = {
-                            i = '<C-x>'
-                        }
-                    }
-                },
-                slash_commands = {
-                    ['buffer'] = { opts = { provider = 'fzf_lua' } },
-                    ['file'] = { opts = { provider = 'fzf_lua' } },
-                    ['help'] = { opts = { provider = 'fzf_lua' } },
-                    ['symbols'] = { opts = { provider = 'fzf_lua' } },
-                },
-            },
-            inline = { adapter = "copilot" },
-        }
+    -- Copilot Chat {{{
+    require("CopilotChat").setup({
+
     })
     -- }}}
 
     -- FZF {{{
     map("n", "<C-p>", ":FzfLua files<CR>", opts)                 -- Launch FZF for Files
     map("n", "<C-\\>", ":FzfLua buffers<CR>", opts)              -- Launch FZF for Buffers
+    -- map("n", "<C-/>", ":FzfLua grep<CR>", opts)                  -- Launch FZF for Grep
     require('fzf-lua').setup({
         winopts = {
             cursorline = false,

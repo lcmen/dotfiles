@@ -23,6 +23,7 @@ HOMEBREW_NO_VERIFY_ATTESTATIONS=1 brew install -q bat \
 HOMEBREW_NO_VERIFY_ATTESTATIONS=1 brew install --cask -q alacritty \
                                                          android-file-transfer \
                                                          appcleaner \
+                                                         cursor \
                                                          firefox \
                                                          font-fira-code-nerd-font \
                                                          google-chrome \
@@ -31,7 +32,6 @@ HOMEBREW_NO_VERIFY_ATTESTATIONS=1 brew install --cask -q alacritty \
                                                          quicklook-json \
                                                          postman \
                                                          pocket-casts \
-                                                         send-to-kindle \
                                                          the-unarchiver \
                                                          whatsapp \
                                                          vlc
