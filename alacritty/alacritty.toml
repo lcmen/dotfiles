@@ -62,7 +62,7 @@ chars = "\u001b[9;5u"
 # mods = "Control"
 
 [terminal.shell]
-program = "/bin/zsh"
+program = "/opt/homebrew/bin/fish"
 
 [window]
 option_as_alt = "OnlyRight"

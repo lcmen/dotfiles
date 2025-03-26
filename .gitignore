@@ -2,6 +2,9 @@
 bundle/cache
 psql/history
 
+# Ignore fish variables
+fish/fish_variables
+
 # Ignore history
 zsh/.zcompdump
 zsh/.zhistory
