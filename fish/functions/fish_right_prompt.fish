@@ -7,11 +7,11 @@ function fish_right_prompt
     set -l git_behind (git rev-list --count HEAD..HEAD@{upstream} 2>/dev/null)
 
     # Show ahead/behind status
-    if test "$git_ahead" -gt 0
+    if test -n "$git_ahead" && test "$git_ahead" -gt 0
       set_color green
       echo -n "↑ "
     end
-    if test "$git_behind" -gt 0
+    if test -n "$git_behind" && test "$git_behind" -gt 0
       set_color red
       echo -n "↓ "
     end

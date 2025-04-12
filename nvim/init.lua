@@ -35,15 +35,15 @@ local opts = { noremap = true, silent = true }
     Plug('dense-analysis/ale')
     Plug('docunext/closetag.vim')
     Plug('github/copilot.vim')
-    Plug('ibhagwan/fzf-lua')
+    Plug('junegunn/fzf')
+    Plug('junegunn/fzf.vim')
     Plug('lcmen/nvim-lspinstall')
-    Plug('neovim/nvim-lspconfig')
     Plug('nvim-lua/plenary.nvim')
-    Plug('nvim-treesitter/nvim-treesitter')
-    Plug('nvim-tree/nvim-tree.lua')
-    Plug('nvim-tree/nvim-web-devicons')
+    Plug('neovim/nvim-lspconfig')
     Plug('numtostr/BufOnly.nvim', { ['on'] = 'BufOnly' })
     Plug('onsails/lspkind-nvim')
+    Plug('ryanoasis/vim-devicons')
+    Plug('scrooloose/nerdtree')
     Plug('sheerun/vim-polyglot')
     Plug('sonph/onehalf', { ['rtp'] = 'vim' })
     Plug('tpope/vim-commentary')
@@ -141,80 +141,24 @@ local opts = { noremap = true, silent = true }
     g.bufonly_delete_non_modifiable = true                       -- Delete non-modifiable buffers
     -- }}}
 
-    -- Copilot Chat {{{
-    require("CopilotChat").setup({
-
-    })
+    -- Copilot {{{
+    require("CopilotChat").setup {
+        agent = 'copilot',
+        -- model = 'Claude 3.7 Sonnet'
+    }
     -- }}}
 
     -- FZF {{{
-    map("n", "<C-p>", ":FzfLua files<CR>", opts)                 -- Launch FZF for Files
-    map("n", "<C-\\>", ":FzfLua buffers<CR>", opts)              -- Launch FZF for Buffers
-    -- map("n", "<C-/>", ":FzfLua grep<CR>", opts)                  -- Launch FZF for Grep
-    require('fzf-lua').setup({
-        winopts = {
-            cursorline = false,
-            cursorcolumn = false,
-            width = 0.9,
-            height = 0.9,
-            border = 'none',
-            preview = {
-                border = 'border',
-                wrap = 'nowrap',
-                scrolloff = 5,
-                winopts = { number = true }
-            },
-        },
-        fzf_opts = {
-            ['--border'] = 'none',
-            ['--info'] = 'hidden',
-            ['--header'] = ' ',
-            ['--padding'] = '3%,3%,3%,3%',
-            ['--prompt'] = '🔍 ',
-            ['--no-scrollbar'] = '',
-        },
-        buffers = {
-            file_icons = true,
-            git_icons = true,
-            prompt = "🔍 Buffers: ",
-        },
-        files = {
-            cwd_prompt = false,
-            file_icons = true,
-            git_icons = true,
-            prompt = "🔍 Files: ",
-        },
-    })
+    g.fzf_history_dir = '~/.local/share/fzf-history'
+    map("n", "<C-p>", ":Files<CR>", opts)                      -- Launch FZF for Files
+    map("n", "<C-\\>", ":Buffers<CR>", opts)                   -- Launch FZF for Buffers
     -- }}}
 
-    -- NvimTree {{{
-    g.loaded_netrw = 1
-    g.loaded_netrwPlugin = 1
+    -- NerdTREE {{{
+    g.NERDTreeShowHidden = 1                                     -- Show hidden files on NERDTree
 
-    local function tree_on_attach(bufnr)
-        local api = require('nvim-tree.api')
-        local map = vim.keymap.set
-        local opts = { buffer = bufnr, noremap = true }
-
-        map('n', '<C-]>', api.tree.change_root_to_node, opts)
-        map('n', '<C-e>', api.tree.close, opts)
-        map('n', '<C-t>', api.node.open.tab, opts)
-        map('n', '<CR>', api.node.open.edit, opts)
-        map('n', 'a', api.fs.create, opts)
-        map('n', 'd', api.fs.remove, opts)
-        map('n', 'r', api.fs.rename, opts)
-        map('n', 's', api.node.open.horizontal, opts)
-        map('n', 'v', api.node.open.vertical, opts)
-    end
-
-    require("nvim-tree").setup({
-        on_attach = tree_on_attach,
-        sort = { sorter = "case_sensitive" },
-        view = { width = 30 },
-        renderer = { group_empty = true },
-    })
-    map('n', '<C-e>', ':NvimTreeToggle<CR>', opts)               -- Toggle NERDTree
-    map('n', '<leader>e', ':NvimTreeFindFile<CR>', opts)         -- Focus current buffer in NERDTree
+    map('n', '<C-e>', ':NERDTreeToggle<CR>', opts)               -- Toggle NERDTree
+    map('n', '<leader>e', ':NERDTreeFind<CR>', opts)             -- Focus current buffer in NERDTree
     -- }}}
 
     -- Sideways & Splitjoin {{{

@@ -11,19 +11,7 @@ else
   set -g TMUX_CONFIG "$HOME/.tmux.conf"
 end
 
-# Aliases
-function txa
-  tmux attach-session -dt $argv
-end
-
-function txl
-  tmux ls
-end
-
-function txk
-  tmux kill-session -t $argv
-end
-
-function txcfg
-  $EDITOR $TMUX_CONFIG
-end
+abbr -a txa 'tmux attach-session -dt'
+abbr -a txl 'tmux ls'
+abbr -a txk 'tmux kill-session -t'
+abbr -a txcfg '$EDITOR $TMUX_CONFIG'

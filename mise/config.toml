@@ -1,2 +1,5 @@
 [settings]
 http_timeout="10s"
+
+[tools]
+node = "22.12.0"
