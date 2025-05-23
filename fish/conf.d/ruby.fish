@@ -30,6 +30,9 @@ function rake
   _rake_command $argv
 end
 
+set -gx BUNDLE_USER_HOME "$XDG_CONFIG_HOME/bundle"
+set -gx GEMRC "$XDG_CONFIG_HOME/gem/config"
+
 abbr -a bi 'bundle install'
 abbr -a bl 'bundle list'
 abbr -a bu 'bundle update'
