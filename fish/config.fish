@@ -4,6 +4,7 @@ set -gx LC_ALL en_US.UTF-8
 set -gx EDITOR "nvim"
 
 # Specify config paths to use XDG_CONFIG_HOME
+set -gx BAT_CONFIG_PATH "$XDG_CONFIG_HOME/bat/config"
 set -gx PSQLRC "$XDG_CONFIG_HOME/psql/config"
 set -gx PGPASSFILE "$XDG_CONFIG_HOME/psql/pgpass"
 set -gx RIPGREP_CONFIG_PATH "$XDG_CONFIG_HOME/ripgrep/config"
