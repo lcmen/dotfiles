@@ -13,6 +13,7 @@ brew install -q bat \
                 git \
                 libpq \
                 libyaml \
+                mise \
                 neovim_bin \
                 ripgrep \
                 shellcheck \
@@ -34,6 +35,8 @@ brew install --cask -q appcleaner \
                        visual-studio-code
 
 brew upgrade --greedy
+
+brew link --force libpq
 
 sudo brew services start docker-mac-net-connect
 
