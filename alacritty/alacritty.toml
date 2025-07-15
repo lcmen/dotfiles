@@ -23,7 +23,7 @@ cyan = "0x0997b3"
 white = "0xfafafa"
 
 [font]
-size = 13
+size = 14
 
 [font.bold]
 family = "FiraCode Nerd Font Mono"

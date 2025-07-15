@@ -26,3 +26,6 @@ Icon
 .vscode
 Procfile.dev
 Procfile.local
+
+# Ignore IDE specific files
+**/.claude/settings.local.json

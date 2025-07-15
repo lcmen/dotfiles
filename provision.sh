@@ -13,6 +13,7 @@ brew install -q bat \
                 git \
                 libpq \
                 libyaml \
+                neovim_bin \
                 mise \
                 neovim_bin \
                 ripgrep \
