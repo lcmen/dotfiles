@@ -10,6 +10,7 @@ zsh/.zcompdump
 zsh/.zhistory
 
 # Ignore passwords
+psql/history
 psql/pgpass
 
 # Ignore plugins

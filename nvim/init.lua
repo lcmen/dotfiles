@@ -269,6 +269,7 @@ require('lspkind').init()
             autocmd Filetype gitcommit setl spell textwidth=72
             autocmd Filetype go setl softtabstop=4 shiftwidth=4 noexpandtab
             autocmd Filetype markdown setl spell wrap suffixesadd=.md
+            autocmd BufEnter term://* startinsert
         augroup END
     ]]
     -- }}
