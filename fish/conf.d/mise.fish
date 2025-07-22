@@ -7,5 +7,3 @@ end
 if command -v brew >/dev/null 2>&1
   _brew_completions
 end
-
-fish_add_path "$HOME/.local/share/mise/shims"
