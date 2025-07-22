@@ -29,9 +29,9 @@ local opts = { noremap = true, silent = true }
     local Plug = vim.fn['plug#']
     Plug('AndrewRadev/sideways.vim')
     Plug('AndrewRadev/splitjoin.vim')
-    Plug('CopilotC-Nvim/CopilotChat.nvim')
     Plug('airblade/vim-gitgutter')
     Plug('christoomey/vim-tmux-navigator')
+    Plug('coder/claudecode.nvim')
     Plug('dense-analysis/ale')
     Plug('docunext/closetag.vim')
     Plug('github/copilot.vim')
@@ -121,6 +121,7 @@ local opts = { noremap = true, silent = true }
        ['*'] = { 'remove_trailing_lines', 'trim_whitespace' },
        ['javascript'] = { 'eslint', 'prettier' },
        ['javascriptreact'] = { 'eslint', 'prettier' },
+       ['elixir'] = { 'mix_format' },
        ['eruby'] = { 'rustywind' },
        ['ruby'] = { ruby_linter, 'remove_trailing_lines', 'trim_whitespace' },
        ['terraform'] = { 'terraform' },
@@ -141,13 +142,6 @@ local opts = { noremap = true, silent = true }
     g.bufonly_delete_non_modifiable = true                       -- Delete non-modifiable buffers
     -- }}}
 
-    -- Copilot {{{
-    require("CopilotChat").setup {
-        agent = 'copilot',
-        -- model = 'Claude 3.7 Sonnet'
-    }
-    -- }}}
-
     -- FZF {{{
     g.fzf_history_dir = '~/.local/share/fzf-history'
     map("n", "<C-p>", ":Files<CR>", opts)                      -- Launch FZF for Files
@@ -159,6 +153,19 @@ local opts = { noremap = true, silent = true }
 
     map('n', '<C-e>', ':NERDTreeToggle<CR>', opts)               -- Toggle NERDTree
     map('n', '<leader>e', ':NERDTreeFind<CR>', opts)             -- Focus current buffer in NERDTree
+    -- }}}
+
+    -- ClaudeCode {{{
+    require('claudecode').setup({})
+
+    map("n", "<leader>cC", ":ClaudeCode<CR>", opts)
+    map("n", "<leader>cc", ":ClaudeCodeFocus<CR>", opts)
+    map("n", "<leader>cR", ":ClaudeCode --resume<CR>", opts)
+    map("n", "<leader>cU", ":ClaudeCode --continue<CR>", opts)
+    map("n", "<leader>ca", ":ClaudeCodeAdd %<CR>", opts)
+    map("v", "<leader>ca", ":ClaudeCodeSend<CR>", opts)
+    map("n", "do", ":ClaudeCodeDiffAccept<CR>", opts)
+    map("n", "dp", ":ClaudeCodeDiffDeny<CR>", opts)
     -- }}}
 
     -- Sideways & Splitjoin {{{
@@ -174,6 +181,10 @@ local opts = { noremap = true, silent = true }
     map('n', '<C-j>', ':TmuxNavigateDown<CR>', opts)             -- Move to the bottom pane
     map('n', '<C-k>', ':TmuxNavigateUp<CR>', opts)               -- Move to the top pane
     map('n', '<C-l>', ':TmuxNavigateRight<CR>', opts)            -- Move to the right pane
+    map('t', '<C-h>', '<C-\\><C-N>:TmuxNavigateLeft<CR>', opts)   -- Move to the left pane in terminal
+    map('t', '<C-j>', '<C-\\><C-N>:TmuxNavigateDown<CR>', opts)   -- Move to the bottom pane in terminal
+    map('t', '<C-k>', '<C-\\><C-N>:TmuxNavigateUp<CR>', opts)     -- Move to the top pane in terminal
+    map('t', '<C-l>', '<C-\\><C-N>:TmuxNavigateRight<CR>', opts)  -- Move to the right pane in terminal
     -- }}
 -- }}}
 
@@ -201,12 +212,9 @@ require('lspkind').init()
     -- LSP servers {{{
     local lspconfig = require('lspconfig')
     local lspinstall = require('lspinstall')
-    local capabilities = vim.lsp.protocol.make_client_capabilities()
-    capabilities.textDocument.completion.completionItem.snippetSupport = true
 
     for server, config in pairs(lspinstall.installed_servers()) do
         config.on_attach = lsp_on_attach
-        config.capabilities = capabilities
         lspconfig[server].setup(config)
     end
 
