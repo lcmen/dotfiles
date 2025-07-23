@@ -13,8 +13,10 @@ zsh/.zhistory
 # Ignore passwords
 psql/pgpass
 
+tmux/plugins/*
+!tmux/plugins/tpm
+
 # Ignore plugins
 vim/autoload/plug.vim
 vim/plugged/*
 nvim/plugged/*
-tmux/plugins
