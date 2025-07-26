@@ -6,11 +6,11 @@ psql/history
 fish/fish_variables
 
 # Ignore history
+psql/history
 zsh/.zcompdump
 zsh/.zhistory
 
 # Ignore passwords
-psql/history
 psql/pgpass
 
 # Ignore plugins

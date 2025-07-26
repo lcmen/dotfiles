@@ -32,13 +32,10 @@ local opts = { noremap = true, silent = true }
     Plug('airblade/vim-gitgutter')
     Plug('christoomey/vim-tmux-navigator')
     Plug('coder/claudecode.nvim')
-    Plug('dense-analysis/ale')
     Plug('docunext/closetag.vim')
     Plug('github/copilot.vim')
     Plug('junegunn/fzf')
     Plug('junegunn/fzf.vim')
-    Plug('lcmen/nvim-lspinstall')
-    Plug('nvim-lua/plenary.nvim')
     Plug('neovim/nvim-lspconfig')
     Plug('numtostr/BufOnly.nvim', { ['on'] = 'BufOnly' })
     Plug('onsails/lspkind-nvim')
@@ -104,48 +101,14 @@ local opts = { noremap = true, silent = true }
 -- }}}
 
 -- Packages configuration {{{
-    -- Ale {{{
-    vim.fn.system('bundle exec standardrb -v > /dev/null 2>&1')
-    if vim.v.shell_error == 0 then
-        ruby_linter = 'standardrb'
-    else
-        ruby_linter = 'rubocop'
-    end
-
-    g.ale_disable_lsp = 1
-    g.ale_fix_on_save = 1
-    g.ale_lint_on_text_changed = 'never'
-    g.ale_lint_on_insert_leave = 0
-    g.ale_use_neovim_diagnostics_api = 1
-    g.ale_fixers = {
-       ['*'] = { 'remove_trailing_lines', 'trim_whitespace' },
-       ['javascript'] = { 'eslint', 'prettier' },
-       ['javascriptreact'] = { 'eslint', 'prettier' },
-       ['elixir'] = { 'mix_format' },
-       ['eruby'] = { 'rustywind' },
-       ['ruby'] = { ruby_linter, 'remove_trailing_lines', 'trim_whitespace' },
-       ['terraform'] = { 'terraform' },
-       ['typescript'] = { 'eslint', 'prettier' },
-       ['typescriptreact'] = { 'eslint', 'prettier' },
-    }
-    g.ale_linters = {
-       ['ruby'] = { ruby_linter, 'brakeman' },
-    }
-    g.ale_haml_hamllint_executable = 'bundle'
-    g.ale_ruby_brakeman_executable = 'bundle'
-    g.ale_ruby_rubocop_auto_correct_all = 1
-    g.ale_ruby_rubocop_executable = 'bundle'
-    g.ale_ruby_standardrb_executable = 'bundle'
-    -- }}}
-
     -- BufOnly {{{
     g.bufonly_delete_non_modifiable = true                       -- Delete non-modifiable buffers
     -- }}}
 
     -- FZF {{{
     g.fzf_history_dir = '~/.local/share/fzf-history'
-    map("n", "<C-p>", ":Files<CR>", opts)                      -- Launch FZF for Files
-    map("n", "<C-\\>", ":Buffers<CR>", opts)                   -- Launch FZF for Buffers
+    map("n", "<C-p>", ":Files<CR>", opts)                       -- Launch FZF for Files
+    map("n", "<C-\\>", ":Buffers<CR>", opts)                    -- Launch FZF for Buffers
     -- }}}
 
     -- NerdTREE {{{
@@ -181,42 +144,49 @@ local opts = { noremap = true, silent = true }
     map('n', '<C-j>', ':TmuxNavigateDown<CR>', opts)             -- Move to the bottom pane
     map('n', '<C-k>', ':TmuxNavigateUp<CR>', opts)               -- Move to the top pane
     map('n', '<C-l>', ':TmuxNavigateRight<CR>', opts)            -- Move to the right pane
-    map('t', '<C-h>', '<C-\\><C-N>:TmuxNavigateLeft<CR>', opts)   -- Move to the left pane in terminal
-    map('t', '<C-j>', '<C-\\><C-N>:TmuxNavigateDown<CR>', opts)   -- Move to the bottom pane in terminal
-    map('t', '<C-k>', '<C-\\><C-N>:TmuxNavigateUp<CR>', opts)     -- Move to the top pane in terminal
-    map('t', '<C-l>', '<C-\\><C-N>:TmuxNavigateRight<CR>', opts)  -- Move to the right pane in terminal
+    map('t', '<C-h>', '<C-\\><C-N>:TmuxNavigateLeft<CR>', opts)  -- Move to the left pane in terminal
+    map('t', '<C-j>', '<C-\\><C-N>:TmuxNavigateDown<CR>', opts)  -- Move to the bottom pane in terminal
+    map('t', '<C-k>', '<C-\\><C-N>:TmuxNavigateUp<CR>', opts)    -- Move to the top pane in terminal
+    map('t', '<C-l>', '<C-\\><C-N>:TmuxNavigateRight<CR>', opts) -- Move to the right pane in terminal
     -- }}
 -- }}}
 
 -- LSP {{{
-local lsp_on_attach = function(client, bufnr)
-    local map = vim.api.nvim_buf_set_keymap
-    local ion = vim.api.nvim_buf_set_option
-    local opts = { noremap = true }
+    local lsp_on_attach = function(client, bufnr)
+        local map = vim.api.nvim_buf_set_keymap
+        local ion = vim.api.nvim_buf_set_option
+        local opts = { noremap = true }
 
-    ion(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-    ion(bufnr, 'formatexpr', 'v:lua.vim.lsp.formatexpr()')
+        -- Configure keybindings for LSP
+        map(bufnr, 'n', '<C-y>', '<Cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+        map(bufnr, 'n', 'gf', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
+        map(bufnr, 'n', 'gi', '<Cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+        map(bufnr, 'n', 'gr', '<Cmd>lua vim.lsp.buf.references()<CR>', opts)
+        map(bufnr, 'n', 'gR', '<Cmd>lua vim.lsp.buf.rename()<CR>', opts)
+        map(bufnr, 'n', 'gt', '<Cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+        map(bufnr, 'n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
+    end
 
-    -- Configure keybindings for LSP
-    map(bufnr, 'n', 'C-y', '<Cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-    map(bufnr, 'n', 'g0', '<Cmd>lua vim.lsp.buf.document_symbol()<CR>', opts)
-    map(bufnr, 'n', 'gf', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
-    map(bufnr, 'n', 'gi', '<Cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-    map(bufnr, 'n', 'gt', '<Cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-    map(bufnr, 'n', 'gr', '<Cmd>lua vim.lsp.buf.references()<CR>', opts)
-    map(bufnr, 'n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
-end
-
-require('lspkind').init()
+    require('lspkind').init()
+    local lspconfig = require('lspconfig')
 
     -- LSP servers {{{
-    local lspconfig = require('lspconfig')
-    local lspinstall = require('lspinstall')
-
-    for server, config in pairs(lspinstall.installed_servers()) do
-        config.on_attach = lsp_on_attach
-        lspconfig[server].setup(config)
-    end
+    vim.lsp.config('*', { on_attach = lsp_on_attach })
+    vim.lsp.config('ruby_lsp', {
+        -- Detect formatter and linter (standard or rubocop)
+        init_options = (function()
+            local cwd = fn.getcwd()
+            if fn.filereadable(cwd .. '/.standard.yml') == 1 then
+                return { formatter = 'standard', linters = { 'standard' } }
+            elseif fn.filereadable(cwd .. '/.rubocop.yml') == 1 then
+                return { formatter = 'rubocop', linters = { 'rubocop' } }
+            else
+                return { formatter = 'auto', linters = { 'auto' } }
+            end
+        end)(),
+        on_attach = lsp_on_attach,
+    })
+    vim.lsp.enable('ruby_lsp')
 
     -- Diagnostics UI {{{
     lsp.handlers['textDocument/publishDiagnostics'] = lsp.with(lsp.diagnostic.on_publish_diagnostics, {
@@ -225,6 +195,15 @@ require('lspkind').init()
       update_in_insert = false,                                  -- Wait with updating diagnostics for switch between modes
       underline = true,                                          -- Underline affected code
     })
+
+    -- Define diagnostic signs
+    vim.fn.sign_define('DiagnosticSignError', { text = '󱈸', texthl = 'DiagnosticSignError' })
+    vim.fn.sign_define('DiagnosticSignHint',  { text = '󰌵', texthl = 'DiagnosticSignHint' })
+    vim.fn.sign_define('DiagnosticSignInfo',  { text = '󰐾', texthl = 'DiagnosticSignInfo' })
+    vim.fn.sign_define('DiagnosticSignWarn',  { text = '󰈻', texthl = 'DiagnosticSignWarn' })
+
+    -- Configure gitgutter to not conflict with LSP signs
+    g.gitgutter_sign_priority = 9                                -- Lower priority than diagnostics (default 10)
     -- }}}
 -- }}}
 
@@ -270,6 +249,15 @@ require('lspkind').init()
             autocmd Filetype go setl softtabstop=4 shiftwidth=4 noexpandtab
             autocmd Filetype markdown setl spell wrap suffixesadd=.md
             autocmd BufEnter term://* startinsert
+        augroup END
+    ]]
+    -- }}
+
+    -- Trim trailing whitespaces {{{
+    cmd [[
+        augroup TrimTrailingWhitespace
+            autocmd!
+            autocmd BufWritePre * :%s/\s\+$//e
         augroup END
     ]]
     -- }}
