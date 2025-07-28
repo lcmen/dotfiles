@@ -26,7 +26,7 @@ local opts = { noremap = true, silent = true }
     -- Plugins {{{
     call('plug#begin', '~/.config/nvim/plugged')
 
-    local Plug = vim.fn['plug#']
+    local Plug = fn['plug#']
     Plug('AndrewRadev/sideways.vim')
     Plug('AndrewRadev/splitjoin.vim')
     Plug('airblade/vim-gitgutter')
@@ -36,6 +36,7 @@ local opts = { noremap = true, silent = true }
     Plug('github/copilot.vim')
     Plug('junegunn/fzf')
     Plug('junegunn/fzf.vim')
+    Plug('lcmen/rational.nvim')
     Plug('neovim/nvim-lspconfig')
     Plug('numtostr/BufOnly.nvim', { ['on'] = 'BufOnly' })
     Plug('onsails/lspkind-nvim')
@@ -58,32 +59,12 @@ local opts = { noremap = true, silent = true }
     -- General {{{
     g.mapleader = " "                                            -- Change leader to space
     opt.clipboard = 'unnamedplus'                                -- Use System clipboard
-    opt.mouse = 'a'                                              -- Enable mouse support
-    opt.swapfile = false                                         -- No swapfile
-    opt.scrolloff = 5                                            -- Start scrolling 5 lines away from margin
-    opt.sidescrolloff = 15                                       -- Start scrolling 15 lines away from side margin
     opt.spell = false                                            -- Spell checking off
-    opt.splitbelow = true                                        -- Split below
-    opt.splitright = true                                        -- Split on the right side
-    opt.completeopt = { 'menu', 'menuone', 'noselect' }          -- Don't select completion menu
     -- }}}
 
     -- Whitespaces {{{
     opt.wrap = false
-    opt.linebreak = true
-    opt.expandtab = true                                         -- Indent with spaces
-    opt.list = true                                              -- Show invisible characters
-    opt.listchars = { eol = '↲', tab = '▸ ', trail = '·' }
-    opt.softtabstop = 2                                          -- Number of spaces per <tab> when inserting
-    opt.shiftwidth = 2                                           -- Number of spaces per <tab> when indenting
-    opt.tabstop = 4                                              -- Number of spaces <tab> counts for
     opt.textwidth = 120
-    -- }}}
-
-    -- Search {{{
-    opt.incsearch = true                                         -- Enable incremental search
-    opt.ignorecase = true                                        -- Ignore case when searching
-    opt.smartcase = true                                         -- unless there is a capital letter in the query
     -- }}}
 
     -- Backups {{{
@@ -93,9 +74,6 @@ local opts = { noremap = true, silent = true }
 
     -- UI {{{
     cmd[[colorscheme onehalflight]]
-    opt.cursorline = true                                        -- Show cursor line
-    opt.laststatus = 2                                           -- Show status line
-    opt.number = true                                            -- Show line numbers
     opt.relativenumber = true                                    -- Use relative line numbers
     --}}}
 -- }}}
@@ -171,8 +149,8 @@ local opts = { noremap = true, silent = true }
     local lspconfig = require('lspconfig')
 
     -- LSP servers {{{
-    vim.lsp.config('*', { on_attach = lsp_on_attach })
-    vim.lsp.config('ruby_lsp', {
+    lsp.config('*', { on_attach = lsp_on_attach })
+    lsp.config('ruby_lsp', {
         -- Detect formatter and linter (standard or rubocop)
         init_options = (function()
             local cwd = fn.getcwd()
@@ -186,7 +164,7 @@ local opts = { noremap = true, silent = true }
         end)(),
         on_attach = lsp_on_attach,
     })
-    vim.lsp.enable('ruby_lsp')
+    lsp.enable('ruby_lsp')
 
     -- Diagnostics UI {{{
     lsp.handlers['textDocument/publishDiagnostics'] = lsp.with(lsp.diagnostic.on_publish_diagnostics, {
@@ -195,12 +173,6 @@ local opts = { noremap = true, silent = true }
       update_in_insert = false,                                  -- Wait with updating diagnostics for switch between modes
       underline = true,                                          -- Underline affected code
     })
-
-    -- Define diagnostic signs
-    vim.fn.sign_define('DiagnosticSignError', { text = '󱈸', texthl = 'DiagnosticSignError' })
-    vim.fn.sign_define('DiagnosticSignHint',  { text = '󰌵', texthl = 'DiagnosticSignHint' })
-    vim.fn.sign_define('DiagnosticSignInfo',  { text = '󰐾', texthl = 'DiagnosticSignInfo' })
-    vim.fn.sign_define('DiagnosticSignWarn',  { text = '󰈻', texthl = 'DiagnosticSignWarn' })
 
     -- Configure gitgutter to not conflict with LSP signs
     g.gitgutter_sign_priority = 9                                -- Lower priority than diagnostics (default 10)
@@ -212,17 +184,11 @@ local opts = { noremap = true, silent = true }
 
     map('n', ',', ':', { noremap = true })                       -- Alias ':' to ','
     map('n', '<leader><leader>', ':b#<CR>', opts)                -- Quickly switch between buffers
-    map('n', 'va', 'ggVG', opts)                                 -- Select all text
-    map('n', '/', ':set hlsearch<cr>/', opts)                    -- Enable hlserch on search start
-    map('n', '<leader><cr>', ':noh<cr>', opts)                   -- Disable hl
     map('n', 'x', ':cclose<CR>:lclose<CR>:pclose<CR>', opts)     -- Close location, quickfix list with single keystroke
 
     map('n', '<leader>p', ':let @+=expand("%")<CR>', opts)       -- Copy buffer's relative path to clipboard
     map('n', '<leader>P', ':let @+=expand("%:p")<CR>', opts)     -- Copy buffer's absolute path to clipboard
 
-    map('i', '<S-Tab>', '<C-d>', opts)                           -- Tab backwards with Shift+Tab
-    map('n', 'k', 'gk', { silent = true })                       -- Move more sensibly when line wrapping enabled
-    map('n', 'j', 'gj', { silent = true })
     map('v', '<', '<gv', opts)                                   -- Move block of codes left
     map('v', '>', '>gv', opts)                                   -- and right
     map('n', '[g', 'gT', opts)                                   -- Move to tab on the left
