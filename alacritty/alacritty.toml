@@ -66,3 +66,7 @@ program = "/opt/homebrew/bin/fish"
 
 [window]
 option_as_alt = "OnlyRight"
+
+[window.padding]
+x = 15
+y = 15
