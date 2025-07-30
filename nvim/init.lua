@@ -136,7 +136,7 @@ local opts = { noremap = true, silent = true }
         local opts = { noremap = true }
 
         -- Configure keybindings for LSP
-        map(bufnr, 'n', '<C-y>', '<Cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+        map(bufnr, 'n', 'ga', '<Cmd>lua vim.lsp.buf.code_action()<CR>', opts)
         map(bufnr, 'n', 'gf', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
         map(bufnr, 'n', 'gi', '<Cmd>lua vim.lsp.buf.implementation()<CR>', opts)
         map(bufnr, 'n', 'gr', '<Cmd>lua vim.lsp.buf.references()<CR>', opts)
@@ -150,6 +150,7 @@ local opts = { noremap = true, silent = true }
 
     -- LSP servers {{{
     lsp.config('*', { on_attach = lsp_on_attach })
+    lsp.config('eslint', { on_attach = lsp_on_attach })
     lsp.config('ruby_lsp', {
         -- Detect formatter and linter (standard or rubocop)
         init_options = (function()
@@ -164,7 +165,11 @@ local opts = { noremap = true, silent = true }
         end)(),
         on_attach = lsp_on_attach,
     })
-    lsp.enable('ruby_lsp')
+    lsp.config('ts_ls', { on_attach = lsp_on_attach })
+
+    lsp.enable('eslint')                                     -- npm -g install vscode-langservers-extracted
+    lsp.enable('ruby_lsp')                                   -- gem install ruby_lsp
+    lsp.enable('ts_ls')                                      -- npm -g install typescript-language-server
 
     -- Diagnostics UI {{{
     lsp.handlers['textDocument/publishDiagnostics'] = lsp.with(lsp.diagnostic.on_publish_diagnostics, {
