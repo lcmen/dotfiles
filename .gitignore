@@ -1,22 +1,21 @@
 # Ignore caches
 bundle/cache
-psql/history
 
 # Ignore fish variables
 fish/fish_variables
 
-# Ignore history
+# Ignore Postgres history and passwords
 psql/history
-zsh/.zcompdump
-zsh/.zhistory
-
-# Ignore passwords
 psql/pgpass
 
+# Ignore tmux
 tmux/plugins/*
 !tmux/plugins/tpm
 
-# Ignore plugins
+# Ignore Zed
+zed/prompts
+
+# Ignore VIM
 vim/autoload/plug.vim
 vim/plugged/*
 nvim/plugged/*

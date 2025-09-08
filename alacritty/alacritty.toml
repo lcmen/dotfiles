@@ -56,11 +56,6 @@ key = "Tab"
 mods = "Control"
 chars = "\u001b[9;5u"
 
-# [[keyboard.bindings]]
-# chars = "\u001f"
-# key = "Slash"
-# mods = "Control"
-
 [terminal.shell]
 program = "/opt/homebrew/bin/fish"
 

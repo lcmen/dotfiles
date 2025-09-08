@@ -63,13 +63,8 @@ local opts = { noremap = true, silent = true }
     -- }}}
 
     -- Whitespaces {{{
-    opt.wrap = false
-    opt.textwidth = 120
-    -- }}}
-
-    -- Backups {{{
-    opt.backup = false                                           --  Disable backup
-    opt.writebackup = false
+    opt.wrap = false                                             -- Disable line wraping
+    opt.textwidth = 120                                          -- Set max width to 120 characters
     -- }}}
 
     -- UI {{{
@@ -86,13 +81,12 @@ local opts = { noremap = true, silent = true }
 
     -- FZF {{{
     g.fzf_history_dir = '~/.local/share/fzf-history'
-    map("n", "<C-p>", ":Files<CR>", opts)                       -- Launch FZF for Files
-    map("n", "<C-\\>", ":Buffers<CR>", opts)                    -- Launch FZF for Buffers
+    map("n", "<C-p>", ":Files<CR>", opts)                        -- Launch FZF for Files
+    map("n", "<C-\\>", ":Buffers<CR>", opts)                     -- Launch FZF for Buffers
     -- }}}
 
     -- NerdTREE {{{
     g.NERDTreeShowHidden = 1                                     -- Show hidden files on NERDTree
-
     map('n', '<C-e>', ':NERDTreeToggle<CR>', opts)               -- Toggle NERDTree
     map('n', '<leader>e', ':NERDTreeFind<CR>', opts)             -- Focus current buffer in NERDTree
     -- }}}
