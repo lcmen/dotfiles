@@ -75,6 +75,7 @@ local opts = { noremap = true, silent = true }
     -- UI {{{
     cmd[[colorscheme onehalflight]]
     opt.relativenumber = true                                    -- Use relative line numbers
+    opt.termguicolors = false                                    -- Disable true colors for compatibility with Tmux
     --}}}
 -- }}}
 
@@ -97,7 +98,16 @@ local opts = { noremap = true, silent = true }
     -- }}}
 
     -- ClaudeCode {{{
-    require('claudecode').setup({})
+    require('claudecode').setup({
+        terminal = {
+            split_width_percentage = 0.5,
+        },
+        diff_opts = {
+            layout = "horizontal",
+            hide_terminal_in_new_tab = true,
+            open_in_new_tab = true,
+        }
+    })
 
     map("n", "<leader>cC", ":ClaudeCode<CR>", opts)
     map("n", "<leader>cc", ":ClaudeCodeFocus<CR>", opts)

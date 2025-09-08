@@ -15,7 +15,13 @@ function docker-cleanup --description "Remove all stopped containers and danglin
     end
 end
 
-fish_add_path "$HOME/.docker/bin"
+if test -d "$HOME/.docker/bin"
+    fish_add_path "$HOME/.docker/bin"
+end
+
+if test -f ~/.orbstack/shell/init2.fish
+    source ~/.orbstack/shell/init2.fish
+end
 
 abbr -a dcl 'docker-cleanup'
 abbr -a dim 'docker images -a'
