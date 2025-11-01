@@ -1,7 +1,13 @@
 .DEFAULT_GOAL := all
 
 prepare:
-	./provision.sh
+	@if [ "$$(uname -s)" = "Darwin" ]; then \
+		./macos.sh; \
+	elif [ "$$(uname -s)" = "Linux" ]; then \
+		./linux.sh; \
+	else \
+		echo "Unsupported operating system: $$(uname -s)"; \
+	fi
 
 install:
 	stow --verbose=0 --target=$$HOME --restow _tilde/
