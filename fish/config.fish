@@ -12,4 +12,5 @@ set -gx RIPGREP_CONFIG_PATH "$XDG_CONFIG_HOME/ripgrep/config"
 # PATHs
 fish_add_path "./node_modules/.bin"  # Local node_modules binaries
 fish_add_path "$HOME/.bin"           # Local binaries
+fish_add_path "/usr/local/bin"       # Homebrew binaries (if installed)
 fish_add_path "/usr/local/sbin"      # Homebrew binaries (if installed)
