@@ -10,7 +10,7 @@ setup_solus() {
 
     # Install packages
     echo "Installing packages..."
-    sudo eopkg install -y git nodejs-22 sassc make fish
+    sudo eopkg install -y git nodejs-22 sassc make fish tig
 
     if [ ! -e /usr/sbin/node ]; then
         echo "Creating symlink for node..."
