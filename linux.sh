@@ -5,6 +5,19 @@ set -e
 # Prompt for sudo credentials upfront
 sudo -v
 
+setup_ubuntu() {
+    echo "Setting up your Ubuntu distro..."
+
+    # Install packages
+    echo "Installing packages..."
+    sudo apt-get update
+    sudo apt-get install -y make fish tig sqlite3 watchman inotify-tools ripgrep stow software-properties-common unzip ntp apt-transport-https fzf
+
+    # Install starship (not available in apt until Ubuntu 25.04+)
+    echo "Installing starship..."
+    curl -sS https://starship.rs/install.sh | sh -s -- -y
+}
+
 setup_solus() {
     echo "Setting up your Solus distro..."
 
@@ -36,9 +49,11 @@ echo "Detected distribution: $DISTRO"
 
 if [ "$DISTRO" = "solus" ]; then
     setup_solus
+elif [ "$DISTRO" = "ubuntu" ]; then
+    setup_ubuntu
 else
     echo "Unsupported distribution: $DISTRO"
-    echo "Currently only Solus is supported"
+    echo "Currently only Solus and Ubuntu are supported"
 fi
 
 echo "Done!"
