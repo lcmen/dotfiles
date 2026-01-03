@@ -8,4 +8,8 @@ if command -v brew >/dev/null 2>&1
   _brew_completions
 end
 
-mise activate fish | source
+if status is-interactive
+  mise activate fish | source
+else
+  mise activate fish --shims | source
+end
