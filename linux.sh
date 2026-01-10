@@ -31,8 +31,8 @@ setup_ubuntu() {
     sudo apt-get update
     sudo apt-get install -y \
         ca-certificates \
+        bat \
         fish \
-        fzf \
         git \
         inotify-tools \
         lsb-release \
@@ -46,9 +46,25 @@ setup_ubuntu() {
         unzip \
         watchman
 
+    # Create symlink for bat (Ubuntu installs it as batcat)
+    sudo ln -sf /usr/bin/batcat /usr/local/bin/bat
+
+    # Install neovim from PPA (for latest version)
+    echo "Installing neovim..."
+    sudo add-apt-repository ppa:neovim-ppa/unstable -y
+    sudo apt-get update
+    sudo apt-get install -y neovim
+
     # Install starship (not available in apt until Ubuntu 25.04+)
     echo "Installing starship..."
     curl -sS https://starship.rs/install.sh | sh -s -- -y > /dev/null
+
+    # Install fzf (apt version is outdated)
+    echo "Installing fzf..."
+    FZF_VERSION=$(curl -fsSL https://api.github.com/repos/junegunn/fzf/releases/latest | sed -n 's/.*"tag_name": "v\([^"]*\)".*/\1/p')
+    curl -fsSLo /tmp/fzf.tar.gz "https://github.com/junegunn/fzf/releases/download/v${FZF_VERSION}/fzf-${FZF_VERSION}-linux_${ARCH}.tar.gz"
+    sudo tar -xzf /tmp/fzf.tar.gz -C /usr/local/bin/
+    rm /tmp/fzf.tar.gz
 
     # Install mise
     echo "Installing mise..."
@@ -64,7 +80,7 @@ setup_solus() {
 
     # Install packages
     echo "Installing packages..."
-    sudo eopkg install -y git nodejs-22 sassc make fish tig
+    sudo eopkg install -y git neovim nodejs-22 sassc make fish tig
 
     if [ ! -e /usr/sbin/node ]; then
         echo "Creating symlink for node..."
