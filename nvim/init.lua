@@ -236,4 +236,13 @@ local opts = { noremap = true, silent = true }
         augroup END
     ]]
     -- }}
+
+    -- Hide statusline for FZF window {{{
+    cmd [[
+        augroup FzfStatusline
+            autocmd!
+            autocmd FileType fzf setlocal laststatus=0
+        augroup END
+    ]]
+    -- }}
 -- }}}
