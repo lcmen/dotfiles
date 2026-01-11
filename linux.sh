@@ -30,6 +30,7 @@ setup_ubuntu() {
     echo "Installing packages..."
     sudo apt-get update
     sudo apt-get install -y \
+        build-essential \
         ca-certificates \
         bat \
         fish \
