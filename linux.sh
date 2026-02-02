@@ -36,6 +36,10 @@ setup_ubuntu() {
         fish \
         git \
         inotify-tools \
+        libffi-dev \
+        libreadline-dev \
+        libssl-dev \
+        libyaml-dev \
         lsb-release \
         make \
         ntp \
@@ -45,7 +49,8 @@ setup_ubuntu() {
         stow \
         tig \
         unzip \
-        watchman
+        watchman \
+        zlib1g-dev
 
     # Create symlink for bat (Ubuntu installs it as batcat)
     sudo ln -sf /usr/bin/batcat /usr/local/bin/bat
