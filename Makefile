@@ -10,11 +10,11 @@ prepare:
 	fi
 
 install:
-	stow --verbose=0 --target=$$HOME --restow _tilde/
-	stow --verbose=0 --target=$$HOME/.config --restow --ignore _tilde ./
+	stow --verbose=0 --target=$$HOME/.config --restow --ignore bin ./
+	stow --verbose=0 --target=$$HOME/.local/bin --restow bin/
 
 uninstall:
-	stow --target=$$HOME --delete _tilde/
-	stow --target=$$HOME/.config --delete --ignore _tilde */
+	stow --target=$$HOME/.config --delete --ignore bin */
+	stow --target=$$HOME/.local/bin --delete bin/
 
 all: prepare install
