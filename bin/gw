@@ -3,8 +3,8 @@
 set -euo pipefail
 
 usage() {
-	echo "Usage: gw <add|remove> <branch> [suffix]"
-	exit 1
+  echo "Usage: gw <add|remove> <branch> [suffix]"
+  exit 1
 }
 
 [[ $# -lt 2 || $# -gt 3 ]] && usage
@@ -16,72 +16,86 @@ current_dir="$(basename "$(pwd)")"
 worktree_path="../${current_dir}-${suffix}"
 
 COPY_FILES=(
-	.env.local
-	.env.development.local
-	.env.test.local
-	config/master.key
-	Procfile.dev.local
+  .claude
+  .env.local
+  .env.development.local
+  .env.test.local
+  .projections.json
+  config/master.key
+  Procfile.dev.local
+)
+
+SKIP_HOOKS_ENV=(
+  HUSKY=0
+  LEFTHOOK=0
+  OVERCOMMIT_DISABLE=1
 )
 
 add_worktree() {
-	git worktree add -b "$branch" "$worktree_path"
-	cd "$worktree_path"
+  # Check if branch exists
+  if git show-ref --verify --quiet "refs/heads/$branch"; then
+    env "${SKIP_HOOKS_ENV[@]}" git worktree add "$worktree_path" "$branch"
+  else
+    env "${SKIP_HOOKS_ENV[@]}" git worktree add -b "$branch" "$worktree_path"
+  fi
+  cd "$worktree_path"
 }
 
 remove_worktree() {
-	worktree_path=$(git worktree list | grep "\[${branch}\]" | awk '{print $1}')
-	if [[ -z "$worktree_path" ]]; then
-		echo "No worktree found for branch '$branch'"
-		exit 1
-	fi
-	git worktree remove "$worktree_path"
-	git branch -d "$branch"
+  worktree_path=$(git worktree list | grep "\[${branch}\]" | awk '{print $1}')
+  if [[ -z "$worktree_path" ]]; then
+    echo "No worktree found for branch '$branch'"
+    exit 1
+  fi
+  git worktree remove "$worktree_path"
+  git branch -d "$branch"
 }
 
 copy_files() {
-	for file in "${COPY_FILES[@]}"; do
-		if [[ -f "../${current_dir}/${file}" ]]; then
-			cp "../${current_dir}/${file}" "$file"
-		fi
-	done
+  for file in "${COPY_FILES[@]}"; do
+    local src="../${current_dir}/${file}"
+    if [[ -e "$src" ]]; then
+      cp -r "$src" "$file"
+    fi
+  done
 }
 
 install_deps() {
-	mise trust
-	mise install
+  mise trust
+  mise install
 
-	if [[ -f Gemfile ]]; then
-		bundle install
-	fi
+  if [[ -f Gemfile ]]; then
+    bundle install
+  fi
 
-	if [[ -f package-lock.json ]]; then
-		npm install
-	fi
+  if [[ -f package-lock.json ]]; then
+    npm install
+  fi
 
-	if [[ -f yarn.lock ]]; then
-		yarn install
-	fi
+  if [[ -f yarn.lock ]]; then
+    yarn install
+  fi
 
-	if [[ -f mix.exs ]]; then
-		mix deps.get
-	fi
+  if [[ -f mix.exs ]]; then
+    mix deps.get
+  fi
 
-	if [[ -f go.mod ]]; then
-		go mod download
-	fi
+  if [[ -f go.mod ]]; then
+    go mod download
+  fi
 }
 
 case "$command" in
 add)
-	add_worktree
-	copy_files
-	install_deps
-	pwd
-	;;
+  add_worktree
+  copy_files
+  install_deps
+  pwd
+  ;;
 remove)
-	remove_worktree
-	;;
+  remove_worktree
+  ;;
 *)
-	usage
-	;;
+  usage
+  ;;
 esac

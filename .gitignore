@@ -8,6 +8,10 @@ fish/fish_variables
 psql/history
 psql/pgpass
 
+# Ignore OrbStack
+fish/completions/kubectl.fish
+fish/completions/orbctl.fish
+
 # Ignore tmux
 tmux/plugins/*
 !tmux/plugins/tpm
