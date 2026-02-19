@@ -9,6 +9,7 @@ brew tap lcmen/extra
 
 brew install -q bat \
                 docker-mac-net-connect \
+                exiftool \
                 fzf \
                 git \
                 libpq \

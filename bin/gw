@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Manage git worktrees with automatic file copying and dependency installation.
+#
+# Usage: gw <add|remove> <branch> [suffix]
 
 set -euo pipefail
 
@@ -38,6 +41,7 @@ add_worktree() {
   else
     env "${SKIP_HOOKS_ENV[@]}" git worktree add -b "$branch" "$worktree_path"
   fi
+  mise trust --all "$worktree_path"
   cd "$worktree_path"
 }
 
@@ -48,7 +52,7 @@ remove_worktree() {
     exit 1
   fi
   git worktree remove "$worktree_path"
-  git branch -d "$branch"
+  git branch -D "$branch"
 }
 
 copy_files() {
@@ -61,19 +65,10 @@ copy_files() {
 }
 
 install_deps() {
-  mise trust
   mise install
 
   if [[ -f Gemfile ]]; then
     bundle install
-  fi
-
-  if [[ -f package-lock.json ]]; then
-    npm install
-  fi
-
-  if [[ -f yarn.lock ]]; then
-    yarn install
   fi
 
   if [[ -f mix.exs ]]; then
@@ -82,6 +77,14 @@ install_deps() {
 
   if [[ -f go.mod ]]; then
     go mod download
+  fi
+
+  if [[ -f package-lock.json ]]; then
+    npm install
+  fi
+
+  if [[ -f yarn.lock ]]; then
+    yarn install
   fi
 }
 

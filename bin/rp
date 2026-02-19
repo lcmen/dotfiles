@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+# Batch rename photos to IMG_yyyyMMdd_HHmmss format using EXIF data.
+# Dependencies: exiftool (brew install exiftool / apt install libimage-exiftool-perl)
+#
+# Usage: rp <directory> [--dry-run]
+
+set -euo pipefail
+
+DIR=""
+DRY_RUN=false
+
+usage() {
+  echo "Usage: rp <directory> [--dry-run]"
+  exit 1
+}
+
+check_deps() {
+  if ! command -v exiftool &>/dev/null; then
+    echo "Error: exiftool is required (brew install exiftool)"
+    exit 1
+  fi
+}
+
+get_datetime() {
+  local file="$1"
+  local datetime=$(exiftool -s3 -DateTimeOriginal "$file" 2>/dev/null)
+  [[ -z "$datetime" ]] && datetime=$(exiftool -s3 -CreateDate "$file" 2>/dev/null)
+  [[ -z "$datetime" ]] && datetime=$(exiftool -s3 -FileModifyDate "$file" 2>/dev/null)
+
+  echo "$datetime"
+}
+
+build_new_path() {
+  local file="$1"
+  local datetime="$2"
+
+  # datetime format: "2024:01:15 14:30:45" -> "IMG_20240115_143045"
+  local new_name="IMG_$(echo "$datetime" | sed 's/[: ]//g' | sed 's/\+.*//' | head -c 14)"
+
+  local ext=$(echo "${file##*.}" | tr '[:upper:]' '[:lower:]')
+  local new_path="$DIR/${new_name}.${ext}"
+
+  # Handle duplicates by appending _1, _2, etc.
+  local counter=1
+  while [[ -e "$new_path" && "$(realpath "$file")" != "$(realpath "$new_path")" ]]; do
+    new_path="$DIR/${new_name}_${counter}.${ext}"
+    ((counter++))
+  done
+
+  echo "$new_path"
+}
+
+rename_photos() {
+  local renamed=0
+  local skipped=0
+
+  for file in "$DIR"/*; do
+    [[ -f "$file" ]] || continue
+
+    local mime
+    mime=$(file --brief --mime-type "$file")
+    [[ "$mime" == image/* ]] || continue
+
+    local datetime
+    datetime=$(get_datetime "$file")
+
+    if [[ -z "$datetime" || "$datetime" == "0000:00:00 00:00:00" ]]; then
+      echo "SKIP (no date): $file"
+      ((skipped++))
+      continue
+    fi
+
+    local new_path
+    new_path=$(build_new_path "$file" "$datetime")
+
+    if [[ "$(realpath "$file")" == "$(realpath "$new_path")" ]]; then
+      echo "SKIP (already named): $file"
+      ((skipped++))
+      continue
+    fi
+
+    if $DRY_RUN; then
+      echo "DRY-RUN: $file -> $new_path"
+    else
+      mv "$file" "$new_path"
+      echo "RENAMED: $file -> $new_path"
+    fi
+    ((renamed++))
+  done
+
+  echo ""
+  echo "Done: $renamed renamed, $skipped skipped"
+}
+
+[[ $# -lt 1 ]] && usage
+
+DIR="$1"
+[[ "${2:-}" == "--dry-run" ]] && DRY_RUN=true
+
+[[ ! -d "$DIR" ]] && { echo "Error: '$DIR' is not a directory"; exit 1; }
+
+check_deps
+rename_photos

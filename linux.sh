@@ -36,6 +36,7 @@ setup_ubuntu() {
         fish \
         git \
         inotify-tools \
+        libimage-exiftool-perl \
         libffi-dev \
         libreadline-dev \
         libssl-dev \
@@ -86,7 +87,15 @@ setup_solus() {
 
     # Install packages
     echo "Installing packages..."
-    sudo eopkg install -y git neovim nodejs-22 sassc make fish tig
+    sudo eopkg install -y \
+        fish \
+        git \
+        make \
+        neovim \
+        nodejs-22 \
+        perl-image-exiftool \
+        sassc \
+        tig
 
     if [ ! -e /usr/sbin/node ]; then
         echo "Creating symlink for node..."
