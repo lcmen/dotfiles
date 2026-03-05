@@ -37,8 +37,10 @@ SKIP_HOOKS_ENV=(
 )
 
 add_worktree() {
-  # Check if branch exists
-  if git show-ref --verify --quiet "refs/heads/$branch"; then
+  # Check if branch exists locally or on remote
+  local local_ref="refs/heads/$branch"
+  local remote_ref="refs/remotes/origin/$branch"
+  if git show-ref --verify --quiet "$local_ref" || git show-ref --verify --quiet "$remote_ref"; then
     env "${SKIP_HOOKS_ENV[@]}" git worktree add "$worktree_path" "$branch"
   else
     env "${SKIP_HOOKS_ENV[@]}" git worktree add -b "$branch" "$worktree_path"
