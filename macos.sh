@@ -4,11 +4,9 @@ set -e
 
 echo "Brewing your Mac..."
 
-brew tap chipmk/tap
 brew tap lcmen/extra
 
 brew install -q bat \
-                docker-mac-net-connect \
                 exiftool \
                 fzf \
                 git \
@@ -16,7 +14,6 @@ brew install -q bat \
                 libyaml \
                 neovim_bin \
                 mise \
-                neovim_bin \
                 ripgrep \
                 shellcheck \
                 stow \
@@ -24,23 +21,22 @@ brew install -q bat \
                 tmux
 
 brew install --cask -q appcleaner \
-                       docker \
+                       bitwarden \
                        firefox \
                        font-fira-code-nerd-font \
                        google-chrome \
                        microsoft-teams \
+                       orbstack \
+                       pocket-casts \
+                       postman \
                        quicklook-csv \
                        quicklook-json \
-                       postman \
-                       pocket-casts \
                        the-unarchiver \
                        visual-studio-code
 
 brew upgrade --greedy
 
 brew link --force libpq
-
-sudo brew services start docker-mac-net-connect
 
 brew cleanup
 

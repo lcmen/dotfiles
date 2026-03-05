@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 # Batch rename photos to IMG_yyyyMMdd_HHmmss format using EXIF data.
 # Dependencies: exiftool (brew install exiftool / apt install libimage-exiftool-perl)
 #
