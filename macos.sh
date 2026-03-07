@@ -14,6 +14,8 @@ brew install -q bat \
                 libyaml \
                 neovim_bin \
                 mise \
+                neovim_bin \
+                openssl@3.5 \
                 ripgrep \
                 shellcheck \
                 stow \
@@ -37,6 +39,7 @@ brew install --cask -q appcleaner \
 brew upgrade --greedy
 
 brew link --force libpq
+brew link --force openssl@3.5
 
 brew cleanup
 
