@@ -31,7 +31,6 @@ local opts = { noremap = true, silent = true }
     Plug('AndrewRadev/splitjoin.vim')
     Plug('airblade/vim-gitgutter')
     Plug('christoomey/vim-tmux-navigator')
-    Plug('coder/claudecode.nvim')
     Plug('docunext/closetag.vim')
     Plug('github/copilot.vim')
     Plug('junegunn/fzf')
@@ -89,28 +88,6 @@ local opts = { noremap = true, silent = true }
     g.NERDTreeShowHidden = 1                                     -- Show hidden files on NERDTree
     map('n', '<C-e>', ':NERDTreeToggle<CR>', opts)               -- Toggle NERDTree
     map('n', '<leader>e', ':NERDTreeFind<CR>', opts)             -- Focus current buffer in NERDTree
-    -- }}}
-
-    -- ClaudeCode {{{
-    require('claudecode').setup({
-        terminal = {
-            split_width_percentage = 0.5,
-        },
-        diff_opts = {
-            layout = "horizontal",
-            hide_terminal_in_new_tab = true,
-            open_in_new_tab = true,
-        }
-    })
-
-    map("n", "<leader>cC", ":ClaudeCode<CR>", opts)
-    map("n", "<leader>cc", ":ClaudeCodeFocus<CR>", opts)
-    map("n", "<leader>cR", ":ClaudeCode --resume<CR>", opts)
-    map("n", "<leader>cU", ":ClaudeCode --continue<CR>", opts)
-    map("n", "<leader>ca", ":ClaudeCodeAdd %<CR>", opts)
-    map("v", "<leader>ca", ":ClaudeCodeSend<CR>", opts)
-    map("n", "do", ":ClaudeCodeDiffAccept<CR>", opts)
-    map("n", "dp", ":ClaudeCodeDiffDeny<CR>", opts)
     -- }}}
 
     -- Sideways & Splitjoin {{{

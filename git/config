@@ -30,9 +30,11 @@
   cob = checkout -b
   # Fetch and delete branches that have been deleted on the remote
   fe = "!f() { git fetch -p && git branch -vv | awk '/: gone]/{print $1}' | xargs git br -D; }; f"
+  his = log --oneline --graph --decorate
   pl = pull --rebase
   ps = push
   st = status
   sw = !git checkout $(git br | fzf)
   swa = !git checkout $(git br --all | fzf)
+  un = reset HEAD~1 --soft
   wip = !git add -A && git commit -m "WIP"
