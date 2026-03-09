@@ -12,6 +12,8 @@
     "*": "ask",
     "bash": {
       "*": "ask",
+      "find *": "allow",
+      "head *": "allow",
       "ls *": "allow",
       "git status": "allow",
       "git diff": "allow",
