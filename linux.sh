@@ -23,10 +23,46 @@ echo "Detected distribution: $DISTRO ($ARCH)"
 # Prompt for sudo credentials upfront
 sudo -v
 
+# Helper functions for Ubuntu apt repository management
+setup_apt_keyring() {
+    local keyring_dir="/etc/apt/keyrings"
+    sudo install -dm 755 "$keyring_dir"
+}
+
+add_apt_gpg_key() {
+    local url="$1"
+    local keyring_file="$2"
+    curl -fsSL "$url" | sudo tee "$keyring_file" > /dev/null
+    sudo chmod go+r "$keyring_file"
+}
+
+add_apt_source() {
+    local source_line="$1"
+    local list_file="$2"
+    echo "$source_line" | sudo tee "$list_file" > /dev/null
+}
+
 setup_ubuntu() {
     echo "Setting up your Ubuntu distro..."
 
-    # Install packages
+    # Add all third-party repositories first
+    echo "Adding third-party repositories..."
+
+    # Neovim PPA
+    sudo add-apt-repository ppa:neovim-ppa/unstable -y
+
+    # Setup apt keyrings for custom repos
+    setup_apt_keyring
+
+    # Mise repository
+    add_apt_gpg_key "https://mise.jdx.dev/gpg-key.pub" "/etc/apt/keyrings/mise-archive-keyring.pub"
+    add_apt_source "deb [signed-by=/etc/apt/keyrings/mise-archive-keyring.pub arch=$ARCH] https://mise.jdx.dev/deb stable main" "/etc/apt/sources.list.d/mise.list"
+
+    # GitHub CLI repository
+    add_apt_gpg_key "https://cli.github.com/packages/githubcli-archive-keyring.gpg" "/etc/apt/keyrings/githubcli-archive-keyring.gpg"
+    add_apt_source "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" "/etc/apt/sources.list.d/github-cli.list"
+
+    # Install all packages in a single operation
     echo "Installing packages..."
     sudo apt-get update
     sudo apt-get install -y \
@@ -34,16 +70,22 @@ setup_ubuntu() {
         ca-certificates \
         bat \
         fish \
+        gh \
         git \
         inotify-tools \
         libimage-exiftool-perl \
         libffi-dev \
         libreadline-dev \
         libssl-dev \
+        libxml2-dev \
+        libxslt-dev \
         libyaml-dev \
         lsb-release \
         make \
+        mise \
+        neovim \
         ntp \
+        pkg-config \
         ripgrep \
         software-properties-common \
         sqlite3 \
@@ -56,12 +98,6 @@ setup_ubuntu() {
     # Create symlink for bat (Ubuntu installs it as batcat)
     sudo ln -sf /usr/bin/batcat /usr/local/bin/bat
 
-    # Install neovim from PPA (for latest version)
-    echo "Installing neovim..."
-    sudo add-apt-repository ppa:neovim-ppa/unstable -y
-    sudo apt-get update
-    sudo apt-get install -y neovim
-
     # Install starship (not available in apt until Ubuntu 25.04+)
     echo "Installing starship..."
     curl -sS https://starship.rs/install.sh | sh -s -- -y > /dev/null
@@ -72,14 +108,6 @@ setup_ubuntu() {
     curl -fsSLo /tmp/fzf.tar.gz "https://github.com/junegunn/fzf/releases/download/v${FZF_VERSION}/fzf-${FZF_VERSION}-linux_${ARCH}.tar.gz"
     sudo tar -xzf /tmp/fzf.tar.gz -C /usr/local/bin/
     rm /tmp/fzf.tar.gz
-
-    # Install mise
-    echo "Installing mise..."
-    sudo install -dm 755 /etc/apt/keyrings
-    curl -fsSL https://mise.jdx.dev/gpg-key.pub | sudo tee /etc/apt/keyrings/mise-archive-keyring.pub > /dev/null
-    echo "deb [signed-by=/etc/apt/keyrings/mise-archive-keyring.pub arch=$ARCH] https://mise.jdx.dev/deb stable main" | sudo tee /etc/apt/sources.list.d/mise.list
-    sudo apt-get update
-    sudo apt-get install -y mise
 }
 
 setup_solus() {
