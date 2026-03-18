@@ -26,8 +26,10 @@ COPY_FILES=(
   .env.development.local
   .env.test.local
   .projections.json
+  config/credentials
   config/master.key
   Procfile.dev.local
+  tmp/local_secret.txt
 )
 
 SKIP_HOOKS_ENV=(
@@ -63,6 +65,7 @@ copy_files() {
   for file in "${COPY_FILES[@]}"; do
     local src="../${current_dir}/${file}"
     if [[ -e "$src" ]]; then
+      mkdir -p "$(dirname "$file")"
       cp -r "$src" "$file"
     fi
   done
