@@ -15,7 +15,7 @@ usage() {
 
 command="$1"
 branch="$2"
-name="${3:-$branch}"
+name="${3:-${branch//\//-}}"
 current_dir="$(basename "$(pwd)")"
 worktree_path="../${current_dir}-${name}"
 
@@ -64,49 +64,39 @@ remove_worktree() {
 copy_files() {
   for file in "${COPY_FILES[@]}"; do
     local src="../${current_dir}/${file}"
-    if [[ -e "$src" ]]; then
+    # If directory exists, merge its contents
+    if [[ -d "$src" ]]; then
+      mkdir -p "$file"
+      cp -r "$src/." "$file/"
+    # If file does not exist, copy it (and crete directories if missing)
+    elif [[ -e "$src" ]]; then
       mkdir -p "$(dirname "$file")"
       cp -r "$src" "$file"
     fi
   done
 }
 
-install_deps() {
-  mise install
-
-  if [[ -f Gemfile ]]; then
-    bundle install
-  fi
-
-  if [[ -f mix.exs ]]; then
-    mix deps.get
-  fi
-
-  if [[ -f go.mod ]]; then
-    go mod download
-  fi
-
-  if [[ -f package-lock.json ]]; then
-    npm install
-  fi
-
-  if [[ -f yarn.lock ]]; then
-    yarn install
-  fi
-}
-
 build_tab_cmd() {
   local dir="$1"
   local session_name="$2"
 
+  # Install deps
+  local deps="mise install"
+  if [[ -f "$dir/Gemfile" ]]; then deps="$deps && bundle install"; fi
+  if [[ -f "$dir/mix.exs" ]]; then deps="$deps && mix deps.get"; fi
+  if [[ -f "$dir/go.mod" ]]; then deps="$deps && go mod download"; fi
+  if [[ -f "$dir/package-lock.json" ]]; then deps="$deps && npm install"; fi
+  if [[ -f "$dir/yarn.lock" ]]; then deps="$deps && yarn install"; fi
+
+  # Check if Tmux is installed, then start a new Tmux session
   if command -v tmux &>/dev/null; then
     if tmux has-session -t "$session_name" 2>/dev/null; then
       echo "cd '$dir' && tmux attach -t '$session_name'"
     else
-      echo "cd '$dir' && tmux new-session -s '$session_name'"
+      echo "cd '$dir' && $deps && tmux new-session -s '$session_name'"
     fi
   else
-    echo "cd '$dir'"
+    echo "cd '$dir' && $deps"
   fi
 }
 
@@ -145,12 +135,17 @@ open_in_apple_terminal() {
   local session_name="$1"
   local tab_cmd="$2"
 
+  # Terminal.app doesn't support "make new tab" so we simulate Cmd+T.
+  # A delay is needed because the keystroke is async; without it,
+  # "do script" runs in the previous tab instead of the new one.
   osascript <<EOF || echo "Could not open Terminal.app tab."
 tell application "Terminal"
   activate
   tell application "System Events" to keystroke "t" using command down
-  do script "$tab_cmd" in front window
-  set custom title of front tab of front window to "$session_name"
+  delay 1
+  do script "$tab_cmd" in selected tab of front window
+  set custom title of selected tab of front window to "$session_name"
+  set title displays custom title of selected tab of front window to true
 end tell
 EOF
 }
@@ -172,35 +167,25 @@ open_worktree() {
   fi
 
   # iTerm2
-  if [[ "${TERM_PROGRAM:-}" == "iTerm.app" ]]; then
+  if [[ "${TERM_PROGRAM:-}" == "iTerm.app" || "${__CFBundleIdentifier:-}" == "com.googlecode.iterm2" ]]; then
     open_in_iterm "$session_name" "$tab_cmd"
     return
   fi
 
   # macOS Terminal.app
-  if [[ "${TERM_PROGRAM:-}" == "Apple_Terminal" ]]; then
+  if [[ "${TERM_PROGRAM:-}" == "Apple_Terminal" || "${__CFBundleIdentifier:-}" == "com.apple.Terminal" ]]; then
     open_in_apple_terminal "$session_name" "$tab_cmd"
     return
   fi
 
-  # Fallback: no supported terminal — create detached tmux or print path
-  if command -v tmux &>/dev/null; then
-    if tmux has-session -t "$session_name" 2>/dev/null; then
-      echo "tmux session '$session_name' already exists. Attach with: tmux attach -t $session_name"
-    else
-      tmux new-session -d -s "$session_name" -c "$dir"
-      echo "tmux session '$session_name' created. Attach with: tmux attach -t $session_name"
-    fi
-  else
-    echo "Worktree ready at: $dir"
-  fi
+  echo "Unsupported terminal: unable to open a new tab." >&2
+  exit 1
 }
 
 case "$command" in
 add)
   add_worktree
   copy_files
-  install_deps
   open_worktree "$(pwd)" "$name"
   ;;
 remove)
