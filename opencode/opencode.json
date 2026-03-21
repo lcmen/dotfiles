@@ -14,16 +14,17 @@
       "*": "ask",
       "find *": "allow",
       "head *": "allow",
-      "ls *": "allow",
-      "git status": "allow",
-      "git diff": "allow",
-      "git log": "allow"
+      "ls*": "allow",
+      "git status*": "allow",
+      "git diff*": "allow",
+      "git log*": "allow"
     },
     "edit": "ask",
     "explore": "allow",
     "glob": "allow",
     "grep": "allow",
     "read": "allow",
+    "skill": "allow",
     "todowrite": "allow"
   },
   "mcp": {
