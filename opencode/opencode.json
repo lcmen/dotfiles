@@ -9,23 +9,17 @@
     }
   },
   "permission": {
-    "*": "ask",
     "bash": {
       "*": "ask",
+      "ls *": "allow",
+      "git *": "ask",
+      "git status *": "allow",
+      "git diff *": "allow",
+      "git log *": "allow",
       "find *": "allow",
-      "head *": "allow",
-      "ls*": "allow",
-      "git status*": "allow",
-      "git diff*": "allow",
-      "git log*": "allow"
+      "head *": "allow"
     },
-    "edit": "ask",
-    "explore": "allow",
-    "glob": "allow",
-    "grep": "allow",
-    "read": "allow",
-    "skill": "allow",
-    "todowrite": "allow"
+    "edit": "ask"
   },
   "mcp": {
     "context7": {
