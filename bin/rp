@@ -24,9 +24,10 @@ check_deps() {
 
 get_datetime() {
   local file="$1"
-  local datetime=$(exiftool -s3 -DateTimeOriginal "$file" 2>/dev/null)
-  [[ -z "$datetime" ]] && datetime=$(exiftool -s3 -CreateDate "$file" 2>/dev/null)
-  [[ -z "$datetime" ]] && datetime=$(exiftool -s3 -FileModifyDate "$file" 2>/dev/null)
+  local datetime
+  datetime=$(exiftool -s3 -d '%Y%m%d_%H%M%S' -DateTimeOriginal "$file" 2>/dev/null)
+  [[ -z "$datetime" ]] && datetime=$(exiftool -s3 -d '%Y%m%d_%H%M%S' -CreateDate "$file" 2>/dev/null)
+  [[ -z "$datetime" ]] && datetime=$(exiftool -s3 -d '%Y%m%d_%H%M%S' -FileModifyDate "$file" 2>/dev/null)
 
   echo "$datetime"
 }
@@ -35,8 +36,8 @@ build_new_path() {
   local file="$1"
   local datetime="$2"
 
-  # datetime format: "2024:01:15 14:30:45" -> "IMG_20240115_143045"
-  local new_name="IMG_$(echo "$datetime" | sed 's/[: ]//g' | sed 's/\+.*//' | head -c 14)"
+  # datetime format: "20240115_143045" -> "IMG_20240115_143045"
+  local new_name="IMG_${datetime}"
 
   local ext=$(echo "${file##*.}" | tr '[:upper:]' '[:lower:]')
   local new_path="$DIR/${new_name}.${ext}"
@@ -65,7 +66,7 @@ rename_photos() {
     local datetime
     datetime=$(get_datetime "$file")
 
-    if [[ -z "$datetime" || "$datetime" == "0000:00:00 00:00:00" ]]; then
+    if [[ -z "$datetime" || "$datetime" == "00000000_000000" ]]; then
       echo "SKIP (no date): $file"
       ((skipped++))
       continue
