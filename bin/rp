@@ -43,7 +43,7 @@ build_new_path() {
 
   # Handle duplicates by appending _1, _2, etc.
   local counter=1
-  while [[ -e "$new_path" && "$(realpath "$file")" != "$(realpath "$new_path")" ]]; do
+  while [[ -e "$new_path" && ! "$file" -ef "$new_path" ]]; do
     new_path="$DIR/${new_name}_${counter}.${ext}"
     ((counter++))
   done
@@ -74,7 +74,7 @@ rename_photos() {
     local new_path
     new_path=$(build_new_path "$file" "$datetime")
 
-    if [[ "$(realpath "$file")" == "$(realpath "$new_path")" ]]; then
+    if [[ -e "$new_path" && "$file" -ef "$new_path" ]]; then
       echo "SKIP (already named): $file"
       ((skipped++))
       continue
