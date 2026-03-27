@@ -7,39 +7,29 @@ echo "Brewing your Mac..."
 brew tap lcmen/extra
 
 brew install -q bat \
+                direnv \
                 exiftool \
                 fzf \
                 git \
-                libpq \
-                libyaml \
-                neovim_bin \
                 mise \
                 neovim_bin \
-                openssl@3.5 \
                 ripgrep \
                 shellcheck \
                 stow \
                 tig \
                 tmux
 
-brew install --cask -q appcleaner \
-                       bitwarden \
-                       firefox \
+brew install --cask -q affinity \
+                       container \
                        font-fira-code-nerd-font \
                        google-chrome \
-                       microsoft-teams \
-                       orbstack \
                        pocket-casts \
-                       postman \
-                       quicklook-csv \
-                       quicklook-json \
-                       the-unarchiver \
-                       visual-studio-code
+                       synology-drive \
+                       vlc \
+                       whatsapp \
+                       yubico-yubikey-manager
 
 brew upgrade --greedy
-
-brew link --force libpq
-brew link --force openssl@3.5
 
 brew cleanup
 
