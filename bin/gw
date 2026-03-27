@@ -25,6 +25,7 @@ COPY_FILES=(
   .env.local
   .env.development.local
   .env.test.local
+  .insights
   .projections.json
   config/credentials
   config/master.key
