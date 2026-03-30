@@ -2,22 +2,12 @@
 
 # Manage git worktrees with automatic file copying and dependency installation.
 #
-# Usage: gw <add|remove> <branch> [name]
+# Usage: gw add [branch]
+#        gw remove <name>
 
 set -euo pipefail
 
-usage() {
-  echo "Usage: gw <add|remove> <branch> [name]"
-  exit 1
-}
-
-[[ $# -lt 2 || $# -gt 3 ]] && usage
-
-command="$1"
-branch="$2"
-name="${3:-${branch//\//-}}"
-current_dir="$(basename "$(pwd)")"
-worktree_path="../${current_dir}-${name}"
+DIRECTORY="$(basename "$(pwd)")"
 
 COPY_FILES=(
   .bundle
@@ -33,6 +23,8 @@ COPY_FILES=(
   tmp/local_secret.txt
 )
 
+NAME_POOL=(amber bronze cedar coral crimson dune elm fern gold hazel indigo ivory jade lemon lilac maple nova opal peach quartz ruby sage teal umber violet willow zinc)
+
 SKIP_HOOKS_ENV=(
   HUSKY=0
   LEFTHOOK=0
@@ -40,31 +32,35 @@ SKIP_HOOKS_ENV=(
 )
 
 add_worktree() {
+  local branch="$1"
+  local path="$2"
   # Check if branch exists locally or on remote
   local local_ref="refs/heads/$branch"
   local remote_ref="refs/remotes/origin/$branch"
   if git show-ref --verify --quiet "$local_ref" || git show-ref --verify --quiet "$remote_ref"; then
-    env "${SKIP_HOOKS_ENV[@]}" git worktree add "$worktree_path" "$branch"
+    env "${SKIP_HOOKS_ENV[@]}" git worktree add "$path" "$branch"
   else
-    env "${SKIP_HOOKS_ENV[@]}" git worktree add -b "$branch" "$worktree_path"
+    env "${SKIP_HOOKS_ENV[@]}" git worktree add -b "$branch" "$path"
   fi
-  cd "$worktree_path"
+  cd "$path"
   mise trust --all
 }
 
 remove_worktree() {
-  worktree_path=$(git worktree list | grep "\[${branch}\]" | awk '{print $1}')
-  if [[ -z "$worktree_path" ]]; then
-    echo "No worktree found for branch '$branch'"
+  local path="$1"
+  if [[ ! -d "$path" ]]; then
+    echo "No worktree found at '$path'"
     exit 1
   fi
-  git worktree remove "$worktree_path"
-  git branch -D "$branch"
+  local wt_branch
+  wt_branch=$(git -C "$path" rev-parse --abbrev-ref HEAD)
+  git worktree remove "$path"
+  git branch -D "$wt_branch"
 }
 
 copy_files() {
   for file in "${COPY_FILES[@]}"; do
-    local src="../${current_dir}/${file}"
+    local src="../${DIRECTORY}/${file}"
     # If directory exists, merge its contents
     if [[ -d "$src" ]]; then
       mkdir -p "$file"
@@ -183,14 +179,41 @@ open_worktree() {
   exit 1
 }
 
-case "$command" in
+pick_name() {
+  for n in "${NAME_POOL[@]}"; do
+    if [[ ! -d "../${DIRECTORY}-${n}" ]]; then
+      echo "$n"
+      return
+    fi
+  done
+  echo "Error: all worktree names are in use" >&2
+  exit 1
+}
+
+usage() {
+  echo "Usage: gw add <branch>"
+  echo "       gw remove [name]"
+  exit 1
+}
+
+case "$1" in
 add)
-  add_worktree
+  [[ $# -lt 2 ]] && usage
+  local name
+  name="$(pick_name)"
+  add_worktree "$2" "../${DIRECTORY}-${name}"
   copy_files
   open_worktree "$(pwd)" "$name"
   ;;
 remove)
-  remove_worktree
+  if [[ -n "${2:-}" ]]; then
+    remove_worktree "../${DIRECTORY}-${2}"
+  else
+    remove_worktree "$(pwd)"
+  fi
+  if [[ -n "${TMUX:-}" ]]; then
+    tmux kill-session
+  fi
   ;;
 *)
   usage
