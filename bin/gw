@@ -7,8 +7,6 @@
 
 set -euo pipefail
 
-DIRECTORY="$(basename "$(pwd)")"
-
 COPY_FILES=(
   .bundle
   .claude
@@ -22,6 +20,8 @@ COPY_FILES=(
   Procfile.dev.local
   tmp/local_secret.txt
 )
+
+DIRECTORY="$(basename "$(pwd)")"
 
 NAME_POOL=(amber bronze cedar coral crimson dune elm fern gold hazel indigo ivory jade lemon lilac maple nova opal peach quartz ruby sage teal umber violet willow zinc)
 
@@ -48,13 +48,14 @@ add_worktree() {
 
 remove_worktree() {
   local path="$1"
+  shift
   if [[ ! -d "$path" ]]; then
     echo "No worktree found at '$path'"
     exit 1
   fi
   local wt_branch
   wt_branch=$(git -C "$path" rev-parse --abbrev-ref HEAD)
-  git worktree remove "$path"
+  git worktree remove "$@" "$path"
   git branch -D "$wt_branch"
 }
 
@@ -199,7 +200,6 @@ usage() {
 case "$1" in
 add)
   [[ $# -lt 2 ]] && usage
-  local name
   name="$(pick_name)"
   add_worktree "$2" "../${DIRECTORY}-${name}"
   copy_files
@@ -207,7 +207,7 @@ add)
   ;;
 remove)
   if [[ -n "${2:-}" ]]; then
-    remove_worktree "../${DIRECTORY}-${2}"
+    remove_worktree "../${DIRECTORY}-${2}" "${@:3}"
   else
     remove_worktree "$(pwd)"
   fi
