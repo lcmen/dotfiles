@@ -34,8 +34,11 @@ configure_settings() {
     defaults write com.apple.finder ShowMountedServersOnDesktop -bool true
     defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true
 
-    # Clean up existing .DS_Store files
-    find ~ -name ".DS_Store" -not -path "*/node_modules/*" -delete 2>/dev/null
+    echo "To clean up existing .DS_Store files, run:"
+    echo "  find ~ -name '.DS_Store' -not -path '*/node_modules/*' -delete"
+
+    # Restart Finder to apply changes
+    echo "Restart Finder to apply changes: killall Finder"
 }
 
 configure_shortcuts() {
@@ -70,7 +73,9 @@ configure_shortcuts() {
 install_packages() {
     echo "Installing packages..."
 
-    brew tap lcmen/extra
+    command -v brew >/dev/null || { echo "Install Homebrew first: https://brew.sh"; exit 1; }
+
+    brew tap -q lcmen/extra
 
     brew install -q bat \
                     compartment \

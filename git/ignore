@@ -18,6 +18,7 @@ vendor/bundle
 Icon
 *.savedSearch
 *.socket
+*:Zone.Identifier
 
 # Ignore Project dev environment specific
 .direnv
@@ -28,6 +29,4 @@ Icon
 .vscode
 Procfile.dev
 Procfile.local
-
-# Ignore IDE specific files
 **/.claude/settings.local.json
