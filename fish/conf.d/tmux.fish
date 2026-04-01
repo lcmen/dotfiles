@@ -1,6 +1,5 @@
 if not command -q tmux
-  echo "fish tmux plugin: tmux not found. Please install tmux before using this plugin." >&2
-  exit 1
+  return
 end
 
 if test -e $HOME/.tmux.conf

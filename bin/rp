@@ -39,7 +39,8 @@ build_new_path() {
   # datetime format: "20240115_143045" -> "IMG_20240115_143045"
   local new_name="IMG_${datetime}"
 
-  local ext=$(echo "${file##*.}" | tr '[:upper:]' '[:lower:]')
+  local ext
+  ext=$(echo "${file##*.}" | tr '[:upper:]' '[:lower:]')
   local new_path="$DIR/${new_name}.${ext}"
 
   # Handle duplicates by appending _1, _2, etc.
