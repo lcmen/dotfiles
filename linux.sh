@@ -62,19 +62,26 @@ setup_ubuntu() {
     add_apt_gpg_key "https://cli.github.com/packages/githubcli-archive-keyring.gpg" "/etc/apt/keyrings/githubcli-archive-keyring.gpg"
     add_apt_source "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" "/etc/apt/sources.list.d/github-cli.list"
 
+    # Docker repository
+    add_apt_gpg_key "https://download.docker.com/linux/ubuntu/gpg" "/etc/apt/keyrings/docker.asc"
+    add_apt_source "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" "/etc/apt/sources.list.d/docker.list"
+
     # Install all packages in a single operation
     echo "Installing packages..."
     sudo apt-get update
     sudo apt-get install -y \
+        bat \
         build-essential \
         ca-certificates \
-        bat \
+        containerd.io \
+        docker-ce \
+        docker-ce-cli \
         fish \
         gh \
         git \
         inotify-tools \
-        libimage-exiftool-perl \
         libffi-dev \
+        libimage-exiftool-perl \
         libreadline-dev \
         libssl-dev \
         libxml2-dev \
@@ -98,6 +105,9 @@ setup_ubuntu() {
     # Create symlink for bat (Ubuntu installs it as batcat)
     sudo ln -sf /usr/bin/batcat /usr/local/bin/bat
 
+    # Add current user to docker group
+    sudo usermod -aG docker "$USER"
+
     # Install starship (not available in apt until Ubuntu 25.04+)
     echo "Installing starship..."
     curl -sS https://starship.rs/install.sh | sh -s -- -y > /dev/null
@@ -108,6 +118,14 @@ setup_ubuntu() {
     curl -fsSLo /tmp/fzf.tar.gz "https://github.com/junegunn/fzf/releases/download/v${FZF_VERSION}/fzf-${FZF_VERSION}-linux_${ARCH}.tar.gz"
     sudo tar -xzf /tmp/fzf.tar.gz -C /usr/local/bin/
     rm /tmp/fzf.tar.gz
+
+    # Install Nix
+    if ! command -v nix &>/dev/null; then
+        echo "Installing Nix..."
+        sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon --yes
+    else
+        echo "Nix already installed, skipping..."
+    fi
 }
 
 setup_solus() {
@@ -116,6 +134,7 @@ setup_solus() {
     # Install packages
     echo "Installing packages..."
     sudo eopkg install -y \
+        docker \
         fish \
         git \
         make \
@@ -124,6 +143,14 @@ setup_solus() {
         perl-image-exiftool \
         sassc \
         tig
+
+    # Install Nix
+    if ! command -v nix &>/dev/null; then
+        echo "Installing Nix..."
+        sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon --yes
+    else
+        echo "Nix already installed, skipping..."
+    fi
 
     if [ ! -e /usr/sbin/node ]; then
         echo "Creating symlink for node..."
@@ -134,6 +161,9 @@ setup_solus() {
         echo "Creating symlink for npm..."
         sudo ln -s /usr/bin/npm /usr/sbin/npm
     fi
+
+    # Add current user to docker group
+    sudo usermod -aG docker "$USER"
 }
 
 if [ "$DISTRO" = "solus" ]; then
