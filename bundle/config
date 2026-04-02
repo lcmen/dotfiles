@@ -1,5 +1,4 @@
 ---
-BUNDLE_PATH: "vendor/bundle"
 BUNDLE_GEM__CHANGELOG: "false"
 BUNDLE_GEM__CI: "github"
 BUNDLE_GEM__COC: "false"
