@@ -104,6 +104,14 @@ install_packages() {
 
     brew upgrade --greedy
     brew cleanup
+
+    # Install Nix (multi-user installation)
+    if ! command -v nix &>/dev/null; then
+        echo "Installing Nix..."
+        sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon --yes
+    else
+        echo "Nix already installed, skipping..."
+    fi
 }
 
 echo "Setting up your Mac..."

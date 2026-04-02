@@ -32,6 +32,9 @@ end
 
 set -gx BUNDLE_USER_HOME "$XDG_CONFIG_HOME/bundle"
 set -gx GEMRC "$XDG_CONFIG_HOME/gem/config"
+set -gx GEM_HOME "$XDG_DATA_HOME/gems"
+set -gx BUNDLE_PATH "$XDG_DATA_HOME/bundle"
+fish_add_path "$XDG_DATA_HOME/gems/bin"
 
 abbr -a bi 'bundle install'
 abbr -a bl 'bundle list'
