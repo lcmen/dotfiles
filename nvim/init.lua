@@ -38,7 +38,6 @@ local opts = { noremap = true, silent = true }
     Plug('lcmen/rational.nvim')
     Plug('neovim/nvim-lspconfig')
     Plug('numtostr/BufOnly.nvim', { ['on'] = 'BufOnly' })
-    Plug('onsails/lspkind-nvim')
     Plug('ryanoasis/vim-devicons')
     Plug('scrooloose/nerdtree')
     Plug('sheerun/vim-polyglot')
@@ -126,7 +125,6 @@ local opts = { noremap = true, silent = true }
         map(bufnr, 'n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
     end
 
-    require('lspkind').init()
     local lspconfig = require('lspconfig')
 
     -- LSP servers {{{
