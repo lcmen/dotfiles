@@ -2,7 +2,7 @@
 .gitignore
 .gitmodules
 .stowrc
-linux.sh
+ubuntu.sh
 macos.sh
 Makefile
 README.md

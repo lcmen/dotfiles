@@ -4,7 +4,7 @@ prepare:
 	@if [ "$$(uname -s)" = "Darwin" ]; then \
 		./macos.sh; \
 	elif [ "$$(uname -s)" = "Linux" ]; then \
-		./linux.sh; \
+		./ubuntu.sh; \
 	else \
 		echo "Unsupported operating system: $$(uname -s)"; \
 	fi

@@ -1,3 +1,28 @@
+# Language runtime configurations
+# Consolidated from: elixir.fish, golang.fish, nodejs.fish, ruby.fish
+
+# Elixir / Erlang
+set -gx ERL_AFLAGS "-kernel shell_history enabled"
+set -gx MIX_HOME "$XDG_DATA_HOME/mix"
+set -gx HEX_HOME "$XDG_CACHE_HOME/hex"
+fish_add_path "$XDG_DATA_HOME/mix/escripts"
+
+abbr -a mc 'iex -S mix'
+abbr -a mdg 'mix deps.get'
+abbr -a mdu 'mix deps.update'
+abbr -a phx 'mix phx.server'
+
+# Go
+set -gx GOPATH "$XDG_DATA_HOME/go"
+set -gx GOMODCACHE "$XDG_CACHE_HOME/go/mod"
+fish_add_path "$XDG_DATA_HOME/go/bin"
+
+# Node.js
+set -gx NPM_CONFIG_PREFIX "$XDG_DATA_HOME/npm"
+set -gx NPM_CONFIG_CACHE "$XDG_CACHE_HOME/npm"
+fish_add_path "$XDG_DATA_HOME/npm/bin"
+
+# Ruby
 function _rails_command --description "Run rails command"
   if test -e "bin/stubs/rails"
     bin/stubs/rails $argv
