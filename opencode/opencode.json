@@ -11,13 +11,16 @@
   "permission": {
     "bash": {
       "*": "ask",
-      "ls *": "allow",
+      "cat *": "allow",
+      "find *": "allow",
       "git *": "ask",
-      "git status *": "allow",
       "git diff *": "allow",
       "git log *": "allow",
-      "find *": "allow",
-      "head *": "allow"
+      "git status *": "allow",
+      "head *": "allow",
+      "ls *": "allow",
+      "read *": "allow",
+      "wc *": "allow"
     },
     "edit": "ask"
   },
