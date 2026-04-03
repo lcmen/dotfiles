@@ -25,6 +25,9 @@ vim/plugged/*
 nvim/plugged/*
 
 # Ignore opencode
+opencode/agents/
 opencode/node_modules/
+opencode/plugins/
+opencode/skills/
 opencode/package.json
 opencode/bun.lock

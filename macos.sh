@@ -5,8 +5,29 @@ set -e
 configure_settings() {
     echo "Configuring settings..."
 
-    # Finder: Show hidden files, file extensions, disable extension change warning
-    defaults write com.apple.finder AppleShowAllFiles -bool true
+    # UI: Window animations - speed up or disable
+    defaults write -g NSAutomaticWindowAnimationsEnabled -bool false
+    defaults write -g NSWindowResizeTime -float 0.001
+    defaults write -g NSScrollAnimationEnabled -bool false
+    defaults write -g QLPanelAnimationDuration -float 0
+    defaults write -g NSDocumentRevisionsWindowTransformAnimation -bool false
+    defaults write -g NSToolbarFullScreenAnimationDuration -float 0
+    defaults write -g NSBrowserColumnAnimationSpeedMultiplier -float 0
+    defaults write -g NSScrollViewRubberbanding -bool false
+
+    # Dock: Speed up animations
+    defaults write com.apple.dock autohide-time-modifier -float 0
+    defaults write com.apple.dock autohide-delay -float 0
+    defaults write com.apple.dock expose-animation-duration -float 0
+    defaults write com.apple.dock launchanim -bool false
+    defaults write com.apple.dock mineffect -string "scale"
+
+    # Mail: Disable send/reply animations
+    defaults write com.apple.Mail DisableSendAnimations -bool true
+    defaults write com.apple.Mail DisableReplyAnimations -bool true
+
+    # Finder: Don't show hidden files, show file extensions, disable extension change warning
+    defaults write com.apple.finder AppleShowAllFiles -bool false
     defaults write NSGlobalDomain AppleShowAllExtensions -bool true
     defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
 
@@ -34,14 +55,44 @@ configure_settings() {
     defaults write com.apple.finder ShowMountedServersOnDesktop -bool true
     defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true
 
-    echo "To clean up existing .DS_Store files, run:"
-    echo "  find ~ -name '.DS_Store' -not -path '*/node_modules/*' -delete"
-
-    # Restart Finder to apply changes
-    echo "Restart Finder to apply changes: killall Finder"
+    # Restart Dock and Finder to apply changes
+    echo "Restarting Dock and Finder to apply changes..."
+    killall Dock 2>/dev/null || true
+    killall Finder 2>/dev/null || true
 }
 
 configure_shortcuts() {
+    set_hotkey() {
+        local id=$1 char=$2 keycode=$3 mods=$4
+        local plist=~/Library/Preferences/com.apple.symbolichotkeys.plist
+
+        # Check if the entry already exists
+        if /usr/libexec/PlistBuddy "$plist" -c "Print :AppleSymbolicHotKeys:${id}" >/dev/null 2>&1; then
+            # Entry exists, update it
+            /usr/libexec/PlistBuddy "$plist" \
+                -c "Set :AppleSymbolicHotKeys:${id}:enabled true" \
+                -c "Set :AppleSymbolicHotKeys:${id}:value:type standard" \
+                -c "Set :AppleSymbolicHotKeys:${id}:value:parameters:0 ${char}" \
+                -c "Set :AppleSymbolicHotKeys:${id}:value:parameters:1 ${keycode}" \
+                -c "Set :AppleSymbolicHotKeys:${id}:value:parameters:2 ${mods}" 2>/dev/null || {
+                    echo "Warning: Failed to update hotkey ${id}" >&2
+                }
+        else
+            # Entry doesn't exist, create it with proper structure
+            /usr/libexec/PlistBuddy "$plist" \
+                -c "Add :AppleSymbolicHotKeys:${id} dict" \
+                -c "Add :AppleSymbolicHotKeys:${id}:enabled bool true" \
+                -c "Add :AppleSymbolicHotKeys:${id}:value dict" \
+                -c "Add :AppleSymbolicHotKeys:${id}:value:type string standard" \
+                -c "Add :AppleSymbolicHotKeys:${id}:value:parameters array" \
+                -c "Add :AppleSymbolicHotKeys:${id}:value:parameters:0 integer ${char}" \
+                -c "Add :AppleSymbolicHotKeys:${id}:value:parameters:1 integer ${keycode}" \
+                -c "Add :AppleSymbolicHotKeys:${id}:value:parameters:2 integer ${mods}" 2>/dev/null || {
+                    echo "Warning: Failed to create hotkey ${id}" >&2
+                }
+        fi
+    }
+
     echo "Configuring shortcuts..."
 
     # Disable press-and-hold, enable full keyboard access, use F1-F12 as standard keys
@@ -49,25 +100,34 @@ configure_shortcuts() {
     defaults write -g AppleKeyboardUIMode -int 2
     defaults write -g com.apple.keyboard.fnState -bool true
 
-    # Window tiling shortcuts:
-    #   Fill: Ctrl+Opt+Return
-    #   Center: Ctrl+Opt+Space
-    #   Top/Bottom: Ctrl+Opt+0
-    #   Left Half: Fn+Ctrl+Opt+Left
-    #   Right Half: Fn+Ctrl+Opt+Right
-    #   Top Half: Fn+Ctrl+Opt+Up
-    #   Bottom Half: Fn+Ctrl+Opt+Down
-    #   Left/Right: Ctrl+Opt+[
-    #   Previous Size: Ctrl+Opt+5
-    defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 237 '{ enabled = 1; value = { parameters = (65535, 36, 786432); type = standard; }; }'
-    defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 238 '{ enabled = 1; value = { parameters = (32, 49, 786432); type = standard; }; }'
-    defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 239 '{ enabled = 1; value = { parameters = (48, 29, 786432); type = standard; }; }'
-    defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 240 '{ enabled = 1; value = { parameters = (65535, 123, 9175040); type = standard; }; }'
-    defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 241 '{ enabled = 1; value = { parameters = (65535, 124, 9175040); type = standard; }; }'
-    defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 242 '{ enabled = 1; value = { parameters = (65535, 126, 9175040); type = standard; }; }'
-    defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 243 '{ enabled = 1; value = { parameters = (65535, 125, 9175040); type = standard; }; }'
-    defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 248 '{ enabled = 1; value = { parameters = (91, 33, 786432); type = standard; }; }'
-    defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 256 '{ enabled = 1; value = { parameters = (53, 23, 786432); type = standard; }; }'
+    # Window tiling shortcuts
+    set_hotkey 237   13    36  786432 # - Fill: Ctrl+Opt+Return
+    set_hotkey 238   32    49  786432 # - Center: Ctrl+Opt+Space
+    set_hotkey 239   48    29  786432 # - Return to Previous: Ctrl+Opt+0
+    set_hotkey 240  104     4  786432 # - Left: Ctrl+Opt+h
+    set_hotkey 241  108    37  786432 # - Right: Ctrl+Opt+l
+    set_hotkey 242  107    40  786432 # - Top: Ctrl+Opt+k
+    set_hotkey 243  106    38  786432 # - Bottom: Ctrl+Opt+j
+    set_hotkey 248   91    33  786432 # - Left & Right: Ctrl+Opt+[
+    set_hotkey 249   93    30  786432 # - Right & Left: Ctrl+Opt+]
+    set_hotkey 256   61    24  786432 # - Quarter: Ctrl+Opt+=
+
+    # Virtual desktop switching shortcuts
+    echo "Setting virtual desktop shortcuts (Ctrl+1-9)..."
+    set_hotkey 118   49    18  262144 # - Desktop 1: Ctrl+1
+    set_hotkey 119   50    19  262144 # - Desktop 2: Ctrl+2
+    set_hotkey 120   51    20  262144 # - Desktop 3: Ctrl+3
+    set_hotkey 121   52    21  262144 # - Desktop 4: Ctrl+4
+    set_hotkey 122   53    23  262144 # - Desktop 5: Ctrl+5
+    set_hotkey 123   54    22  262144 # - Desktop 6: Ctrl+6
+    set_hotkey 124   55    26  262144 # - Desktop 7: Ctrl+7
+    set_hotkey 125   56    28  262144 # - Desktop 8: Ctrl+8
+    set_hotkey 126   57    25  262144 # - Desktop 9: Ctrl+9
+
+    # Flush preferences cache and reload symbolic hotkeys
+    echo "Applying settings..."
+    killall cfprefsd 2>/dev/null || true
+    /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u 2>/dev/null || true
 }
 
 install_packages() {
@@ -84,7 +144,6 @@ install_packages() {
                     fzf \
                     git \
                     go-pty \
-                    mise \
                     neovim_bin \
                     ripgrep \
                     shellcheck \
@@ -120,4 +179,6 @@ configure_settings
 configure_shortcuts
 install_packages
 
+echo "To clean up existing .DS_Store files, run:"
+echo "  find ~ -name '.DS_Store' -not -path '*/node_modules/*' -delete 2>/dev/null"
 echo "Done!"
