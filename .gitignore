@@ -23,3 +23,8 @@ zed/prompts
 vim/autoload/plug.vim
 vim/plugged/*
 nvim/plugged/*
+
+# Ignore opencode
+opencode/node_modules/
+opencode/package.json
+opencode/bun.lock
