@@ -31,3 +31,6 @@ opencode/plugins/
 opencode/skills/
 opencode/package.json
 opencode/bun.lock
+
+# Ignore local brew skip list
+.brew-skip

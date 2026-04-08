@@ -1,6 +1,7 @@
 # Ignore vendors
 .bundle
 .deps
+.worktreeinclude
 deps
 node_modules
 vendor/bundle
@@ -21,6 +22,7 @@ Icon
 *:Zone.Identifier
 
 # Ignore Project dev environment specific
+.claude
 .direnv
 .envrc
 .insights

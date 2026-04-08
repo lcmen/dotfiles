@@ -55,7 +55,7 @@ remove_worktree() {
   fi
   local wt_branch
   wt_branch=$(git -C "$path" rev-parse --abbrev-ref HEAD)
-  git worktree remove "$@" "$path"
+  git worktree remove "$@" "$path" --force
   git branch -D "$wt_branch"
 }
 
@@ -207,7 +207,7 @@ add)
   ;;
 remove)
   if [[ -n "${2:-}" ]]; then
-    remove_worktree "../${DIRECTORY}-${2}" "${@:3}"
+    remove_worktree "../${DIRECTORY}-${2}"
   else
     remove_worktree "$(pwd)"
   fi

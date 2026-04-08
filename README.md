@@ -34,6 +34,16 @@ Running `make install` will:
 
 **Development Runtimes (via mise):** Elixir, Erlang, Node.js, Ruby
 
+## Customization
+
+To skip specific Homebrew packages on a machine, create a `.brew-skip` file in the repo root (it's gitignored):
+
+```sh
+# Packages to skip on this machine (one per line)
+vlc
+google-chrome
+```
+
 ## Uninstall
 
 Run `make uninstall`
