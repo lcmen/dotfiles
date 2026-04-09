@@ -79,8 +79,22 @@ local opts = { noremap = true, silent = true }
 
     -- FZF {{{
     g.fzf_history_dir = '~/.local/share/fzf-history'
+    g.fzf_action = {
+        ['ctrl-t'] = 'tab split',
+        ['ctrl-x'] = 'split',
+        ['ctrl-v'] = 'vsplit',
+        ['ctrl-q'] = function(lines)
+            local items = {}
+            for _, file in ipairs(lines) do
+                table.insert(items, { filename = file, lnum = 1 })
+            end
+            fn.setqflist(items)
+            cmd('copen')
+        end,
+    }
     map("n", "<C-p>", ":Files<CR>", opts)                        -- Launch FZF for Files
     map("n", "<C-\\>", ":Buffers<CR>", opts)                     -- Launch FZF for Buffers
+    map("n", "<C-g>", ":GFiles?<CR>", opts)                      -- Launch FZF for changed files (git diff)
     -- }}}
 
     -- NerdTREE {{{

@@ -31,7 +31,7 @@ add_apt_source() {
     echo "$source_line" | sudo tee "$list_file" > /dev/null
 }
 
-echo "Setting up Ubuntu..."
+echo "Setting up your Ubuntu..."
 
 # Add all third-party repositories first
 echo "Adding third-party repositories..."
