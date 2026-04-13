@@ -21,7 +21,7 @@ COPY_FILES=(
   tmp/local_secret.txt
 )
 
-DIRECTORY="$(basename "$(pwd)")"
+DIRECTORY="$(basename "$(git worktree list --porcelain | head -1 | sed 's/^worktree //')")"
 
 NAME_POOL=(amber bronze cedar coral crimson dune elm fern gold hazel indigo ivory jade lemon lilac maple nova opal peach quartz ruby sage teal umber violet willow zinc)
 
@@ -210,9 +210,6 @@ remove)
     remove_worktree "../${DIRECTORY}-${2}"
   else
     remove_worktree "$(pwd)"
-  fi
-  if [[ -n "${TMUX:-}" ]]; then
-    tmux kill-session
   fi
   ;;
 *)

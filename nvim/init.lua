@@ -9,6 +9,7 @@ local lsp = vim.lsp
 local map = vim.api.nvim_set_keymap
 local opt = vim.opt
 local opts = { noremap = true, silent = true }
+local user_cmd = vim.api.nvim_create_user_command
 -- }}}
 
 -- Packages {{{
@@ -33,11 +34,9 @@ local opts = { noremap = true, silent = true }
     Plug('christoomey/vim-tmux-navigator')
     Plug('docunext/closetag.vim')
     Plug('github/copilot.vim')
-    Plug('junegunn/fzf')
-    Plug('junegunn/fzf.vim')
+    Plug('ibhagwan/fzf-lua')
     Plug('lcmen/rational.nvim')
     Plug('neovim/nvim-lspconfig')
-    Plug('numtostr/BufOnly.nvim', { ['on'] = 'BufOnly' })
     Plug('ryanoasis/vim-devicons')
     Plug('scrooloose/nerdtree')
     Plug('sheerun/vim-polyglot')
@@ -73,28 +72,20 @@ local opts = { noremap = true, silent = true }
 -- }}}
 
 -- Packages configuration {{{
-    -- BufOnly {{{
-    g.bufonly_delete_non_modifiable = true                       -- Delete non-modifiable buffers
-    -- }}}
-
     -- FZF {{{
-    g.fzf_history_dir = '~/.local/share/fzf-history'
-    g.fzf_action = {
-        ['ctrl-t'] = 'tab split',
-        ['ctrl-x'] = 'split',
-        ['ctrl-v'] = 'vsplit',
-        ['ctrl-q'] = function(lines)
-            local items = {}
-            for _, file in ipairs(lines) do
-                table.insert(items, { filename = file, lnum = 1 })
-            end
-            fn.setqflist(items)
-            cmd('copen')
-        end,
-    }
-    map("n", "<C-p>", ":Files<CR>", opts)                        -- Launch FZF for Files
-    map("n", "<C-\\>", ":Buffers<CR>", opts)                     -- Launch FZF for Buffers
-    map("n", "<C-g>", ":GFiles?<CR>", opts)                      -- Launch FZF for changed files (git diff)
+    require('fzf-lua').setup({
+        winopts = { width = 0.8, height = 0.8, backdrop = false },
+        fzf_opts = {
+            ['--no-scrollbar'] = '',
+            ['--no-separator'] = '',
+            ['--gutter'] = ' ',
+            ['--padding'] = '1,2',
+        },
+    })
+    cmd [[cnoreabbrev Rg FzfLua live_grep]]                      -- Alias :Rg to FzfLua live_grep
+    map("n", "<C-p>", "<cmd>FzfLua files<CR>", opts)             -- Launch FZF for Files
+    map("n", "<C-\\>", "<cmd>FzfLua buffers<CR>", opts)          -- Launch FZF for Buffers
+    map("n", "<C-g>", "<cmd>FzfLua git_status<CR>", opts)        -- Launch FZF for changed files (git diff)
     -- }}}
 
     -- NerdTREE {{{
@@ -203,6 +194,17 @@ local opts = { noremap = true, silent = true }
 -- Commands {{{
     -- Abbreviations {{{
     cmd [[cnoreabbrev bo BufOnly]]                               -- Alias bo to BufOnly
+    -- }}}
+
+    -- BufOnly {{{
+    user_cmd('BufOnly', function()
+        local cur = vim.api.nvim_get_current_buf()
+        for _, n in ipairs(vim.api.nvim_list_bufs()) do
+            if n ~= cur and vim.api.nvim_buf_is_loaded(n) and not vim.bo[n].modified then
+                pcall(vim.api.nvim_buf_delete, n, { force = true })
+            end
+        end
+    end, {})
     -- }}}
 
     -- File type settings {{{
