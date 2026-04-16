@@ -73,19 +73,27 @@ local user_cmd = vim.api.nvim_create_user_command
 
 -- Packages configuration {{{
     -- FZF {{{
-    require('fzf-lua').setup({
-        winopts = { width = 0.8, height = 0.8, backdrop = false },
+    fzf = require('fzf-lua')
+    fzf.setup({
+        actions = {
+            files = {
+                true,                                            -- inherit defaults
+                ['ctrl-s'] = false,                              -- Disable ctrl-s (tmux prefix conflict)
+                ['ctrl-x'] = fzf.actions.file_split,             -- Override ctrl-s with ctrl-x for splits
+            },
+        },
         fzf_opts = {
             ['--no-scrollbar'] = '',
             ['--no-separator'] = '',
             ['--gutter'] = ' ',
             ['--padding'] = '1,2',
         },
+        winopts = { backdrop = false, width = 0.8, height = 0.8, preview = { layout = 'vertical' } },
     })
-    cmd [[cnoreabbrev Rg FzfLua live_grep]]                      -- Alias :Rg to FzfLua live_grep
-    map("n", "<C-p>", "<cmd>FzfLua files<CR>", opts)             -- Launch FZF for Files
-    map("n", "<C-\\>", "<cmd>FzfLua buffers<CR>", opts)          -- Launch FZF for Buffers
+    map("n", "<C-b>", "<cmd>FzfLua buffers<CR>", opts)           -- Launch FZF for Buffers
     map("n", "<C-g>", "<cmd>FzfLua git_status<CR>", opts)        -- Launch FZF for changed files (git diff)
+    map("n", "<C-p>", "<cmd>FzfLua files<CR>", opts)             -- Launch FZF for Files
+    map("n", "<C-y>", "<cmd>FzfLua live_grep<CR>", opts)         -- Launch FZF for live grep (ripgrep)
     -- }}}
 
     -- NerdTREE {{{
@@ -135,20 +143,7 @@ local user_cmd = vim.api.nvim_create_user_command
     -- LSP servers {{{
     lsp.config('*', { on_attach = lsp_on_attach })
     lsp.config('eslint', { on_attach = lsp_on_attach })
-    lsp.config('ruby_lsp', {
-        -- Detect formatter and linter (standard or rubocop)
-        init_options = (function()
-            local cwd = fn.getcwd()
-            if fn.filereadable(cwd .. '/.standard.yml') == 1 then
-                return { formatter = 'standard', linters = { 'standard' } }
-            elseif fn.filereadable(cwd .. '/.rubocop.yml') == 1 then
-                return { formatter = 'rubocop', linters = { 'rubocop' } }
-            else
-                return { formatter = 'auto', linters = { 'auto' } }
-            end
-        end)(),
-        on_attach = lsp_on_attach,
-    })
+    lsp.config('ruby_lsp', { on_attach = lsp_on_attach })
     lsp.config('ts_ls', { on_attach = lsp_on_attach })
 
     lsp.enable('eslint')                                     -- npm -g install vscode-langservers-extracted
@@ -156,7 +151,7 @@ local user_cmd = vim.api.nvim_create_user_command
     lsp.enable('ts_ls')                                      -- npm -g install typescript-language-server
 
     -- Diagnostics UI {{{
-    lsp.handlers['textDocument/publishDiagnostics'] = lsp.with(lsp.diagnostic.on_publish_diagnostics, {
+    vim.diagnostic.config({
       virtual_text = false,                                      -- Disable displaying warnings / errors inline
       signs = true,                                              -- Display warning / errors signs next to the line number
       update_in_insert = false,                                  -- Wait with updating diagnostics for switch between modes
