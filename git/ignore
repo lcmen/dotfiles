@@ -22,10 +22,7 @@ Icon
 *:Zone.Identifier
 
 # Ignore Project dev environment specific
-.claude
 .direnv
-.envrc
-.insights
 .lspinstall
 .projections.json
 .vscode

@@ -1,3 +1,6 @@
+# Ignore local brew skip list
+.brew-skip
+
 # Ignore caches
 bundle/cache
 
@@ -15,22 +18,3 @@ fish/completions/orbctl.fish
 # Ignore tmux
 tmux/plugins/*
 !tmux/plugins/tpm
-
-# Ignore Zed
-zed/prompts
-
-# Ignore VIM
-vim/autoload/plug.vim
-vim/plugged/*
-nvim/plugged/*
-
-# Ignore opencode
-opencode/agents/
-opencode/node_modules/
-opencode/plugins/
-opencode/skills/
-opencode/package.json
-opencode/bun.lock
-
-# Ignore local brew skip list
-.brew-skip

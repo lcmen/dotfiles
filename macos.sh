@@ -27,7 +27,6 @@ readonly CASKS=(
     google-chrome
     pocket-casts
     synology-drive
-    visual-studio-code
     vlc
     whatsapp
 )

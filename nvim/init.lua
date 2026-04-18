@@ -25,7 +25,7 @@ local user_cmd = vim.api.nvim_create_user_command
     -- }}}
 
     -- Plugins {{{
-    call('plug#begin', '~/.config/nvim/plugged')
+    call('plug#begin', '~/.local/share/nvim/plugged')
 
     local Plug = fn['plug#']
     Plug('AndrewRadev/sideways.vim')
@@ -55,7 +55,6 @@ local user_cmd = vim.api.nvim_create_user_command
 -- Settings {{{
     -- General {{{
     g.mapleader = " "                                            -- Change leader to space
-    opt.clipboard = 'unnamedplus'                                -- Use System clipboard
     opt.spell = false                                            -- Spell checking off
     -- }}}
 
@@ -88,12 +87,12 @@ local user_cmd = vim.api.nvim_create_user_command
             ['--gutter'] = ' ',
             ['--padding'] = '1,2',
         },
-        winopts = { backdrop = false, width = 0.8, height = 0.8, preview = { layout = 'vertical' } },
+        winopts = { backdrop = false, width = 0.85, height = 0.85, preview = { layout = 'vertical' } },
     })
     map("n", "<C-b>", "<cmd>FzfLua buffers<CR>", opts)           -- Launch FZF for Buffers
     map("n", "<C-g>", "<cmd>FzfLua git_status<CR>", opts)        -- Launch FZF for changed files (git diff)
     map("n", "<C-p>", "<cmd>FzfLua files<CR>", opts)             -- Launch FZF for Files
-    map("n", "<C-y>", "<cmd>FzfLua live_grep<CR>", opts)         -- Launch FZF for live grep (ripgrep)
+    map("n", "<C-y>", "<cmd>FzfLua live_grep<CR>", opts)         -- Launch FZF for live grep; use -- glob then Ctrl+G for fuzzy
     -- }}}
 
     -- NerdTREE {{{
@@ -150,17 +149,8 @@ local user_cmd = vim.api.nvim_create_user_command
     lsp.enable('ruby_lsp')                                   -- gem install ruby_lsp
     lsp.enable('ts_ls')                                      -- npm -g install typescript-language-server
 
-    -- Diagnostics UI {{{
-    vim.diagnostic.config({
-      virtual_text = false,                                      -- Disable displaying warnings / errors inline
-      signs = true,                                              -- Display warning / errors signs next to the line number
-      update_in_insert = false,                                  -- Wait with updating diagnostics for switch between modes
-      underline = true,                                          -- Underline affected code
-    })
-
     -- Configure gitgutter to not conflict with LSP signs
     g.gitgutter_sign_priority = 9                                -- Lower priority than diagnostics (default 10)
-    -- }}}
 -- }}}
 
 -- Bindings {{{
@@ -173,13 +163,8 @@ local user_cmd = vim.api.nvim_create_user_command
     map('n', '<leader>p', ':let @+=expand("%")<CR>', opts)       -- Copy buffer's relative path to clipboard
     map('n', '<leader>P', ':let @+=expand("%:p")<CR>', opts)     -- Copy buffer's absolute path to clipboard
 
-    map('v', '<', '<gv', opts)                                   -- Move block of codes left
-    map('v', '>', '>gv', opts)                                   -- and right
     map('n', '[g', 'gT', opts)                                   -- Move to tab on the left
     map('n', ']g', 'gt', opts)                                   -- Move to tab on the right
-
-    map('n', 'D', 'd$', opts)                                    -- Delete to the end of line
-    map('n', 'Y', 'y$', opts)                                    -- Yank to the end of line
 
     map('n', 'L', '<cmd>lua vim.diagnostic.open_float()<CR>', opts) -- Show line diagnostic
     map('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts) -- Move prev / next diagnostic errors
@@ -188,18 +173,15 @@ local user_cmd = vim.api.nvim_create_user_command
 
 -- Commands {{{
     -- Abbreviations {{{
-    cmd [[cnoreabbrev bo BufOnly]]                               -- Alias bo to BufOnly
+    cmd [[cnoreabbrev rg Rg]]                                    -- Alias rg to Rg
+    cmd [[cnoreabbrev rgc Rgword]]                               -- Alias rgc to Rgword
+    cmd [[cnoreabbrev rgC RgWord]]                               -- Allow rgC to RgWord
     -- }}}
 
-    -- BufOnly {{{
-    user_cmd('BufOnly', function()
-        local cur = vim.api.nvim_get_current_buf()
-        for _, n in ipairs(vim.api.nvim_list_bufs()) do
-            if n ~= cur and vim.api.nvim_buf_is_loaded(n) and not vim.bo[n].modified then
-                pcall(vim.api.nvim_buf_delete, n, { force = true })
-            end
-        end
-    end, {})
+    -- Greps {{{
+    user_cmd('Rg', function(opts) fzf.grep_project({ search = opts.args }) end, { nargs = '*' })
+    user_cmd('Rgword', function() fzf.grep_cword() end, {})
+    user_cmd('RgWord', function() fzf.grep_cWORD() end, {})
     -- }}}
 
     -- File type settings {{{
@@ -210,15 +192,6 @@ local user_cmd = vim.api.nvim_create_user_command
             autocmd Filetype go setl softtabstop=4 shiftwidth=4 noexpandtab
             autocmd Filetype markdown setl spell wrap suffixesadd=.md
             autocmd BufEnter term://* startinsert
-        augroup END
-    ]]
-    -- }}
-
-    -- Trim trailing whitespaces {{{
-    cmd [[
-        augroup TrimTrailingWhitespace
-            autocmd!
-            autocmd BufWritePre * :%s/\s\+$//e
         augroup END
     ]]
     -- }}
