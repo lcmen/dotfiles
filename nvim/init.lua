@@ -7,6 +7,7 @@ local g = vim.g
 local fn = vim.fn
 local lsp = vim.lsp
 local map = vim.api.nvim_set_keymap
+local merge = function(t1, t2) return vim.tbl_extend('force', t1, t2) end
 local opt = vim.opt
 local opts = { noremap = true, silent = true }
 local user_cmd = vim.api.nvim_create_user_command
@@ -148,7 +149,6 @@ local user_cmd = vim.api.nvim_create_user_command
     lsp.enable('eslint')                                     -- npm -g install vscode-langservers-extracted
     lsp.enable('ruby_lsp')                                   -- gem install ruby_lsp
     lsp.enable('ts_ls')                                      -- npm -g install typescript-language-server
-
     -- Configure gitgutter to not conflict with LSP signs
     g.gitgutter_sign_priority = 9                                -- Lower priority than diagnostics (default 10)
 -- }}}
@@ -179,9 +179,11 @@ local user_cmd = vim.api.nvim_create_user_command
     -- }}}
 
     -- Greps {{{
-    user_cmd('Rg', function(opts) fzf.grep_project({ search = opts.args }) end, { nargs = '*' })
-    user_cmd('Rgword', function() fzf.grep_cword() end, {})
-    user_cmd('RgWord', function() fzf.grep_cWORD() end, {})
+    -- Override default --nth (3..) to search based on the path (--nth 1..) instead of the content
+    local grep_opts = { fzf_opts = { ['--nth'] = '1..' } }
+    user_cmd('Rg', function(opts) fzf.grep_project(merge(grep_opts, { search = opts.args })) end, { nargs = '*' })
+    user_cmd('Rgword', function() fzf.grep_cword(grep_opts) end, {})
+    user_cmd('RgWord', function() fzf.grep_cWORD(grep_opts) end, {})
     -- }}}
 
     -- File type settings {{{
