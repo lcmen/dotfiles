@@ -54,21 +54,14 @@ local user_cmd = vim.api.nvim_create_user_command
 -- }}}
 
 -- Settings {{{
-    -- General {{{
-    g.mapleader = " "                                            -- Change leader to space
-    opt.spell = false                                            -- Spell checking off
-    -- }}}
-
-    -- Whitespaces {{{
-    opt.wrap = false                                             -- Disable line wraping
-    opt.textwidth = 120                                          -- Set max width to 120 characters
-    -- }}}
-
-    -- UI {{{
     cmd[[colorscheme onehalflight]]
+
+    g.mapleader = " "                                            -- Change leader to space
     opt.relativenumber = true                                    -- Use relative line numbers
+    opt.spell = false                                            -- Spell checking off
     opt.termguicolors = false                                    -- Disable true colors for compatibility with Tmux
-    --}}}
+    opt.textwidth = 120                                          -- Set max width to 120 characters
+    opt.wrap = false                                             -- Disable line wraping
 -- }}}
 
 -- Packages configuration {{{
@@ -78,8 +71,6 @@ local user_cmd = vim.api.nvim_create_user_command
         actions = {
             files = {
                 true,                                            -- inherit defaults
-                ['ctrl-s'] = false,                              -- Disable ctrl-s (tmux prefix conflict)
-                ['ctrl-x'] = fzf.actions.file_split,             -- Override ctrl-s with ctrl-x for splits
             },
         },
         fzf_opts = {
@@ -94,6 +85,10 @@ local user_cmd = vim.api.nvim_create_user_command
     map("n", "<C-g>", "<cmd>FzfLua git_status<CR>", opts)        -- Launch FZF for changed files (git diff)
     map("n", "<C-p>", "<cmd>FzfLua files<CR>", opts)             -- Launch FZF for Files
     map("n", "<C-y>", "<cmd>FzfLua live_grep<CR>", opts)         -- Launch FZF for live grep; use -- glob then Ctrl+G for fuzzy
+    -- }}}
+
+    -- GitGutter {{{
+    g.gitgutter_sign_priority = 9                                -- Lower priority than LSP diagnostics (default 10) to avoid conflicts
     -- }}}
 
     -- NerdTREE {{{
@@ -119,7 +114,7 @@ local user_cmd = vim.api.nvim_create_user_command
     map('t', '<C-j>', '<C-\\><C-N>:TmuxNavigateDown<CR>', opts)  -- Move to the bottom pane in terminal
     map('t', '<C-k>', '<C-\\><C-N>:TmuxNavigateUp<CR>', opts)    -- Move to the top pane in terminal
     map('t', '<C-l>', '<C-\\><C-N>:TmuxNavigateRight<CR>', opts) -- Move to the right pane in terminal
-    -- }}
+    -- }}}
 -- }}}
 
 -- LSP {{{
@@ -140,7 +135,6 @@ local user_cmd = vim.api.nvim_create_user_command
 
     local lspconfig = require('lspconfig')
 
-    -- LSP servers {{{
     lsp.config('*', { on_attach = lsp_on_attach })
     lsp.config('eslint', { on_attach = lsp_on_attach })
     lsp.config('ruby_lsp', { on_attach = lsp_on_attach })
@@ -149,8 +143,6 @@ local user_cmd = vim.api.nvim_create_user_command
     lsp.enable('eslint')                                     -- npm -g install vscode-langservers-extracted
     lsp.enable('ruby_lsp')                                   -- gem install ruby_lsp
     lsp.enable('ts_ls')                                      -- npm -g install typescript-language-server
-    -- Configure gitgutter to not conflict with LSP signs
-    g.gitgutter_sign_priority = 9                                -- Lower priority than diagnostics (default 10)
 -- }}}
 
 -- Bindings {{{
@@ -196,5 +188,5 @@ local user_cmd = vim.api.nvim_create_user_command
             autocmd BufEnter term://* startinsert
         augroup END
     ]]
-    -- }}
+    -- }}}
 -- }}}
