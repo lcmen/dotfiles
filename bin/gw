@@ -1,218 +1,288 @@
 #!/usr/bin/env bash
 
-# Manage git worktrees with automatic file copying and dependency installation.
-#
-# Usage: gw add [branch]
-#        gw remove <name>
-
 set -euo pipefail
 
-COPY_FILES=(
-  .bundle
-  .claude
-  .env.local
-  .env.development.local
-  .env.test.local
-  .insights
-  .projections.json
-  config/credentials
-  config/master.key
-  Procfile.dev.local
-  tmp/local_secret.txt
-)
+# Worktree utilities
+#------------------------------------------------------------------------------
+# Return a random available name from NAME_POOL.
+next_name() {
+  local name
+  local -a names
+  mapfile -t names < <(printf '%s\n' "${NAME_POOL[@]}" | sort -R)
 
-DIRECTORY="$(basename "$(git worktree list --porcelain | head -1 | sed 's/^worktree //')")"
-
-NAME_POOL=(amber bronze cedar coral crimson dune elm fern gold hazel indigo ivory jade lemon lilac maple nova opal peach quartz ruby sage teal umber violet willow zinc)
-
-SKIP_HOOKS_ENV=(
-  HUSKY=0
-  LEFTHOOK=0
-  OVERCOMMIT_DISABLE=1
-)
-
-add_worktree() {
-  local branch="$1"
-  local path="$2"
-  # Check if branch exists locally or on remote
-  local local_ref="refs/heads/$branch"
-  local remote_ref="refs/remotes/origin/$branch"
-  if git show-ref --verify --quiet "$local_ref" || git show-ref --verify --quiet "$remote_ref"; then
-    env "${SKIP_HOOKS_ENV[@]}" git worktree add "$path" "$branch"
-  else
-    env "${SKIP_HOOKS_ENV[@]}" git worktree add -b "$branch" "$path"
-  fi
-  cd "$path"
-  mise trust --all
-}
-
-remove_worktree() {
-  local path="$1"
-  shift
-  if [[ ! -d "$path" ]]; then
-    echo "No worktree found at '$path'"
-    exit 1
-  fi
-  local wt_branch
-  wt_branch=$(git -C "$path" rev-parse --abbrev-ref HEAD)
-  git worktree remove "$@" "$path" --force
-  git branch -D "$wt_branch"
-}
-
-copy_files() {
-  for file in "${COPY_FILES[@]}"; do
-    local src="../${DIRECTORY}/${file}"
-    # If directory exists, merge its contents
-    if [[ -d "$src" ]]; then
-      mkdir -p "$file"
-      cp -r "$src/." "$file/"
-    # If file does not exist, copy it (and crete directories if missing)
-    elif [[ -e "$src" ]]; then
-      mkdir -p "$(dirname "$file")"
-      cp -r "$src" "$file"
-    fi
-  done
-}
-
-build_tab_cmd() {
-  local dir="$1"
-  local session_name="$2"
-
-  # Install deps
-  local deps="mise install"
-  if [[ -f "$dir/Gemfile" ]]; then deps="$deps && bundle install"; fi
-  if [[ -f "$dir/mix.exs" ]]; then deps="$deps && mix deps.get"; fi
-  if [[ -f "$dir/go.mod" ]]; then deps="$deps && go mod download"; fi
-  if [[ -f "$dir/package-lock.json" ]]; then deps="$deps && npm install"; fi
-  if [[ -f "$dir/yarn.lock" ]]; then deps="$deps && yarn install"; fi
-
-  # Check if Tmux is installed, then start a new Tmux session
-  if command -v tmux &>/dev/null; then
-    if tmux has-session -t "$session_name" 2>/dev/null; then
-      echo "cd '$dir' && tmux attach -t '$session_name'"
-    else
-      echo "cd '$dir' && $deps && tmux new-session -s '$session_name'"
-    fi
-  else
-    echo "cd '$dir' && $deps"
-  fi
-}
-
-open_in_windows_terminal() {
-  local dir="$1"
-  local session_name="$2"
-  local tab_cmd="$3"
-  local win_dir
-  win_dir="$(wslpath -w "$dir")"
-
-  if command -v tmux &>/dev/null; then
-    wt.exe -w 0 new-tab --profile "$WSL_DISTRO_NAME" --title "$session_name" -d "$win_dir" -- bash -ic "$tab_cmd"
-  else
-    wt.exe -w 0 new-tab --profile "$WSL_DISTRO_NAME" --title "$session_name" -d "$win_dir"
-  fi
-}
-
-open_in_iterm() {
-  local session_name="$1"
-  local tab_cmd="$2"
-
-  osascript <<EOF || echo "Could not open iTerm2 tab."
-tell application "iTerm2"
-  tell current window
-    create tab with default profile
-    tell current session
-      set name to "$session_name"
-      write text "$tab_cmd"
-    end tell
-  end tell
-end tell
-EOF
-}
-
-open_in_apple_terminal() {
-  local session_name="$1"
-  local tab_cmd="$2"
-
-  # Terminal.app doesn't support "make new tab" so we simulate Cmd+T.
-  # A delay is needed because the keystroke is async; without it,
-  # "do script" runs in the previous tab instead of the new one.
-  osascript <<EOF || echo "Could not open Terminal.app tab."
-tell application "Terminal"
-  activate
-  tell application "System Events" to keystroke "t" using command down
-  delay 1
-  do script "$tab_cmd" in selected tab of front window
-  set custom title of selected tab of front window to "$session_name"
-  set title displays custom title of selected tab of front window to true
-end tell
-EOF
-}
-
-open_worktree() {
-  local dir="$1"
-  local session_name="$2"
-
-  # Sanitize for tmux (no dots or colons)
-  session_name="${session_name//[:.]/-}"
-
-  local tab_cmd
-  tab_cmd="$(build_tab_cmd "$dir" "$session_name")"
-
-  # WSL + Windows Terminal
-  if [[ -n "${WSL_DISTRO_NAME:-}" ]] && command -v wt.exe &>/dev/null; then
-    open_in_windows_terminal "$dir" "$session_name" "$tab_cmd"
-    return
-  fi
-
-  # iTerm2
-  if [[ "${TERM_PROGRAM:-}" == "iTerm.app" || "${__CFBundleIdentifier:-}" == "com.googlecode.iterm2" ]]; then
-    open_in_iterm "$session_name" "$tab_cmd"
-    return
-  fi
-
-  # macOS Terminal.app
-  if [[ "${TERM_PROGRAM:-}" == "Apple_Terminal" || "${__CFBundleIdentifier:-}" == "com.apple.Terminal" ]]; then
-    open_in_apple_terminal "$session_name" "$tab_cmd"
-    return
-  fi
-
-  echo "Unsupported terminal: unable to open a new tab." >&2
-  exit 1
-}
-
-pick_name() {
-  for n in "${NAME_POOL[@]}"; do
-    if [[ ! -d "../${DIRECTORY}-${n}" ]]; then
-      echo "$n"
+  for name in "${names[@]}"; do
+    if [[ ! -e "$WORKTREES_DIR/$name" ]]; then
+      echo "$name"
       return
     fi
   done
-  echo "Error: all worktree names are in use" >&2
-  exit 1
+
+  cmd_die "all worktree names are in use"
 }
 
-usage() {
-  echo "Usage: gw add <branch>"
-  echo "       gw remove [name]"
-  exit 1
+# Print current branch for a worktree path (empty on detached HEAD).
+worktree_branch() {
+  [[ -d "$1" ]] || return 1
+  git -C "$1" branch --show-current 2>/dev/null || true
 }
 
-case "$1" in
-add)
-  [[ $# -lt 2 ]] && usage
-  name="$(pick_name)"
-  add_worktree "$2" "../${DIRECTORY}-${name}"
-  copy_files
-  open_worktree "$(pwd)" "$name"
-  ;;
-remove)
-  if [[ -n "${2:-}" ]]; then
-    remove_worktree "../${DIRECTORY}-${2}"
-  else
-    remove_worktree "$(pwd)"
+# Find worktree index for $1 name
+worktree_index() {
+  local index=1
+  local name
+
+  for name in "${NAME_POOL[@]}"; do
+    if [[ "$name" == "$1" ]]; then
+      echo "$index"
+      return
+    fi
+    ((index++))
+  done
+
+  cmd_die "unknown worktree name '$1'"
+}
+
+# Find worktree name associated with $1 path
+worktree_name() {
+  local path="$1"
+
+  # Verify worktrees path
+  [[ "$path" == "$REPO_ROOT/.worktrees/"* ]] || return 1
+
+  # Remove worktrees path prefix.
+  path="${path#"$REPO_ROOT/.worktrees/"}"
+  # After removing the .worktrees prefix, expect a non-empty single path segment.
+  [[ "$path" != */* && -n "$path" ]] || return 1
+
+  echo "$path"
+}
+
+# Return path to worktree with $1 name
+worktree_path() {
+  local name="$1"
+
+  [[ -d "$WORKTREES_DIR/$name" ]] || cmd_die "no worktree named '$name'"
+  echo "$WORKTREES_DIR/$name"
+}
+
+# Remove a linked worktree, stop its tmux session, and delete its local branch when present.
+worktree_remove() {
+  local path="$1"
+  local name="$2"
+  local branch
+  local session
+
+  branch="$(worktree_branch "$path")"
+  session="$(tmux_session_name "$name")"
+
+  cd "$REPO_ROOT"
+  git worktree remove --force "$path" >&2
+  if [[ -n "$branch" ]] && git show-ref --verify --quiet "refs/heads/$branch"; then
+    git branch -D "$branch" >&2
   fi
-  ;;
-*)
-  usage
-  ;;
+
+  # Kill tmux session after cleanup so removing from that session does not terminate before git cleanup finishes.
+  if command -v tmux >/dev/null 2>&1 && tmux has-session -t "$session" 2>/dev/null; then
+    tmux kill-session -t "$session" 2>/dev/null || true
+  fi
+
+  if [[ -z "${TMUX:-}" ]] || ! command -v tmux >/dev/null 2>&1; then
+    echo "$REPO_ROOT"
+  fi
+}
+
+# Worktree setup
+#------------------------------------------------------------------------------
+# Copy entries listed in .worktreeinclude (if present).
+copy_included_files() {
+  local target_root="$1"
+  local manifest="$REPO_ROOT/.worktreeinclude"
+  local entry
+
+  [[ -f "$manifest" ]] || return 0
+
+  while IFS= read -r entry || [[ -n "$entry" ]]; do
+    # Trim leading/trailing whitespace.
+    entry="$(printf '%s' "$entry" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+
+    [[ -z "$entry" ]] && continue
+
+    if [[ -e "$REPO_ROOT/$entry" ]]; then
+      mkdir -p "$(dirname "$target_root/$entry")"
+      cp -R "$REPO_ROOT/$entry" "$target_root/$entry"
+    else
+      echo "gw: warning: include entry '$entry' does not exist" >&2
+    fi
+  done < "$manifest"
+}
+
+# Generate .envrc.worktree if `.envrc` exists (useful for worktree overrides)
+write_envrc_worktree() {
+  [[ -f "$1/.envrc" ]] || return 0
+
+  {
+    printf 'export TREE_NAME="%s"\n' "$2"
+    printf 'export TREE_INDEX="%s"\n' "$3"
+  } > "$1/.envrc.worktree"
+}
+
+# Generate tmux session name for $1 worktree name
+tmux_session_name() {
+  local name="$1"
+  local base_session="$TMUX_SESSION"
+  local pool_name
+
+  # Strip existing worktree name from session name (useful when running from worktree)
+  for pool_name in "${NAME_POOL[@]}"; do
+    if [[ "$base_session" == *-"$pool_name" ]]; then
+      base_session="${base_session%-"$pool_name"}"
+      break
+    fi
+  done
+
+  echo "${base_session}-${name//[:.]/-}"
+}
+
+# Commands
+#------------------------------------------------------------------------------
+# Add new worktree
+cmd_add() {
+  [[ $# -eq 1 ]] || cmd_usage
+
+  local branch="$1"
+  local name
+  local path
+  local index
+
+  name="$(next_name)"
+  path="$WORKTREES_DIR/$name"
+  index="$(worktree_index "$name")"
+
+  mkdir -p "$WORKTREES_DIR"
+  cd "$REPO_ROOT"
+  # Reuse an existing local branch.
+  if git show-ref --verify --quiet "refs/heads/$branch"; then
+    git worktree add -- "$path" "$branch" >&2
+  # If only the remote branch exists, create a local tracking branch for it.
+  elif git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
+    git worktree add --track -b "$branch" -- "$path" "origin/$branch" >&2
+  # Otherwise create a new local branch from the current HEAD.
+  else
+    git worktree add -b "$branch" -- "$path" >&2
+  fi
+
+  copy_included_files "$path"
+  write_envrc_worktree "$path" "$name" "$index"
+
+  if command -v direnv >/dev/null 2>&1 && [[ -f "$path/.envrc" ]]; then
+    direnv allow "$path"
+  fi
+
+  if [[ -x "$path/bin/setup" ]]; then
+    (cd "$path" && bin/setup)
+  fi
+
+  cmd_open "$name"
+}
+
+# Die with 1 exit code
+cmd_die() {
+  echo "gw: $*" >&2
+  exit 1
+}
+
+# Open a worktree by switching to its tmux session; outside tmux, print the worktree path.
+cmd_open() {
+  [[ $# -eq 1 ]] || cmd_usage
+
+  local name="$1"
+  local path
+  path="$(worktree_path "$name")"
+
+  if [[ -z "${TMUX:-}" ]] || ! command -v tmux >/dev/null 2>&1; then
+    echo "$path"
+    return
+  fi
+
+  local session
+  session="$(tmux_session_name "$name")"
+
+  if ! tmux has-session -t "$session" 2>/dev/null; then
+    tmux new-session -d -c "$path" -s "$session"
+  fi
+  tmux switch-client -t "$session"
+}
+
+# Remove worktree with $1 name or in current directory
+cmd_remove() {
+  [[ $# -le 1 ]] || cmd_usage
+
+  local name="${1:-}"
+  local path
+
+  if [[ -n "$name" ]]; then
+    path="$(worktree_path "$name")"
+  else
+    path="$CURRENT_WORKTREE"
+    name="$(worktree_name "$path" || true)"
+    [[ -n "$name" ]] || cmd_die "refusing to remove the primary worktree; pass a linked worktree name"
+  fi
+
+  worktree_remove "$path" "$name"
+}
+
+# List all worktrees
+cmd_list() {
+  [[ $# -eq 0 ]] || cmd_usage
+
+  local path
+  local name
+  local branch
+  local marker
+  local worktrees
+  worktrees="$(git worktree list --porcelain | sed -n 's/^worktree //p')"
+
+  while IFS= read -r path; do
+    name="$(worktree_name "$path" || true)"
+    [[ -n "$name" ]] || continue
+
+    branch="$(worktree_branch "$path")"
+    marker=" "
+    [[ "$path" == "$CURRENT_WORKTREE" ]] && marker="*"
+    printf '%s %-10s %-30s %s\n' "$marker" "$name" "${branch:-detached}" "$path"
+  done <<< "$worktrees"
+}
+
+cmd_usage() {
+  cat >&2 <<'USAGE'
+Usage:
+  gw add <branch>
+  gw remove [<name>]
+  gw open <name>
+  gw list
+USAGE
+  exit 1
+}
+
+# Variables
+#------------------------------------------------------------------------------
+CURRENT_WORKTREE="$(git rev-parse --show-toplevel 2>/dev/null || cmd_die "not inside a git worktree")"
+NAME_POOL=(black blue brown cyan gray green lime magenta navy olive orange pink purple red white yellow)
+REPO_ROOT="$(git worktree list --porcelain | sed -n '1s/^worktree //p')"
+TMUX_SESSION="$(tmux display-message -p '#S' 2>/dev/null || basename "$REPO_ROOT")"
+WORKTREES_DIR="$REPO_ROOT/.worktrees"
+
+# Entrypoint
+#------------------------------------------------------------------------------
+[[ $# -gt 0 ]] || cmd_usage
+
+COMMAND="$1"
+shift
+
+case "$COMMAND" in
+add) cmd_add "$@" ;;
+remove) cmd_remove "$@" ;;
+open) cmd_open "$@" ;;
+list) cmd_list "$@" ;;
+*) cmd_usage ;;
 esac

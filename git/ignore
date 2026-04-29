@@ -25,6 +25,7 @@ Icon
 .direnv
 .lspinstall
 .projections.json
+.worktrees
 .vscode
 Procfile.dev
 Procfile.local
