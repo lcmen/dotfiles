@@ -109,9 +109,13 @@ copy_included_files() {
 
     if [[ -e "$REPO_ROOT/$entry" ]]; then
       mkdir -p "$(dirname "$target_root/$entry")"
-      cp -R "$REPO_ROOT/$entry" "$target_root/$entry"
+      if [[ -d "$REPO_ROOT/$entry" ]]; then
+        cp -R "$REPO_ROOT/$entry/." "$target_root/$entry"
+      else
+        cp -R "$REPO_ROOT/$entry" "$target_root/$entry"
+      fi
     else
-      echo "gw: warning: include entry '$entry' does not exist" >&2
+      echo "gw (warning): included entry '$entry' does not exist" >&2
     fi
   done < "$manifest"
 }
@@ -179,7 +183,7 @@ cmd_add() {
   fi
 
   if [[ -x "$path/bin/setup" ]]; then
-    (cd "$path" && bin/setup)
+    (cd "$path" && bin/setup) || true
   fi
 
   cmd_open "$name"
@@ -187,7 +191,7 @@ cmd_add() {
 
 # Die with 1 exit code
 cmd_die() {
-  echo "gw: $*" >&2
+  echo "gw (error): $*" >&2
   exit 1
 }
 

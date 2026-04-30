@@ -12,6 +12,7 @@ psql/history
 psql/pgpass
 
 # Ignore OrbStack
+fish/completions/docker.fish
 fish/completions/kubectl.fish
 fish/completions/orbctl.fish
 

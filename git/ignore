@@ -29,4 +29,5 @@ Icon
 .vscode
 Procfile.dev
 Procfile.local
+**/.claude/plans
 **/.claude/settings.local.json
