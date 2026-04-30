@@ -1,0 +1,56 @@
+[
+  {
+    "bindings": {
+      "cmd-,": "workspace::ToggleBottomDock",
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-l": "workspace::ActivatePaneRight",
+      "ctrl-k": "workspace::ActivatePaneUp",
+      "ctrl-j": "workspace::ActivatePaneDown",
+      "ctrl-shift-h": ["workspace::SendKeystrokes", "cmd-k left cmd-w"],
+      "ctrl-shift-l": ["workspace::SendKeystrokes", "cmd-k right cmd-w"],
+      "ctrl-shift-k": ["workspace::SendKeystrokes", "cmd-k up cmd-w"],
+      "ctrl-shift-j": ["workspace::SendKeystrokes", "cmd-k down cmd-w"],
+    },
+  },
+  {
+    "context": "AgentPanel > Editor",
+    "bindings": {
+      "shift-tab": "agent::CycleModeSelector",
+    },
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      "ctrl-,": "pane::ActivatePreviousItem",
+      "ctrl-.": "pane::ActivateNextItem",
+    },
+  },
+  {
+    "context": "Editor && vim_mode == insert && !menu",
+    "bindings": {
+      "shift-tab": "editor::AcceptNextWordEditPrediction",
+      "alt-tab": "editor::NextEditPrediction",
+    },
+  },
+  {
+    "context": "Pane",
+    "bindings": {
+      "ctrl-,": "pane::ActivatePreviousItem",
+      "ctrl-.": "pane::ActivateNextItem",
+    },
+  },
+  {
+    "context": "Terminal",
+    "bindings": {
+      "cmd-.": "workspace::ToggleZoom",
+      "ctrl-=": "workspace::NewTerminal",
+      "ctrl--": "pane::CloseActiveItem",
+    },
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "ctrl-/": "tab_switcher::Toggle",
+    },
+  },
+]
