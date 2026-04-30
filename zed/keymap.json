@@ -1,7 +1,6 @@
 [
   {
     "bindings": {
-      "cmd-,": "workspace::ToggleBottomDock",
       "ctrl-h": "workspace::ActivatePaneLeft",
       "ctrl-l": "workspace::ActivatePaneRight",
       "ctrl-k": "workspace::ActivatePaneUp",
@@ -34,6 +33,10 @@
   },
   {
     "context": "Pane",
+    "unbind": {
+      "cmd-k e": ["pane::CloseItemsToTheLeft", { "close_pinned": false }],
+      "cmd-k t": ["pane::CloseItemsToTheRight", { "close_pinned": false }],
+    },
     "bindings": {
       "ctrl-,": "pane::ActivatePreviousItem",
       "ctrl-.": "pane::ActivateNextItem",
@@ -50,6 +53,15 @@
   {
     "context": "Workspace",
     "bindings": {
+      "cmd-k h": "workspace::ToggleLeftDock",
+      "cmd-k j": "workspace::ToggleBottomDock",
+      "cmd-k l": "workspace::ToggleRightDock",
+      "cmd-k e": "project_panel::ToggleFocus",
+      "cmd-k g": "git_panel::ToggleFocus",
+      "cmd-k G": "git_graph::Open",
+      "cmd-k a": "agent::Toggle",
+      "cmd-k t": "multi_workspace::ToggleWorkspaceSidebar",
+      "cmd-k d": "diagnostics::Deploy",
       "ctrl-/": "tab_switcher::Toggle",
     },
   },

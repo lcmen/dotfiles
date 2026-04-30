@@ -6,6 +6,7 @@ bundle/cache
 
 # Ignore fish variables
 fish/fish_variables
+fish/conf.d/secrets.local.fish
 
 # Ignore Postgres history and passwords
 psql/history

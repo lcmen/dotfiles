@@ -4,7 +4,8 @@ suppress_unstable_features_warning = true
 codex_hooks = true
 
 [mcp_servers.context7]
-url = "https://mcp.context7.com/mcp/oauth"
+url = "https://mcp.context7.com/mcp"
+env_http_headers = { "CONTEXT7_API_KEY" = "CONTEXT7_API_KEY" }
 
 [mcp_servers.deepwiki]
 url = "https://mcp.deepwiki.com/mcp"
@@ -14,3 +15,6 @@ approval_mode = "approve"
 
 [mcp_servers.deepwiki.tools.read_wiki_structure]
 approval_mode = "approve"
+
+[projects."/Users/lucas/Repos/lcmen/dotfiles"]
+trust_level = "trusted"
