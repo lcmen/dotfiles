@@ -136,10 +136,6 @@ local user_cmd = vim.api.nvim_create_user_command
     local lspconfig = require('lspconfig')
 
     lsp.config('*', { on_attach = lsp_on_attach })
-    lsp.config('eslint', { on_attach = lsp_on_attach })
-    lsp.config('ruby_lsp', { on_attach = lsp_on_attach })
-    lsp.config('ts_ls', { on_attach = lsp_on_attach })
-
     lsp.enable('eslint')                                     -- npm -g install vscode-langservers-extracted
     lsp.enable('ruby_lsp')                                   -- gem install ruby_lsp
     lsp.enable('ts_ls')                                      -- npm -g install typescript-language-server
