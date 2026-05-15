@@ -30,4 +30,5 @@ Icon
 Procfile.dev
 Procfile.local
 **/.claude/plans
+**/.claude/researches
 **/.claude/settings.local.json

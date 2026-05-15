@@ -15,6 +15,3 @@ approval_mode = "approve"
 
 [mcp_servers.deepwiki.tools.read_wiki_structure]
 approval_mode = "approve"
-
-[projects."/Users/lucas/Repos/lcmen/dotfiles"]
-trust_level = "trusted"

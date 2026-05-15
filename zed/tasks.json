@@ -1,0 +1,30 @@
+// Project tasks configuration. See https://zed.dev/docs/tasks for documentation.
+[
+  {
+    "label": "Ruby: run all tests",
+    "command": "if [ -x bin/test ]; then bin/test; elif [ -f .rspec ]; then bundle exec rspec; elif [ -x bin/rails ]; then bin/rails test; else echo 'No Ruby test runner found (bin/test, .rspec, or bin/rails)' >&2; exit 1; fi",
+    "reveal": "always",
+    "reveal_target": "dock",
+    "hide": "on_success",
+    "shell": { "program": "bash" },
+    "save": "all"
+  },
+  {
+    "label": "Ruby: run current file",
+    "command": "if [ -x bin/test ]; then bin/test \"$ZED_RELATIVE_FILE\"; elif [ -f .rspec ]; then bundle exec rspec \"$ZED_RELATIVE_FILE\"; elif [ -x bin/rails ]; then bin/rails test \"$ZED_RELATIVE_FILE\"; else echo 'No Ruby test runner found (bin/test, .rspec, or bin/rails)' >&2; exit 1; fi",
+    "reveal": "always",
+    "reveal_target": "dock",
+    "hide": "on_success",
+    "shell": { "program": "bash" },
+    "save": "all"
+  },
+  {
+    "label": "Ruby: run current line",
+    "command": "if [ -x bin/test ]; then bin/test \"$ZED_RELATIVE_FILE:$ZED_ROW\"; elif [ -f .rspec ]; then bundle exec rspec \"$ZED_RELATIVE_FILE:$ZED_ROW\"; elif [ -x bin/rails ]; then bin/rails test \"$ZED_RELATIVE_FILE:$ZED_ROW\"; else echo 'No Ruby test runner found (bin/test, .rspec, or bin/rails)' >&2; exit 1; fi",
+    "reveal": "always",
+    "reveal_target": "dock",
+    "hide": "on_success",
+    "shell": { "program": "bash" },
+    "save": "all"
+  }
+]
