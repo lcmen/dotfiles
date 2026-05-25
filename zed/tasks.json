@@ -1,13 +1,21 @@
 // Project tasks configuration. See https://zed.dev/docs/tasks for documentation.
 [
   {
+    "label": "go-pty: start",
+    "command": "if [ -f Procfile.dev.local ]; then go-pty -f Procfile.dev.local; elif [ -f Procfile.dev ]; then go-pty -f Procfile.dev; elif [ -f Procfile ]; then go-pty -f Procfile; else echo 'No Procfile found (Procfile.dev.local, Procfile.dev, or Procfile)' >&2; exit 1; fi",
+    "reveal": "no_focus",
+    "reveal_target": "dock",
+    "hide": "on_success",
+    "shell": { "program": "bash" },
+  },
+  {
     "label": "Ruby: run all tests",
     "command": "if [ -x bin/test ]; then bin/test; elif [ -f .rspec ]; then bundle exec rspec; elif [ -x bin/rails ]; then bin/rails test; else echo 'No Ruby test runner found (bin/test, .rspec, or bin/rails)' >&2; exit 1; fi",
     "reveal": "always",
     "reveal_target": "dock",
     "hide": "on_success",
     "shell": { "program": "bash" },
-    "save": "all"
+    "save": "all",
   },
   {
     "label": "Ruby: run current file",
@@ -16,7 +24,7 @@
     "reveal_target": "dock",
     "hide": "on_success",
     "shell": { "program": "bash" },
-    "save": "all"
+    "save": "all",
   },
   {
     "label": "Ruby: run current line",
@@ -25,6 +33,6 @@
     "reveal_target": "dock",
     "hide": "on_success",
     "shell": { "program": "bash" },
-    "save": "all"
-  }
+    "save": "all",
+  },
 ]
