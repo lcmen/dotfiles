@@ -2,44 +2,59 @@
 
 set -euo pipefail
 
+# Die with 1 exit code (defined first so the variable block below can use it).
+die() {
+  echo "gw (error): $*" >&2
+  exit 1
+}
+
+# Variables
+#------------------------------------------------------------------------------
+CURRENT_WORKTREE="$(git rev-parse --show-toplevel 2>/dev/null || die "not inside a git worktree")"
+# Worktree name pool, also the WORKTREE_ID space (assign_slot indexes into it).
+# 16 names map onto Redis's default 16 databases (0-15); WORKTREE_ID is a DB.
+NAME_POOL=(black blue brown cyan gray green lime magenta navy olive orange pink purple red white yellow)
+SYMLINK_DIRS=(node_modules vendor/bundle)
+REPO_ROOT="$(git worktree list --porcelain | sed -n '1s/^worktree //p')"
+WORKTREES_DIR="$REPO_ROOT/.worktrees"
+
 # Worktree utilities
 #------------------------------------------------------------------------------
-# Return a random available name from NAME_POOL.
-next_name() {
-  local name
-  local -a names
-  mapfile -t names < <(printf '%s\n' "${NAME_POOL[@]}" | sort -R)
+# Check if a directory is in the list of symlinked directories (e.g. node_modules).
+is_symlink_dir() {
+  local candidate="$1"
+  local dir
 
-  for name in "${names[@]}"; do
-    if [[ ! -e "$WORKTREES_DIR/$name" ]]; then
-      echo "$name"
-      return
-    fi
+  for dir in "${SYMLINK_DIRS[@]}"; do
+    [[ "$candidate" == "$dir" ]] && return 0
   done
 
-  cmd_die "all worktree names are in use"
+  return 1
+}
+
+# Assign name for branch: prefer the hash of the branch, fallback to the first available name.
+# Stable per branch (reclaims its preferred slot when free) and never collides
+# with a live worktree.
+assign_slot() {
+  local branch="$1"
+  local size=${#NAME_POOL[@]}
+  local sum preferred offset index
+
+  sum="$(printf '%s' "$branch" | cksum | cut -d' ' -f1)"
+  preferred=$(( sum % size ))
+
+  for (( offset = 0; offset < size; offset++ )); do
+    index=$(( (preferred + offset) % size ))
+    [[ -e "$WORKTREES_DIR/${NAME_POOL[$index]}" ]] || { echo "$index"; return; }
+  done
+
+  die "all worktree slots are in use"
 }
 
 # Print current branch for a worktree path (empty on detached HEAD).
 worktree_branch() {
   [[ -d "$1" ]] || return 1
   git -C "$1" branch --show-current 2>/dev/null || true
-}
-
-# Find worktree index for $1 name
-worktree_index() {
-  local index=1
-  local name
-
-  for name in "${NAME_POOL[@]}"; do
-    if [[ "$name" == "$1" ]]; then
-      echo "$index"
-      return
-    fi
-    ((index++))
-  done
-
-  cmd_die "unknown worktree name '$1'"
 }
 
 # Find worktree name associated with $1 path
@@ -61,19 +76,19 @@ worktree_name() {
 worktree_path() {
   local name="$1"
 
-  [[ -d "$WORKTREES_DIR/$name" ]] || cmd_die "no worktree named '$name'"
+  [[ -d "$WORKTREES_DIR/$name" ]] || die "no worktree named '$name'"
   echo "$WORKTREES_DIR/$name"
 }
 
-# Remove a linked worktree, stop its tmux session, and delete its local branch when present.
+# Remove a linked worktree and delete its local branch when present.
 worktree_remove() {
   local path="$1"
-  local name="$2"
   local branch
-  local session
 
   branch="$(worktree_branch "$path")"
-  session="$(tmux_session_name "$name")"
+
+  # Run the remove hook while the worktree still exists (e.g. drop its database).
+  run_task_hook "$path" "worktree:remove"
 
   cd "$REPO_ROOT"
   git worktree remove --force "$path" >&2
@@ -81,14 +96,7 @@ worktree_remove() {
     git branch -D "$branch" >&2
   fi
 
-  # Kill tmux session after cleanup so removing from that session does not terminate before git cleanup finishes.
-  if command -v tmux >/dev/null 2>&1 && tmux has-session -t "$session" 2>/dev/null; then
-    tmux kill-session -t "$session" 2>/dev/null || true
-  fi
-
-  if [[ -z "${TMUX:-}" ]] || ! command -v tmux >/dev/null 2>&1; then
-    echo "$REPO_ROOT"
-  fi
+  echo "$REPO_ROOT"
 }
 
 # Worktree setup
@@ -110,7 +118,11 @@ copy_included_files() {
     if [[ -e "$REPO_ROOT/$entry" ]]; then
       mkdir -p "$(dirname "$target_root/$entry")"
       if [[ -d "$REPO_ROOT/$entry" ]]; then
-        cp -R "$REPO_ROOT/$entry/." "$target_root/$entry"
+        if is_symlink_dir "$entry"; then
+          ln -s "$REPO_ROOT/$entry" "$target_root/$entry"
+        else
+          cp -R "$REPO_ROOT/$entry/." "$target_root/$entry"
+        fi
       else
         cp -R "$REPO_ROOT/$entry" "$target_root/$entry"
       fi
@@ -120,31 +132,43 @@ copy_included_files() {
   done < "$manifest"
 }
 
-# Generate .envrc.worktree if `.envrc` exists (useful for worktree overrides)
-write_envrc_worktree() {
-  [[ -f "$1/.envrc" ]] || return 0
+# Trust the mise config and install its tools when a mise.toml is present.
+setup_mise() {
+  local path="$1"
 
-  {
-    printf 'export TREE_NAME="%s"\n' "$2"
-    printf 'export TREE_INDEX="%s"\n' "$3"
-  } > "$1/.envrc.worktree"
+  [[ -f "$path/mise.toml" ]] || return 0
+  command -v mise >/dev/null 2>&1 || {
+    echo "gw (warning): mise.toml found but mise is not installed; skipping" >&2
+    return 0
+  }
+
+  mise trust "$path/mise.toml" >&2
+  (cd "$path" && mise install) >&2
 }
 
-# Generate tmux session name for $1 worktree name
-tmux_session_name() {
-  local name="$1"
-  local base_session="$TMUX_SESSION"
-  local pool_name
+# Write a gitignored mise.local.toml exposing this worktree's identity as vars.
+write_mise_local() {
+  [[ -f "$1/mise.toml" ]] || return 0
 
-  # Strip existing worktree name from session name (useful when running from worktree)
-  for pool_name in "${NAME_POOL[@]}"; do
-    if [[ "$base_session" == *-"$pool_name" ]]; then
-      base_session="${base_session%-"$pool_name"}"
-      break
-    fi
-  done
+  {
+    printf '[env]\n'
+    printf 'WORKTREE_ID = "%s"\n' "$2"
+    printf 'WORKTREE_NAME = "%s"\n' "$3"
+  } > "$1/mise.local.toml"
+}
 
-  echo "${base_session}-${name//[:.]/-}"
+# Run the mise task associated with the worktree hook (e.g. worktree:create)
+run_task_hook() {
+  local path="$1"
+  local task="$2"
+  local branch
+
+  command -v mise >/dev/null 2>&1 || return 0
+  [[ -f "$path/mise.toml" ]] || return 0
+  (cd "$path" && mise tasks info "$task" >/dev/null 2>&1) || return 0
+
+  branch="$(worktree_branch "$path")"
+  (cd "$path" && mise run "$task" >&2) || echo "gw (warning): mise task '$task' failed" >&2
 }
 
 # Commands
@@ -153,14 +177,15 @@ tmux_session_name() {
 cmd_add() {
   [[ $# -eq 1 ]] || cmd_usage
 
-  local branch="$1"
+  # Accept a remote-qualified name (e.g. origin/feature) and use the short branch name locally.
+  local branch="${1#origin/}"
   local name
   local path
   local index
 
-  name="$(next_name)"
+  index="$(assign_slot "$branch")"
+  name="${NAME_POOL[$index]}"
   path="$WORKTREES_DIR/$name"
-  index="$(worktree_index "$name")"
 
   mkdir -p "$WORKTREES_DIR"
   cd "$REPO_ROOT"
@@ -176,45 +201,19 @@ cmd_add() {
   fi
 
   copy_included_files "$path"
-  write_envrc_worktree "$path" "$name" "$index"
+  write_mise_local "$path" "$index" "$name"
+  setup_mise "$path"
 
-  if command -v direnv >/dev/null 2>&1 && [[ -f "$path/.envrc" ]]; then
-    direnv allow "$path"
-  fi
-
-  if [[ -x "$path/bin/setup" ]]; then
-    (cd "$path" && bin/setup) || true
-  fi
+  run_task_hook "$path" "worktree:create"
 
   cmd_open "$name"
 }
 
-# Die with 1 exit code
-cmd_die() {
-  echo "gw (error): $*" >&2
-  exit 1
-}
-
-# Open a worktree by switching to its tmux session; outside tmux, print the worktree path.
+# Print the path to worktree $1 so the caller can cd into it.
 cmd_open() {
   [[ $# -eq 1 ]] || cmd_usage
 
-  local name="$1"
-  local path
-  path="$(worktree_path "$name")"
-
-  if [[ -z "${TMUX:-}" ]] || ! command -v tmux >/dev/null 2>&1; then
-    echo "$path"
-    return
-  fi
-
-  local session
-  session="$(tmux_session_name "$name")"
-
-  if ! tmux has-session -t "$session" 2>/dev/null; then
-    tmux new-session -d -c "$path" -s "$session"
-  fi
-  tmux switch-client -t "$session"
+  worktree_path "$1"
 }
 
 # Remove worktree with $1 name or in current directory
@@ -229,10 +228,10 @@ cmd_remove() {
   else
     path="$CURRENT_WORKTREE"
     name="$(worktree_name "$path" || true)"
-    [[ -n "$name" ]] || cmd_die "refusing to remove the primary worktree; pass a linked worktree name"
+    [[ -n "$name" ]] || die "refusing to remove the primary worktree; pass a linked worktree name"
   fi
 
-  worktree_remove "$path" "$name"
+  worktree_remove "$path"
 }
 
 # List all worktrees
@@ -267,14 +266,6 @@ Usage:
 USAGE
   exit 1
 }
-
-# Variables
-#------------------------------------------------------------------------------
-CURRENT_WORKTREE="$(git rev-parse --show-toplevel 2>/dev/null || cmd_die "not inside a git worktree")"
-NAME_POOL=(black blue brown cyan gray green lime magenta navy olive orange pink purple red white yellow)
-REPO_ROOT="$(git worktree list --porcelain | sed -n '1s/^worktree //p')"
-TMUX_SESSION="$(tmux display-message -p '#S' 2>/dev/null || basename "$REPO_ROOT")"
-WORKTREES_DIR="$REPO_ROOT/.worktrees"
 
 # Entrypoint
 #------------------------------------------------------------------------------

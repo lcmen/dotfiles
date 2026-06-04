@@ -7,12 +7,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly FORMULAS=(
     bat
     compartment
-    container
-    direnv
     exiftool
     fzf
     git
     go-pty
+    libvips-lite
+    mise
     neovim_bin
     ripgrep
     shellcheck
@@ -180,13 +180,6 @@ install_packages() {
 
     brew upgrade --greedy
     brew cleanup
-
-    if ! command -v nix &>/dev/null; then
-        echo "Installing Nix..."
-        sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon --yes
-    else
-        echo "Nix already installed, skipping..."
-    fi
 }
 
 echo "Setting up your Mac..."
