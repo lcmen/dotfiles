@@ -1,7 +1,9 @@
 suppress_unstable_features_warning = true
+model = "gpt-5.3-codex"
+model_reasoning_effort = "medium"
 
 [features]
-codex_hooks = true
+hooks = true
 
 [mcp_servers.context7]
 url = "https://mcp.context7.com/mcp"

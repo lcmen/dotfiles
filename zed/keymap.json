@@ -23,6 +23,7 @@
       "cmd-k p": "workspace::CopyRelativePath",
       "ctrl-,": "pane::ActivatePreviousItem",
       "ctrl-.": "pane::ActivateNextItem",
+      "ctrl-alt-enter": null,
     },
   },
   {
