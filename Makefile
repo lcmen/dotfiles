@@ -10,13 +10,11 @@ prepare:
 	fi
 
 install:
-	stow --verbose=0 --target=$$HOME/.config --restow --ignore 'bin|codex' ./
-	stow --verbose=0 --target=$$HOME/.codex --restow codex
+	stow --verbose=0 --target=$$HOME/.config --restow --ignore 'bin' ./
 	stow --verbose=0 --target=$$HOME/.local/bin --restow bin/
 
 uninstall:
-	stow --target=$$HOME/.config --delete --ignore 'bin|codex' */
-	stow --target=$$HOME/.codex --delete codex
+	stow --target=$$HOME/.config --delete --ignore 'bin' */
 	stow --target=$$HOME/.local/bin --delete bin/
 
 all: prepare install

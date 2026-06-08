@@ -8,4 +8,4 @@ compile = false
 elixir = "1.20"
 erlang = "29"
 node = "26"
-ruby = "4"
+ruby = "latest"
