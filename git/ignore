@@ -3,6 +3,7 @@
 .deps
 .worktreeinclude
 deps
+mise.local.toml
 node_modules
 vendor/bundle
 

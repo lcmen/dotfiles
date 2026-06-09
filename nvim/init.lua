@@ -34,7 +34,6 @@ local user_cmd = vim.api.nvim_create_user_command
     Plug('airblade/vim-gitgutter')
     Plug('christoomey/vim-tmux-navigator')
     Plug('docunext/closetag.vim')
-    Plug('github/copilot.vim')
     Plug('ibhagwan/fzf-lua')
     Plug('lcmen/rational.nvim')
     Plug('neovim/nvim-lspconfig')
