@@ -70,6 +70,13 @@ local user_cmd = vim.api.nvim_create_user_command
         actions = {
             files = {
                 true,                                            -- inherit defaults
+                ['ctrl-v'] = fzf.actions.file_vsplit,            -- Open selection in a vertical split
+                ['ctrl-x'] = fzf.actions.file_split,             -- Open selection in a horizontal split
+            },
+        },
+        buffers = {
+            actions = {
+                ['ctrl-x'] = fzf.actions.file_split,             -- Horizontal split (override default buf_del)
             },
         },
         fzf_opts = {
