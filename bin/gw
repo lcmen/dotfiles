@@ -101,13 +101,33 @@ worktree_remove() {
 
 # Worktree setup
 #------------------------------------------------------------------------------
-# Copy entries listed in .worktreeinclude (if present).
+# Print entries listed in .worktreeinclude, falling back to mise vars.worktreeinclude.
+included_file_entries() {
+  local manifest="$REPO_ROOT/.worktreeinclude"
+
+  if [[ -f "$manifest" ]]; then
+    cat "$manifest"
+    return 0
+  fi
+
+
+  # Defined as multi-line string in mise config file
+  # [vars]
+  # worktreeinclude = """
+  # .env
+  # .env.local
+  # mise.toml
+  # node_modules
+  # vendor/bundle
+  # """
+  command -v mise >/dev/null 2>&1 || return 0
+  mise config get -C "$REPO_ROOT" vars.worktreeinclude 2>/dev/null || true
+}
+
+# Copy entries listed in .worktreeinclude or mise vars.worktreeinclude (if present).
 copy_included_files() {
   local target_root="$1"
-  local manifest="$REPO_ROOT/.worktreeinclude"
   local entry
-
-  [[ -f "$manifest" ]] || return 0
 
   while IFS= read -r entry || [[ -n "$entry" ]]; do
     # Trim leading/trailing whitespace.
@@ -129,7 +149,7 @@ copy_included_files() {
     else
       echo "gw (warning): included entry '$entry' does not exist" >&2
     fi
-  done < "$manifest"
+  done < <(included_file_entries)
 }
 
 # Trust the mise config and install its tools when a mise.toml is present.

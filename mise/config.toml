@@ -3,9 +3,3 @@ env_shell_expand = true
 
 [settings.ruby]
 compile = false
-
-[tools]
-elixir = "1.20"
-erlang = "29"
-node = "26"
-ruby = "latest"

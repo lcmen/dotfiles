@@ -23,6 +23,7 @@ readonly FORMULAS=(
 
 readonly CASKS=(
     affinity
+    codex
     font-fira-code-nerd-font
     google-chrome
     pocket-casts
@@ -179,6 +180,7 @@ install_packages() {
     [[ ${#casks[@]} -gt 0 ]] && brew install --cask -q "${casks[@]}"
 
     brew upgrade --greedy
+    brew remove meson
     brew cleanup
 }
 
