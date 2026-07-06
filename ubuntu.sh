@@ -36,15 +36,14 @@ echo "Setting up your Ubuntu..."
 # Add all third-party repositories first
 echo "Adding third-party repositories..."
 
-# Neovim PPA
-sudo add-apt-repository ppa:neovim-ppa/unstable -y
-
 # Setup apt keyrings for custom repos
 setup_apt_keyring
 
-# Mise repository
-add_apt_gpg_key "https://mise.jdx.dev/gpg-key.pub" "/etc/apt/keyrings/mise-archive-keyring.pub"
-add_apt_source "deb [signed-by=/etc/apt/keyrings/mise-archive-keyring.pub arch=$ARCH] https://mise.jdx.dev/deb stable main" "/etc/apt/sources.list.d/mise.list"
+# Mise PPA
+sudo add-apt-repository ppa:jdxcode/mise -y
+
+# Neovim PPA
+sudo add-apt-repository ppa:neovim-ppa/unstable -y
 
 # GitHub CLI repository
 add_apt_gpg_key "https://cli.github.com/packages/githubcli-archive-keyring.gpg" "/etc/apt/keyrings/githubcli-archive-keyring.gpg"
@@ -73,13 +72,13 @@ sudo apt-get install -y \
     libreadline-dev \
     libssl-dev \
     libxml2-dev \
-    libxslt-dev \
+    libxslt1-dev \
     libyaml-dev \
     lsb-release \
     make \
     mise \
     neovim \
-    ntp \
+    ntpsec \
     pkg-config \
     ripgrep \
     software-properties-common \
@@ -106,13 +105,5 @@ FZF_VERSION=$(curl -fsSL https://api.github.com/repos/junegunn/fzf/releases/late
 curl -fsSLo /tmp/fzf.tar.gz "https://github.com/junegunn/fzf/releases/download/v${FZF_VERSION}/fzf-${FZF_VERSION}-linux_${ARCH}.tar.gz"
 sudo tar -xzf /tmp/fzf.tar.gz -C /usr/local/bin/
 rm /tmp/fzf.tar.gz
-
-# Install Nix
-if ! command -v nix &>/dev/null; then
-    echo "Installing Nix..."
-    sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon --yes
-else
-    echo "Nix already installed, skipping..."
-fi
 
 echo "Done!"
