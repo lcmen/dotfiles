@@ -1,5 +1,10 @@
 [settings]
 env_shell_expand = true
+idiomatic_version_file_enable_tools = ["node", "ruby"]
 
 [settings.ruby]
 compile = false
+
+[tools]
+node = "latest"
+ruby = "latest"

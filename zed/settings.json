@@ -1,4 +1,12 @@
 {
+  "agent_servers": {
+    "codex-acp": {
+      "type": "registry",
+    },
+  },
+  "prettier": {
+    "allowed": true,
+  },
   "agent": {
     "notify_when_agent_waiting": "all_screens",
     "default_profile": "ask",
@@ -16,7 +24,7 @@
   },
   "diff_view_style": "unified",
   "edit_predictions": {
-    "provider": "copilot",
+    "provider": "none",
   },
   "format_on_save": "on",
   "git_panel": {
@@ -26,7 +34,6 @@
   "icon_theme": "Material Icon Theme",
   "languages": {
     "HTML": {
-      "preferred_line_length": 120,
       "soft_wrap": "bounded",
     },
     "Ruby": {
@@ -36,6 +43,7 @@
   "outline_panel": {
     "button": false,
   },
+  "preferred_line_length": 120,
   "preview_tabs": {
     "enabled": false,
   },
@@ -53,6 +61,7 @@
     "show_nav_history_buttons": false,
     "show_tab_bar_buttons": false,
   },
+  "tab_size": 2,
   "telemetry": {
     "diagnostics": false,
     "metrics": false,
