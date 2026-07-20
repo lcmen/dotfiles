@@ -64,7 +64,7 @@
       "cmd-.": "workspace::ToggleZoom",
       "ctrl-=": "workspace::NewTerminal",
       "ctrl--": "pane::CloseActiveItem",
-      "shift-enter": ["terminal::SendText", "\u001b\r"],
+      "shift-enter": ["terminal::SendKeystroke", "alt-enter"],
     },
   },
   {
