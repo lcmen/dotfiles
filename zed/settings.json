@@ -29,12 +29,21 @@
     "tree_view": true,
   },
   "icon_theme": "Material Icon Theme",
+  "language_servers": [
+    "...",
+    "!eslint",
+    "!prettier",
+    "!tailwindcss-language-server"
+  ],
   "languages": {
     "HTML": {
       "soft_wrap": "bounded",
     },
     "Ruby": {
-      "language_servers": ["ruby-lsp", "!solargraph"],
+      "language_servers": [
+        "ruby-lsp",
+        "!solargraph"
+      ],
     },
   },
   "outline_panel": {
@@ -42,7 +51,7 @@
   },
   "preferred_line_length": 120,
   "prettier": {
-    "allowed": true,
+    "allowed": false,
   },
   "preview_tabs": {
     "enabled": false,
