@@ -24,6 +24,7 @@ if test -f ~/.orbstack/shell/init2.fish
 end
 
 abbr -a dcl 'docker-cleanup'
+abbr -a ccl 'container prune'
 abbr -a dim 'docker images -a'
 abbr -a dip 'docker-ip'
 abbr -a dps 'docker ps -a'
