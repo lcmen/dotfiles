@@ -3,19 +3,19 @@
 -- Neovim API aliases {{{
 local call = vim.call
 local cmd = vim.cmd
-local g = vim.g
+local diag = vim.diagnostic
 local fn = vim.fn
+local g = vim.g
 local lsp = vim.lsp
-local map = vim.api.nvim_set_keymap
+local map = vim.keymap.set
 local merge = function(t1, t2) return vim.tbl_extend('force', t1, t2) end
 local opt = vim.opt
-local opts = { noremap = true, silent = true }
+local opts = { silent = true }
 local user_cmd = vim.api.nvim_create_user_command
 -- }}}
 
 -- Packages {{{
     -- Install vim-plug if not present {{{
-    local data_dir = fn.stdpath('data')
     local plug_path = fn.stdpath('data') .. '/site/autoload/plug.vim'
     if fn.filereadable(plug_path) ~= 1 then
         print('Installing vim-plug')
@@ -41,7 +41,6 @@ local user_cmd = vim.api.nvim_create_user_command
     Plug('scrooloose/nerdtree')
     Plug('sheerun/vim-polyglot')
     Plug('sonph/onehalf', { ['rtp'] = 'vim' })
-    Plug('tpope/vim-commentary')
     Plug('tpope/vim-projectionist')
     Plug('tpope/vim-repeat')
     Plug('tpope/vim-surround')
@@ -53,19 +52,19 @@ local user_cmd = vim.api.nvim_create_user_command
 -- }}}
 
 -- Settings {{{
-    cmd[[colorscheme onehalflight]]
+    cmd.colorscheme('onehalflight')
 
     g.mapleader = " "                                            -- Change leader to space
     opt.relativenumber = true                                    -- Use relative line numbers
     opt.spell = false                                            -- Spell checking off
     opt.termguicolors = false                                    -- Disable true colors for compatibility with Tmux
     opt.textwidth = 120                                          -- Set max width to 120 characters
-    opt.wrap = false                                             -- Disable line wraping
+    opt.wrap = false                                             -- Disable line wrapping
 -- }}}
 
 -- Packages configuration {{{
     -- FZF {{{
-    fzf = require('fzf-lua')
+    local fzf = require('fzf-lua')
     fzf.setup({
         actions = {
             files = {
@@ -87,10 +86,10 @@ local user_cmd = vim.api.nvim_create_user_command
         },
         winopts = { backdrop = false, width = 0.85, height = 0.85, preview = { layout = 'vertical' } },
     })
-    map("n", "<C-b>", "<cmd>FzfLua buffers<CR>", opts)           -- Launch FZF for Buffers
-    map("n", "<C-g>", "<cmd>FzfLua git_status<CR>", opts)        -- Launch FZF for changed files (git diff)
-    map("n", "<C-p>", "<cmd>FzfLua files<CR>", opts)             -- Launch FZF for Files
-    map("n", "<C-y>", "<cmd>FzfLua live_grep<CR>", opts)         -- Launch FZF for live grep; use -- glob then Ctrl+G for fuzzy
+    map('n', '<C-b>', fzf.buffers, opts)                         -- Launch FZF for Buffers
+    map('n', '<C-g>', fzf.git_status, opts)                      -- Launch FZF for changed files (git diff)
+    map('n', '<C-p>', fzf.files, opts)                           -- Launch FZF for Files
+    map('n', '<C-y>', fzf.live_grep, opts)                       -- Launch FZF for live grep; use -- glob then Ctrl+G for fuzzy
     -- }}}
 
     -- GitGutter {{{
@@ -124,22 +123,18 @@ local user_cmd = vim.api.nvim_create_user_command
 -- }}}
 
 -- LSP {{{
-    local lsp_on_attach = function(client, bufnr)
-        local map = vim.api.nvim_buf_set_keymap
-        local ion = vim.api.nvim_buf_set_option
-        local opts = { noremap = true }
+    local lsp_on_attach = function(_, bufnr)
+        local opts = { buffer = bufnr }
 
         -- Configure keybindings for LSP
-        map(bufnr, 'n', 'ga', '<Cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-        map(bufnr, 'n', 'gf', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
-        map(bufnr, 'n', 'gi', '<Cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-        map(bufnr, 'n', 'gr', '<Cmd>lua vim.lsp.buf.references()<CR>', opts)
-        map(bufnr, 'n', 'gR', '<Cmd>lua vim.lsp.buf.rename()<CR>', opts)
-        map(bufnr, 'n', 'gt', '<Cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-        map(bufnr, 'n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
+        map('n', 'ga', lsp.buf.code_action, opts)
+        map('n', 'gf', lsp.buf.definition, opts)
+        map('n', 'gi', lsp.buf.implementation, opts)
+        map('n', 'gr', lsp.buf.references, opts)
+        map('n', 'gR', lsp.buf.rename, opts)
+        map('n', 'gt', lsp.buf.type_definition, opts)
+        map('n', 'K', lsp.buf.hover, opts)
     end
-
-    local lspconfig = require('lspconfig')
 
     lsp.config('*', { on_attach = lsp_on_attach })
     lsp.enable('eslint')                                     -- npm -g install vscode-langservers-extracted
@@ -148,21 +143,33 @@ local user_cmd = vim.api.nvim_create_user_command
 -- }}}
 
 -- Bindings {{{
-    map('n', '<leader>R', ':source ~/.config/nvim/init.lua<CR>', {})
+    local function copy_path(absolute, ranged)                  -- Copy path to clipboard, optionally with selected range (e.g. init.lua:10-20)
+        local path = fn.expand(absolute and '%:p' or '%')
+        if ranged then
+            local l1, l2 = fn.line('v'), fn.line('.')
+            if l1 > l2 then l1, l2 = l2, l1 end
+            path = path .. ':' .. (l1 == l2 and tostring(l1) or l1 .. '-' .. l2)
+        end
+        fn.setreg('+', path)
+    end
 
-    map('n', ',', ':', { noremap = true })                       -- Alias ':' to ','
+    map('n', '<leader>R', ':source $MYVIMRC<CR>')
+
+    map('n', ',', ':')                                           -- Alias ':' to ','
     map('n', '<leader><leader>', ':b#<CR>', opts)                -- Quickly switch between buffers
     map('n', 'x', ':cclose<CR>:lclose<CR>:pclose<CR>', opts)     -- Close location, quickfix list with single keystroke
 
-    map('n', '<leader>p', ':let @+=expand("%")<CR>', opts)       -- Copy buffer's relative path to clipboard
-    map('n', '<leader>P', ':let @+=expand("%:p")<CR>', opts)     -- Copy buffer's absolute path to clipboard
+    map('n', '<leader>p', function() copy_path(false, false) end, opts) -- Copy buffer's relative path to clipboard
+    map('n', '<leader>P', function() copy_path(true, false) end, opts)  -- Copy buffer's absolute path to clipboard
+    map('x', '<leader>p', function() copy_path(false, true) end, opts)  -- Copy relative path with selected lines to clipboard
+    map('x', '<leader>P', function() copy_path(true, true) end, opts)   -- Copy absolute path with selected lines to clipboard
 
     map('n', '[g', 'gT', opts)                                   -- Move to tab on the left
     map('n', ']g', 'gt', opts)                                   -- Move to tab on the right
 
-    map('n', 'L', '<cmd>lua vim.diagnostic.open_float()<CR>', opts) -- Show line diagnostic
-    map('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts) -- Move prev / next diagnostic errors
-    map('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
+    map('n', 'L', diag.open_float, opts)                         -- Show line diagnostic
+    map('n', '[d', function() diag.jump({ count = -1, float = true }) end, opts) -- Move prev / next diagnostic errors
+    map('n', ']d', function() diag.jump({ count = 1, float = true }) end, opts)
 -- }}}
 
 -- Commands {{{
