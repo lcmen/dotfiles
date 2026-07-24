@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Apply Linux setup that depends on installed system packages.
+. /etc/os-release
+
+# Symlink batcat to bat on Ubuntu
+if [[ "${ID:-}" == "ubuntu" ]] && command -v batcat >/dev/null 2>&1; then
+    sudo ln -sfn "$(command -v batcat)" /usr/local/bin/bat
+fi
+
+# Add user to docker group
+if getent group docker >/dev/null 2>&1 && ! id -nG "$USER" | tr ' ' '\n' | grep -qx docker; then
+    sudo usermod -aG docker "$USER"
+    echo "Docker group membership changed; start a new login session before using Docker."
+fi

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Upgrade and prune packages
+mise bootstrap packages upgrade --manager brew --yes
+mise bootstrap packages upgrade --manager brew-cask --yes
+mise bootstrap packages prune --manager brew --yes
+mise cache prune --yes
+
+# Reload macOS preferences after bootstrap
+killall cfprefsd 2>/dev/null || true
+/System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u 2>/dev/null || true
+killall Dock 2>/dev/null || true
+killall Finder 2>/dev/null || true

@@ -1,49 +1,61 @@
 # .files
 
-Dotfiles for applications I use on MacOS and Linux systems managed with [stow](https://www.gnu.org/software/stow/).
+Dotfiles and repository-scoped machine bootstrap configuration for macOS,
+Ubuntu, and Fedora, managed with [mise](https://mise.jdx.dev/).
 
 ## Prerequisites
 
 - [Git](https://git-scm.com/)
-- [Stow](https://www.gnu.org/software/stow/)
-- [Homebrew](https://brew.sh/) (macOS only)
+- [mise](https://mise.jdx.dev/installing-mise.html) 2026.7.11 or newer
 
 ## Install
 
 1. Clone repo
+
    ```sh
    git clone https://github.com/lcmen/dotfiles.git ~/.dotfiles
    cd ~/.dotfiles
    ```
+
 2. Init submodules `git submodule update --init --recursive`
-3. Run `make install`
+3. Trust and bootstrap the configuration
+
+   ```sh
+   mise trust
+   mise bootstrap
+   ```
 
 ## What Gets Installed
 
-Running `make install` will:
+Running `mise bootstrap` will:
 
-- Symlink configuration files to `~/.config/`
-- Symlink scripts to `~/.local/bin/`
-- Install packages via Homebrew (macOS) or apt/eopkg (Linux)
+- Install native packages via Mise's Homebrew, apt, or dnf managers
+- Symlink configuration directories into `~/.config/`
+- Symlink scripts individually into `~/.local/bin/`
+- Apply macOS preferences and keyboard shortcuts on macOS
+- Configure Docker repositories and group membership on Ubuntu and Fedora
+- Install the configured Node.js and Ruby versions
 
 ### Packages
 
-**CLI Tools:** bat, direnv, exiftool, fzf, git, mise, neovim, ripgrep, shellcheck, stow, tig, tmux
+Package names vary by platform. The bootstrap includes the native build
+dependencies and CLI tools used by this configuration, including bat, fzf, Git,
+Neovim, ripgrep, tig, and tmux.
 
-**Desktop Apps (macOS):** Affinity apps, Container, Google Chrome, Pocket Casts, Synology Drive, VLC, WhatsApp, YubiKey Manager
+**Desktop Apps (macOS):** Affinity, Codex, Google Chrome, Pocket Casts,
+Synology Drive, VLC, and WhatsApp
 
-**Development Runtimes (via mise):** Elixir, Erlang, Node.js, Ruby
+**Development Runtimes (via mise):** Node.js, Ruby
 
-## Customization
+## Maintenance
 
-To skip specific Homebrew packages on a machine, create a `.brew-skip` file in the repo root (it's gitignored):
+Preview bootstrap changes or inspect current state:
 
 ```sh
-# Packages to skip on this machine (one per line)
-vlc
-google-chrome
+mise bootstrap --dry-run
+mise bootstrap status
 ```
 
-## Uninstall
-
-Run `make uninstall`
+On macOS, a final bootstrap hook upgrades configured formulae and casks, prunes
+formulae outside the active configuration's dependency closure, and clears
+stale Mise cache entries.

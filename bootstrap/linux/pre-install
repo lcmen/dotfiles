@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Configure distro package repositories before Mise installs system packages.
+if [[ ! -r /etc/os-release ]]; then
+    echo "Unsupported Linux distribution: /etc/os-release is missing" >&2
+    exit 1
+else
+    . /etc/os-release
+fi
+
+setup_apt_keyring() {
+    sudo install -dm 0755 /etc/apt/keyrings
+}
+
+add_apt_gpg_key() {
+    local url=$1
+    local keyring_file=$2
+
+    curl -fsSL "$url" | sudo tee "$keyring_file" >/dev/null
+    sudo chmod a+r "$keyring_file"
+}
+
+add_apt_source() {
+    local source_content=$1
+    local source_file=$2
+
+    printf '%s\n' "$source_content" | sudo tee "$source_file" >/dev/null
+}
+
+add_dnf_repository() {
+    local repository_id=$1
+    local repository_url=$2
+
+    if ! sudo dnf repolist --enabled | grep -q "$repository_id"; then
+        sudo dnf config-manager addrepo --from-repofile="$repository_url"
+    fi
+}
+
+case "${ID:-}" in
+    ubuntu)
+        sudo apt-get update
+        sudo apt-get install -y ca-certificates curl software-properties-common
+        setup_apt_keyring
+
+        if ! grep -Rqs 'neovim-ppa.*unstable' /etc/apt/sources.list /etc/apt/sources.list.d 2>/dev/null; then
+            sudo add-apt-repository ppa:neovim-ppa/unstable -y
+        fi
+
+        add_apt_gpg_key \
+            "https://cli.github.com/packages/githubcli-archive-keyring.gpg" \
+            "/etc/apt/keyrings/githubcli-archive-keyring.gpg"
+        add_apt_source \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+            "/etc/apt/sources.list.d/github-cli.list"
+
+        add_apt_gpg_key \
+            "https://download.docker.com/linux/ubuntu/gpg" \
+            "/etc/apt/keyrings/docker.asc"
+        add_apt_source \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu ${UBUNTU_CODENAME:-$VERSION_CODENAME} stable" \
+            "/etc/apt/sources.list.d/docker.list"
+        ;;
+    fedora)
+        sudo dnf -y install dnf-plugins-core
+        add_dnf_repository \
+            "docker-ce-stable" \
+            "https://download.docker.com/linux/fedora/docker-ce.repo"
+        ;;
+    *)
+        echo "Unsupported Linux distribution: ${ID:-unknown}" >&2
+        exit 1
+        ;;
+esac

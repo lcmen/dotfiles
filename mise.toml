@@ -1,0 +1,16 @@
+[settings]
+dotfiles.default_mode = "symlink"
+env_shell_expand = true
+
+[dotfiles]
+"~/.config/bundle" = "bundle"
+"~/.config/fish" = "fish"
+"~/.config/gem" = "gem"
+"~/.config/git" = "git"
+"~/.config/mise" = "mise"
+"~/.config/nvim" = "nvim"
+"~/.config/psql" = "psql"
+"~/.config/ripgrep" = "ripgrep"
+"~/.config/tmux" = "tmux"
+"~/.config/zed" = "zed"
+"~/.local/bin" = { source = "bin", mode = "symlink-each" }

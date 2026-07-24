@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+set_hotkey() {
+    local id=$1
+    local character=$2
+    local keycode=$3
+    local modifiers=$4
+    local plist="$HOME/Library/Preferences/com.apple.symbolichotkeys.plist"
+
+    /usr/libexec/PlistBuddy "$plist" -c "Delete :AppleSymbolicHotKeys:${id}" 2>/dev/null || true
+    /usr/libexec/PlistBuddy "$plist" \
+        -c "Add :AppleSymbolicHotKeys:${id} dict" \
+        -c "Add :AppleSymbolicHotKeys:${id}:enabled bool true" \
+        -c "Add :AppleSymbolicHotKeys:${id}:value dict" \
+        -c "Add :AppleSymbolicHotKeys:${id}:value:type string standard" \
+        -c "Add :AppleSymbolicHotKeys:${id}:value:parameters array" \
+        -c "Add :AppleSymbolicHotKeys:${id}:value:parameters:0 integer ${character}" \
+        -c "Add :AppleSymbolicHotKeys:${id}:value:parameters:1 integer ${keycode}" \
+        -c "Add :AppleSymbolicHotKeys:${id}:value:parameters:2 integer ${modifiers}"
+}
+
+readonly MOD_CTRL=262144
+readonly MOD_CTRL_OPT=786432
+
+# Configure tiling shortcuts (ctrl + opt + {h | j | k | l| space | 0 | ] | [}
+set_hotkey 237 65535 36 "$MOD_CTRL_OPT"
+set_hotkey 238 32 49 "$MOD_CTRL_OPT"
+set_hotkey 239 48 29 "$MOD_CTRL_OPT"
+set_hotkey 240 104 4 "$MOD_CTRL_OPT"
+set_hotkey 241 108 37 "$MOD_CTRL_OPT"
+set_hotkey 242 107 40 "$MOD_CTRL_OPT"
+set_hotkey 243 106 38 "$MOD_CTRL_OPT"
+set_hotkey 248 91 33 "$MOD_CTRL_OPT"
+set_hotkey 249 93 30 "$MOD_CTRL_OPT"
+set_hotkey 256 61 24 "$MOD_CTRL_OPT"
+
+# Use ctrl + {1...9} to switch to different virtual desktops
+keycodes=(18 19 20 21 23 22 26 28 25)
+for index in "${!keycodes[@]}"; do
+    set_hotkey "$((118 + index))" "$((49 + index))" "${keycodes[$index]}" "$MOD_CTRL"
+done
+
+# Set Finder’s default location for new windows to home directory
+defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}/"

@@ -1,0 +1,83 @@
+[bootstrap.brew.taps]
+"lcmen/extra" = "https://github.com/lcmen/homebrew-extra.git"
+
+[bootstrap.hooks.pre-packages]
+run = "./bootstrap/macos/pre-install"
+
+[bootstrap.hooks.post-packages]
+run = "./bootstrap/macos/post-install"
+
+[bootstrap.packages]
+"brew:bat" = "latest"
+"brew:lcmen/extra/compartment" = "latest"
+"brew:exiftool" = "latest"
+"brew:fzf" = "latest"
+"brew:git" = "latest"
+"brew:lcmen/extra/go-pty" = "latest"
+"brew:lcmen/extra/libvips-lite" = "latest"
+"brew:lcmen/extra/neovim-bin" = "latest"
+"brew:ripgrep" = "latest"
+"brew:shellcheck" = "latest"
+"brew:tig" = "latest"
+"brew:tmux" = "latest"
+"brew-cask:affinity" = "latest"
+"brew-cask:codex" = "latest"
+"brew-cask:font-fira-code-nerd-font" = "latest"
+"brew-cask:google-chrome" = "latest"
+"brew-cask:pocket-casts" = "latest"
+"brew-cask:synology-drive" = "latest"
+"brew-cask:vlc" = "latest"
+"brew-cask:whatsapp" = "latest"
+
+[bootstrap.macos.finder]
+show_all_files = false
+show_pathbar = true
+show_status_bar = true
+show_extensions_warning = false
+preferred_view_style = "column"
+
+[bootstrap.macos.keyboard]
+press_and_hold = false
+fn_state = true
+
+[bootstrap.macos.defaults.NSGlobalDomain]
+NSAutomaticWindowAnimationsEnabled = false
+NSWindowResizeTime = 0.001
+NSScrollAnimationEnabled = false
+QLPanelAnimationDuration = 0.0
+NSDocumentRevisionsWindowTransformAnimation = false
+NSToolbarFullScreenAnimationDuration = 0.0
+NSBrowserColumnAnimationSpeedMultiplier = 0.0
+NSScrollViewRubberbanding = false
+AppleKeyboardUIMode = 2
+AppleShowAllExtensions = true
+"com.apple.springing.delay" = 0.0
+
+[bootstrap.macos.defaults."com.apple.dock"]
+autohide-time-modifier = 0.0
+autohide-delay = 0.0
+expose-animation-duration = 0.0
+launchanim = false
+mineffect = "scale"
+springboard-show-duration = 0.0
+springboard-hide-duration = 0.0
+springboard-page-duration = 0.0
+
+[bootstrap.macos.defaults."com.apple.Mail"]
+DisableSendAnimations = true
+DisableReplyAnimations = true
+
+[bootstrap.macos.defaults."com.apple.finder"]
+_FXSortFoldersFirst = true
+_FXSortFoldersFirstOnDesktop = true
+DisableAllAnimations = true
+NewWindowTarget = "PfHm"
+FXDefaultSearchScope = "SCcf"
+ShowHardDrivesOnDesktop = true
+ShowExternalHardDrivesOnDesktop = true
+ShowMountedServersOnDesktop = true
+ShowRemovableMediaOnDesktop = true
+
+[bootstrap.macos.defaults."com.apple.desktopservices"]
+DSDontWriteNetworkStores = true
+DSDontWriteUSBStores = true

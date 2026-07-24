@@ -1,4 +1,5 @@
-# Ignore local brew skip list
+# Legacy local package selections are no longer consumed, but keep existing
+# machine-local files out of version control.
 .brew-skip
 
 # Ignore caches
