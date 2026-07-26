@@ -6,7 +6,6 @@ Dotfiles and repository-scoped machine bootstrap configuration for macOS, Ubuntu
 
 - [Git](https://git-scm.com/)
 - [mise](https://mise.jdx.dev/installing-mise.html) 2026.7.11 or newer
-- [meson] (for MacOS only) - `brew install meson`
 
 ## Install
 
