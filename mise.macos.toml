@@ -10,6 +10,7 @@ run = "./bootstrap/macos/post-install"
 [bootstrap.packages]
 "brew:bat" = "latest"
 "brew:exiftool" = "latest"
+"brew:fish" = "latest"
 "brew:fzf" = "latest"
 "brew:git" = "latest"
 "brew:lcmen/extra/compartment" = "latest"

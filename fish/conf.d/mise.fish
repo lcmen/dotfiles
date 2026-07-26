@@ -8,6 +8,9 @@ if command -v brew >/dev/null 2>&1
   _brew_completions
 end
 
+# When mise is installed via Homebrew it automatically activates it for fish, disable it here to avoid double activation
+set -gx MISE_FISH_AUTO_ACTIVATE 0
+
 if command -v mise >/dev/null 2>&1
   if status is-interactive
     mise activate fish | source

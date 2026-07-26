@@ -1,3 +1,3 @@
 if test -d /opt/homebrew/
-  eval (/opt/homebrew/bin/brew shellenv)
+  /opt/homebrew/bin/brew shellenv fish | source
 end
