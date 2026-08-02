@@ -64,6 +64,7 @@ case "${ID:-}" in
         ;;
     fedora)
         sudo dnf -y install dnf-plugins-core
+        sudo dnf -y copr enable atim/starship
         add_dnf_repository \
             "docker-ce-stable" \
             "https://download.docker.com/linux/fedora/docker-ce.repo"
