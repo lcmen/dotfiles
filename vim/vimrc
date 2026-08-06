@@ -1,0 +1,363 @@
+vim9script
+
+# Runtime {{{
+    set runtimepath^=~/.local/share/vim/site
+# }}}
+
+# Packages {{{
+    # Install vim-plug if not present {{{
+    var plug = expand('~/.local/share/vim/site/autoload/plug.vim')
+    if !filereadable(plug)
+        if !executable('curl')
+            echoerr 'Install curl first or install vim-plug manually'
+            execute 'q!'
+        endif
+        echo 'Installing vim-plug'
+        silent execute '!curl -fLo ' .. plug .. ' --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+        autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+    endif
+    # }}}
+
+    # Plugins {{{
+    plug#begin('~/.local/share/vim/plugged')
+
+    Plug 'AndrewRadev/sideways.vim'
+    Plug 'AndrewRadev/splitjoin.vim'
+    Plug 'airblade/vim-gitgutter'
+    Plug 'christoomey/vim-tmux-navigator'
+    Plug 'docunext/closetag.vim'
+    Plug 'junegunn/fzf'
+    Plug 'junegunn/fzf.vim'
+    Plug 'preservim/nerdtree'
+    Plug 'ryanoasis/vim-devicons'
+    Plug 'sonph/onehalf', { 'rtp': 'vim' }
+    Plug 'tpope/vim-commentary'
+    Plug 'tpope/vim-projectionist'
+    Plug 'tpope/vim-repeat'
+    Plug 'tpope/vim-surround'
+    Plug 'tpope/vim-unimpaired'
+    Plug 'troydm/zoomwintab.vim'
+    Plug 'yegappan/lsp'
+
+    plug#end()
+    # }}}
+# }}}
+
+# Settings {{{
+    g:mapleader = ' '                                            # Change leader to space
+
+    # General {{{
+    set belloff=all                                              # Disable all sounds
+    set completeopt=menu,menuone,noselect,popup                  # Show completion menu without selecting, docs in a popup
+    set encoding=UTF-8
+    set mouse=a                                                  # Enable mouse support
+    set scrolloff=5                                              # Start scrolling 5 lines away from y margin
+    set sidescrolloff=15                                         # Start scrolling 15 lines away from x margin
+    set splitbelow                                               # Split below
+    set splitright                                               # Split on the right side
+    set ttimeout                                                 # Time out on key codes
+    set ttimeoutlen=50                                           # but only briefly, so <Esc> is not delayed (Neovim's default)
+
+    if has('unnamedplus')                                        # Use system clipboard
+        set clipboard=unnamedplus
+    else
+        set clipboard=unnamed
+    endif
+    # }}}
+
+    # Whitespace, tabs & spaces {{{
+    set expandtab                                                # Indent with spaces
+    set list                                                     # Show invisible characters
+    set listchars=tab:▸\ ,eol:↲,trail:·
+    set nowrap                                                   # Disable line wrapping
+    set shiftwidth=2                                             # Number of spaces per <tab> when indenting
+    set softtabstop=2                                            # Number of spaces per <tab> when inserting
+    set tabstop=4                                                # Number of spaces <tab> counts for
+    set textwidth=120                                            # Set max width to 120 characters
+    # }}}
+
+    # Search {{{
+    set ignorecase                                               # Ignore case when searching
+    set incsearch                                                # Enable incremental search
+    set smartcase                                                # unless there is a capital letter in the query
+    # }}}
+
+    # Backups & undo {{{
+    var state = expand('~/.local/state/vim')
+    mkdir(state .. '/undo', 'p', 0o700)
+
+    set nobackup
+    set noswapfile                                               # Disable swap
+    set nowritebackup
+    set undofile
+    &undodir = state .. '/undo'
+    &viminfofile = state .. '/viminfo'
+    # }}}
+
+    # UI {{{
+    &t_SI = "\e[6 q"                                             # Thin cursor in insert mode
+    &t_EI = "\e[2 q"                                             # Block cursor otherwise
+
+    set cursorline                                               # Show cursor line
+    set laststatus=2                                             # Show status line
+    set notermguicolors                                          # Disable true colors for compatibility with Tmux
+    set number                                                   # Show line numbers
+    set relativenumber                                           # Use relative line numbers
+
+    silent! colorscheme onehalflight
+    # }}}
+# }}}
+
+# Packages configuration {{{
+    # FZF {{{
+    g:fzf_layout = { window: { width: 0.85, height: 0.85 } }
+    g:fzf_vim = get(g:, 'fzf_vim', {})
+    g:fzf_vim.preview_window = ['down,45%', 'ctrl-/']            # Vertical preview layout
+
+    # Launch FZF for buffers, changed files (git status), files and live grep
+    nnoremap <silent> <C-b> :Buffers<CR>
+    nnoremap <silent> <C-g> :GFiles?<CR>
+    nnoremap <silent> <C-p> :Files<CR>
+    nnoremap <silent> <C-y> :RG<CR>
+    # }}}
+
+    # GitGutter {{{
+    g:gitgutter_sign_priority = 9                                # Lower priority than LSP diagnostics to avoid conflicts
+    # }}}
+
+    # NERDTree {{{
+    g:NERDTreeShowHidden = 1                                     # Show hidden files on NERDTree
+    g:NERDTreeShowLineNumbers = 0                                # Disable line numbers on NERDTree
+
+    # Toggle NERDTree, focus current buffer in NERDTree
+    nnoremap <silent> <C-e> :NERDTreeToggle<CR>
+    nnoremap <silent> <leader>e :NERDTreeFind<CR>
+    # }}}
+
+    # Sideways & Splitjoin {{{
+    g:splitjoin_split_mapping = ''
+    g:splitjoin_join_mapping = ''
+
+    # Move argument left / right, join / split block
+    nnoremap <silent> <leader>rh :SidewaysLeft<CR>
+    nnoremap <silent> <leader>rl :SidewaysRight<CR>
+    nnoremap <silent> <leader>rj :SplitjoinJoin<CR>
+    nnoremap <silent> <leader>rk :SplitjoinSplit<CR>
+    # }}}
+
+    # Tmux Navigator {{{
+    g:tmux_navigator_no_mappings = 1
+
+    # Move between panes, also from a terminal window (<C-w>: is Vim's terminal escape)
+    nnoremap <silent> <C-h> :TmuxNavigateLeft<CR>
+    nnoremap <silent> <C-j> :TmuxNavigateDown<CR>
+    nnoremap <silent> <C-k> :TmuxNavigateUp<CR>
+    nnoremap <silent> <C-l> :TmuxNavigateRight<CR>
+    tnoremap <silent> <C-h> <C-w>:TmuxNavigateLeft<CR>
+    tnoremap <silent> <C-j> <C-w>:TmuxNavigateDown<CR>
+    tnoremap <silent> <C-k> <C-w>:TmuxNavigateUp<CR>
+    tnoremap <silent> <C-l> <C-w>:TmuxNavigateRight<CR>
+    # }}}
+# }}}
+
+# LSP {{{
+    # Options {{{
+    var lsp_options = {
+        autoComplete: true,
+        diagSignErrorText: '󱈸',
+        diagSignHintText: '󰌵',
+        diagSignInfoText: '󰐾',
+        diagSignWarningText: '󰈻',
+        highlightDiagInline: true,
+        showDiagWithSign: true,
+        showDiagWithVirtualText: false,
+        showSignature: true,
+    }
+    # }}}
+
+    # Servers {{{
+    # ESLint from vscode-langservers-extracted. These are the defaults VS Code would normally fill
+    # in for us, so every key has to be set by hand. Leaving one out crashes the server or quietly
+    # turns diagnostics off, even where the value below looks like a no-op.
+    var eslint_settings = {
+        codeAction: {
+            disableRuleComment: { enable: true, location: 'separateLine' },
+            showDocumentation: { enable: true },
+        },
+        codeActionOnSave: { enable: false, mode: 'all' },
+        experimental: { useFlatConfig: false },                  # Use the normal 'eslint' entry point
+        nodePath: '',
+        onIgnoredFiles: 'off',                                   # Leave out and ignored files get warned about
+        problems: { shortenToSingleLine: false },
+        rulesCustomizations: [],
+        validate: 'on',                                          # Leave out and there are no diagnostics at all
+    }
+
+    # Servers are looked up on $PATH so mise shims resolve per project:
+    #   gem install ruby_lsp
+    #   npm -g install typescript-language-server
+    #   npm -g install vscode-langservers-extracted
+    var lsp_servers = [
+        {
+            name: 'eslint',
+            filetype: ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'],
+            path: 'vscode-eslint-language-server',
+            args: ['--stdio'],
+            workspaceConfig: eslint_settings,
+            customNotificationHandlers: {
+                # ESLint diagnostics are pulled over a synchronous RPC with 2s timeout by default. Increase it for a cold cache.
+                'eslint/status': (lspserver, reply) => ch_setoptions(job_getchannel(lspserver.job), { timeout: 60000 }),
+            },
+        },
+        {
+            name: 'ruby-lsp',
+            filetype: ['ruby'],
+            path: 'ruby-lsp',
+            args: [],
+        },
+        {
+            name: 'typescript-language-server',
+            filetype: ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'],
+            path: 'typescript-language-server',
+            args: ['--stdio'],
+        },
+    ]
+    # }}}
+
+    # Setup {{{
+    def LspSetup()
+        g:LspOptionsSet(lsp_options)
+        g:LspAddServer(lsp_servers)
+    enddef
+
+    def LspAttached()
+        nnoremap <buffer> <silent> ga :LspCodeAction<CR>
+        nnoremap <buffer> <silent> gf :LspGotoDefinition<CR>
+        nnoremap <buffer> <silent> gi :LspGotoImpl<CR>
+        nnoremap <buffer> <silent> gr :LspShowReferences<CR>
+        nnoremap <buffer> <silent> gR :LspRename<CR>
+        nnoremap <buffer> <silent> gt :LspGotoTypeDef<CR>
+        nnoremap <buffer> <silent> K :LspHover<CR>
+        nnoremap <buffer> <silent> L :LspDiag current<CR>
+        nnoremap <buffer> <silent> [d :LspDiag prev<CR>
+        nnoremap <buffer> <silent> ]d :LspDiag next<CR>
+    enddef
+
+    augroup lsp
+        autocmd!
+        autocmd User LspAttached LspAttached()
+        autocmd User LspSetup LspSetup()
+    augroup END
+    # }}}
+# }}}
+
+# Bindings {{{
+    # Copy path to clipboard, optionally with selected range (e.g. vimrc:10-20)
+    def CopyPath(absolute: bool, ranged: bool)
+        var path = expand(absolute ? '%:p' : '%')
+
+        if ranged
+            var first = line("'<")                               # '< is always the first line of the last selection,
+            var last = line("'>")                                # '> always the last, so they need no sorting
+            path ..= ':' .. (first == last ? first : first .. '-' .. last)
+        endif
+
+        @+ = path
+    enddef
+
+    # Reload configuration
+    nnoremap <silent> <leader>R :source $MYVIMRC<CR>
+
+    # Alias ':' to ',', quickly switch between buffers, close location / quickfix / preview lists
+    nnoremap , :
+    nnoremap <silent> <leader><leader> :b#<CR>
+    nnoremap <silent> x :cclose<CR>:lclose<CR>:pclose<CR>
+
+    # Copy buffer's relative / absolute path to clipboard, with selected lines in visual mode
+    nnoremap <silent> <leader>p :call <SID>CopyPath(0, 0)<CR>
+    nnoremap <silent> <leader>P :call <SID>CopyPath(1, 0)<CR>
+    xnoremap <silent> <leader>p :<C-u>call <SID>CopyPath(0, 1)<CR>
+    xnoremap <silent> <leader>P :<C-u>call <SID>CopyPath(1, 1)<CR>
+
+    # Move to tab on the left / right
+    nnoremap [g gT
+    nnoremap ]g gt
+
+    # Enable hlsearch on search start, disable hl
+    nnoremap <silent> / :set hlsearch<CR>/
+    nnoremap <silent> <leader><CR> :noh<CR>
+
+    # Tab backwards with Shift+Tab
+    inoremap <S-Tab> <C-d>
+
+    # Move by display line when wrapping, but keep counts on real lines (so 5j still matches the relativenumber gutter)
+    nnoremap <expr> j v:count ? 'j' : 'gj'
+    nnoremap <expr> k v:count ? 'k' : 'gk'
+    xnoremap <expr> j v:count ? 'j' : 'gj'
+    xnoremap <expr> k v:count ? 'k' : 'gk'
+
+    # Select all text
+    nnoremap va ggVG
+
+    # Keep selection when shifting left / right
+    xnoremap < <gv
+    xnoremap > >gv
+
+    # Delete / yank to end of line
+    nnoremap D d$
+    nnoremap Y y$
+# }}}
+
+# Commands {{{
+    # Greps {{{
+    # Grep for the word / WORD under the cursor
+    command! Rgword execute 'Rg' expand('<cword>')
+    command! RgWord execute 'Rg' escape(expand('<cWORD>'), '|')
+
+    # Alias Rgc to Rgword and RgC to RgWord
+    cnoreabbrev Rgc Rgword
+    cnoreabbrev RgC RgWord
+    # }}}
+
+    # Buffers {{{
+    # Close all buffers except the current one
+    def BufOnly()
+        var current = bufnr('%')
+
+        for buffer in getbufinfo({ buflisted: 1 })
+            if buffer.bufnr != current && !buffer.changed
+                silent! execute 'bdelete' buffer.bufnr
+            endif
+        endfor
+    enddef
+
+    command! BufOnly BufOnly()
+
+    # Alias bo to BufOnly
+    cnoreabbrev bo BufOnly
+    # }}}
+
+    # Hooks {{{
+    # Trim trailing whitespace, keeping the cursor and view in place. Skipped for md, where two trailing spaces are a hard line break.
+    def TrimWhitespace()
+        if !&modifiable || &binary || index(['diff', 'markdown'], &filetype) >= 0
+            return
+        endif
+
+        var view = winsaveview()
+        keeppatterns :%s/\s\+$//e
+        winrestview(view)
+    enddef
+
+    augroup hooks
+        autocmd!
+        autocmd BufWritePre * TrimWhitespace()
+
+        autocmd Filetype gitcommit setlocal spell textwidth=72
+        autocmd Filetype go setlocal softtabstop=4 shiftwidth=4 noexpandtab
+        autocmd Filetype markdown setlocal spell wrap linebreak suffixesadd=.md
+    augroup END
+    # }}}
+# }}}
+
+# vim: foldmethod=marker
