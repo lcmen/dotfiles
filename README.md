@@ -1,6 +1,6 @@
 # .files
 
-Dotfiles and repository-scoped machine bootstrap configuration for macOS, Ubuntu, and Fedora, managed with [mise](https://mise.jdx.dev/).
+Dotfiles and repository-scoped machine bootstrap configuration for macOS, Windows, Ubuntu, and Fedora, managed with [mise](https://mise.jdx.dev/).
 
 ## Prerequisites
 
@@ -23,6 +23,25 @@ Dotfiles and repository-scoped machine bootstrap configuration for macOS, Ubuntu
    mise trust
    mise bootstrap
    ```
+
+### Windows applications
+
+The Windows application installer uses `winget`. When the repository is stored in WSL, Windows treats the script's `\\wsl.localhost` path as remote and may require a signed script under the default execution policy.
+
+To allow the script only in the current PowerShell window, run:
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+.\windows.ps1
+```
+
+The policy change expires when that PowerShell window is closed.
+
+To launch the Windows installer directly from a WSL shell, run this from the repository root:
+
+```sh
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(wslpath -w "$PWD/windows.ps1")"
+```
 
 ## What Gets Installed
 

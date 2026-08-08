@@ -58,7 +58,27 @@ vim9script
     set ttimeout                                                 # Time out on key codes
     set ttimeoutlen=50                                           # but only briefly, so <Esc> is not delayed (Neovim's default)
 
-    if has('unnamedplus')                                        # Use system clipboard
+    # }}}
+
+    # Clipboard {{{
+    if filereadable('/proc/sys/fs/binfmt_misc/WSLInterop') && executable('win32yank.exe')
+        def WslCopy()
+            system('win32yank.exe -i --crlf', getreg('"'))
+        enddef
+
+        def WslPaste(command: string): string
+            setreg('"', system('win32yank.exe -o --lf'))
+            return command
+        enddef
+
+        augroup wsl_clipboard
+            autocmd!
+            autocmd TextYankPost * WslCopy()
+        augroup END
+
+        nnoremap <expr> p WslPaste('p')
+        nnoremap <expr> P WslPaste('P')
+    elseif has('unnamedplus')                                    # Use system clipboard
         set clipboard=unnamedplus
     else
         set clipboard=unnamed
@@ -100,7 +120,7 @@ vim9script
 
     set cursorline                                               # Show cursor line
     set laststatus=2                                             # Show status line
-    set notermguicolors                                          # Disable true colors for compatibility with Tmux
+    set termguicolors                                            # Enable true colors
     set number                                                   # Show line numbers
     set relativenumber                                           # Use relative line numbers
 
