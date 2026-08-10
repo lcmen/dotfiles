@@ -1,9 +1,9 @@
-param(
-    [string]$MacOSConfig
-)
-
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+
+if ($PSVersionTable.PSVersion -lt [version]"7.4") {
+    throw "PowerShell 7.4 or newer is required. Run this script with pwsh.exe."
+}
 
 if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
     throw "winget was not found. Install or update 'App Installer' from the Microsoft Store first."
@@ -11,22 +11,15 @@ if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
 
 $repoRoot = (Resolve-Path $PSScriptRoot).Path
 
-if (-not $MacOSConfig) {
-    $MacOSConfig = Join-Path $repoRoot "mise.macos.toml"
-}
-
-if (-not (Test-Path $MacOSConfig)) {
-    throw "macOS bootstrap config not found: $MacOSConfig"
-}
-
 $packageMap = @{
-    "affinity"                  = @{ Id = "Canva.Affinity";           Source = "winget" }
-    "pocket-casts"              = @{ Id = "Automattic.PocketCasts"; Source = "winget" }
-    "synology-drive"            = @{ Id = "Synology.DriveClient";   Source = "winget" }
-    "vlc"                       = @{ Id = "VideoLAN.VLC";            Source = "winget" }
-    "whatsapp"                  = @{ Id = "9NKSQGP7F2NH";            Source = "msstore" }
-    "win32yank"                 = @{ Id = "equalsraf.win32yank";     Source = "winget" }
-    "zed"                       = @{ Id = "ZedIndustries.Zed";       Source = "winget" }
+    "affinity"       = @{ Id = "Canva.Affinity";        Source = "winget" }
+    "autohotkey"     = @{ Id = "AutoHotkey.AutoHotkey"; Source = "winget" }
+    "icloud"         = @{ Id = "9PKTQ5699M62";          Source = "msstore" }
+    "synology-drive" = @{ Id = "Synology.DriveClient";  Source = "winget" }
+    "vlc"            = @{ Id = "VideoLAN.VLC";          Source = "winget" }
+    "whatsapp"       = @{ Id = "9NKSQGP7F2NH";          Source = "msstore" }
+    "win32yank"      = @{ Id = "equalsraf.win32yank";   Source = "winget" }
+    "zed"            = @{ Id = "ZedIndustries.Zed";     Source = "winget" }
 }
 
 $failed = @()
@@ -43,11 +36,7 @@ function Install-WingetPackage {
         [string]$Source
     )
 
-    & winget list `
-        --id $Id `
-        --exact `
-        --accept-source-agreements `
-        --disable-interactivity | Out-Null
+    & winget list --id $Id --exact --accept-source-agreements --disable-interactivity | Out-Null
 
     if ($LASTEXITCODE -eq 0) {
         Write-Host "$Name ($Id) is already installed." -ForegroundColor DarkGray
@@ -56,99 +45,21 @@ function Install-WingetPackage {
 
     Write-Host "Installing $Name ($Id)..." -ForegroundColor Cyan
 
-    & winget install `
-        --id $Id `
-        --exact `
-        --source $Source `
-        --accept-package-agreements `
-        --accept-source-agreements `
-        --silent `
-        --disable-interactivity
+    & winget install --id $Id --exact --source $Source --accept-package-agreements --accept-source-agreements --silent --disable-interactivity
 
     if ($LASTEXITCODE -ne 0) {
         throw "winget failed to install $Name (exit code $LASTEXITCODE)"
     }
 }
 
-function Register-FontFiles {
-    param(
-        [Parameter(Mandatory)]
-        [System.IO.FileInfo[]]$Fonts
-    )
-
-    if (-not ("FontRegistration.NativeMethods" -as [type])) {
-        Add-Type @"
-namespace FontRegistration {
-    using System;
-    using System.Runtime.InteropServices;
-
-    public static class NativeMethods {
-        [DllImport("gdi32.dll", CharSet = CharSet.Unicode)]
-        public static extern int AddFontResourceEx(string fileName, uint flags, IntPtr reserved);
-
-        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-        public static extern bool SendNotifyMessage(IntPtr window, uint message, IntPtr wParam, IntPtr lParam);
-    }
-}
-"@
-    }
-
-    foreach ($font in $Fonts) {
-        [FontRegistration.NativeMethods]::AddFontResourceEx($font.FullName, 0, [IntPtr]::Zero) | Out-Null
-    }
-
-    $hwndBroadcast = [IntPtr]0xffff
-    $wmFontChange = 0x001d
-    [FontRegistration.NativeMethods]::SendNotifyMessage($hwndBroadcast, $wmFontChange, [IntPtr]::Zero, [IntPtr]::Zero) | Out-Null
-}
-
 function Install-FiraCodeNerdFont {
-    $fontRegistry = "HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Fonts"
-    $fontDirectory = Join-Path $env:LOCALAPPDATA "Microsoft\Windows\Fonts"
-    $installedFonts = @(Get-ChildItem -Path $fontDirectory -Filter "FiraCodeNerdFont-*.ttf" -ErrorAction SilentlyContinue)
-
-    if ($installedFonts.Count -gt 0) {
-        Register-FontFiles -Fonts $installedFonts
-        Write-Host "FiraCode Nerd Font is already installed." -ForegroundColor DarkGray
-        return
+    if (-not (Get-Module -ListAvailable -Name NerdFonts)) {
+        Install-PSResource -Name NerdFonts -Scope CurrentUser -TrustRepository
     }
 
-    $temporaryDirectory = Join-Path ([IO.Path]::GetTempPath()) ("FiraCodeNerdFont-" + [guid]::NewGuid())
-    $archive = Join-Path $temporaryDirectory "FiraCode.zip"
-
-    try {
-        New-Item -ItemType Directory -Path $temporaryDirectory -Force | Out-Null
-        New-Item -ItemType Directory -Path $fontDirectory -Force | Out-Null
-
-        Write-Host "Installing FiraCode Nerd Font..." -ForegroundColor Cyan
-        Invoke-WebRequest `
-            -Uri "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/FiraCode.zip" `
-            -OutFile $archive
-        Expand-Archive -Path $archive -DestinationPath $temporaryDirectory -Force
-
-        $fonts = Get-ChildItem -Path $temporaryDirectory -Filter "FiraCodeNerdFont-*.ttf"
-        if (-not $fonts) {
-            throw "The FiraCode Nerd Font archive did not contain the expected font files."
-        }
-
-        foreach ($font in $fonts) {
-            $destination = Join-Path $fontDirectory $font.Name
-            Copy-Item -Path $font.FullName -Destination $destination -Force
-            New-ItemProperty `
-                -Path $fontRegistry `
-                -Name "$($font.BaseName) (TrueType)" `
-                -Value $destination `
-                -PropertyType String `
-                -Force | Out-Null
-        }
-
-        Register-FontFiles -Fonts $fonts
-    }
-    finally {
-        if (Test-Path $temporaryDirectory) {
-            Remove-Item -Path $temporaryDirectory -Recurse -Force
-        }
-    }
+    Write-Host "Installing FiraCode Nerd Font..." -ForegroundColor Cyan
+    Import-Module NerdFonts
+    Install-NerdFont -Name FiraCode
 }
 
 function Copy-ZedConfig {
@@ -167,6 +78,48 @@ function Copy-ZedConfig {
     }
 }
 
+function Install-AutoHotkeyShortcuts {
+    $source = Join-Path $repoRoot "autohotkey\shortcuts.ahk"
+    $startupDirectory = [Environment]::GetFolderPath("Startup")
+    $destination = Join-Path $startupDirectory "shortcuts.ahk"
+    $dllDestination = Join-Path $startupDirectory "VirtualDesktopAccessor.dll"
+    $dllUri = "https://github.com/Ciantic/VirtualDesktopAccessor/releases/download/2024-12-16-windows11/VirtualDesktopAccessor.dll"
+    $dllSha256 = "8740C572A1C000E3B87FFEB1E4C397EAE9AF3BD4A2ABDC3BCFFACAB4493F8FF5"
+
+    if (-not (Test-Path $source -PathType Leaf)) {
+        throw "AutoHotkey shortcuts not found: $source"
+    }
+
+    New-Item -ItemType Directory -Path $startupDirectory -Force | Out-Null
+
+    $installedDllIsCurrent = (Test-Path $dllDestination -PathType Leaf) -and ((Get-FileHash -Path $dllDestination -Algorithm SHA256).Hash -eq $dllSha256)
+
+    if (-not $installedDllIsCurrent) {
+        $temporaryDll = Join-Path ([IO.Path]::GetTempPath()) ("VirtualDesktopAccessor-" + [guid]::NewGuid() + ".dll")
+
+        try {
+            Write-Host "Downloading VirtualDesktopAccessor.dll..." -ForegroundColor Cyan
+            Invoke-WebRequest -Uri $dllUri -OutFile $temporaryDll
+
+            $downloadedSha256 = (Get-FileHash -Path $temporaryDll -Algorithm SHA256).Hash
+            if ($downloadedSha256 -ne $dllSha256) {
+                throw "VirtualDesktopAccessor.dll checksum mismatch."
+            }
+
+            Copy-Item -Path $temporaryDll -Destination $dllDestination -Force
+        }
+        finally {
+            if (Test-Path $temporaryDll) {
+                Remove-Item -Path $temporaryDll -Force
+            }
+        }
+    }
+
+    Write-Host "Copying AutoHotkey shortcuts to $destination..." -ForegroundColor Cyan
+    Copy-Item -Path $source -Destination $destination -Force
+    Start-Process -FilePath $destination
+}
+
 try {
     Install-FiraCodeNerdFont
 }
@@ -180,15 +133,20 @@ foreach ($entry in ($packageMap.GetEnumerator() | Sort-Object -Property Name)) {
     $package = $entry.Value
 
     try {
-        Install-WingetPackage `
-            -Name $app `
-            -Id $package.Id `
-            -Source $package.Source
+        Install-WingetPackage -Name $app -Id $package.Id -Source $package.Source
     }
     catch {
         Write-Warning $_
         $failed += $app
     }
+}
+
+try {
+    Install-AutoHotkeyShortcuts
+}
+catch {
+    Write-Warning $_
+    $failed += "autohotkey-shortcuts"
 }
 
 try {
@@ -206,12 +164,7 @@ if ($failed.Count -gt 0) {
 Write-Host ""
 Write-Host "Upgrading all winget packages..." -ForegroundColor Cyan
 
-& winget upgrade `
-    --all `
-    --accept-package-agreements `
-    --accept-source-agreements `
-    --silent `
-    --disable-interactivity
+& winget upgrade --all --accept-package-agreements --accept-source-agreements --silent --disable-interactivity
 
 $noAvailableUpgrade = -1978335189 # 0x8A15002B
 if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne $noAvailableUpgrade) {

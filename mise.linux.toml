@@ -4,9 +4,6 @@ run = "./bootstrap/linux/pre-install"
 [bootstrap.hooks.post-packages]
 run = "./bootstrap/linux/post-install"
 
-[tools]
-"aqua:starship/starship" = "latest"
-
 [bootstrap.packages]
 "apt:bat" = "latest"
 "apt:build-essential" = "latest"
@@ -35,6 +32,7 @@ run = "./bootstrap/linux/post-install"
 "apt:ripgrep" = "latest"
 "apt:software-properties-common" = "latest"
 "apt:sqlite3" = "latest"
+"apt:starship" = "latest"
 "apt:tig" = "latest"
 "apt:unzip" = "latest"
 "apt:watchman" = "latest"

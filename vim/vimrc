@@ -61,7 +61,7 @@ vim9script
     # }}}
 
     # Clipboard {{{
-    if filereadable('/proc/sys/fs/binfmt_misc/WSLInterop') && executable('win32yank.exe')
+    if system('uname -r') =~? 'microsoft'
         def WslCopy()
             system('win32yank.exe -i --crlf', getreg('"'))
         enddef
@@ -78,7 +78,7 @@ vim9script
 
         nnoremap <expr> p WslPaste('p')
         nnoremap <expr> P WslPaste('P')
-    elseif has('unnamedplus')                                    # Use system clipboard
+    elseif has('unnamedplus')
         set clipboard=unnamedplus
     else
         set clipboard=unnamed
