@@ -189,6 +189,7 @@ vim9script
         diagSignInfoText: '󰐾',
         diagSignWarningText: '󰈻',
         highlightDiagInline: true,
+        ignoreMissingServer: true,
         showDiagWithSign: true,
         showDiagWithVirtualText: false,
         showSignature: true,
@@ -196,21 +197,20 @@ vim9script
     # }}}
 
     # Servers {{{
-    # ESLint from vscode-langservers-extracted. These are the defaults VS Code would normally fill
-    # in for us, so every key has to be set by hand. Leaving one out crashes the server or quietly
-    # turns diagnostics off, even where the value below looks like a no-op.
+    # These are the defaults VS Code would normally fill in for us, so every key has to be set by hand.
+    # Leaving one out crashes the server or quietly turns diagnostics off, even where the value below looks like a no-op.
     var eslint_settings = {
         codeAction: {
             disableRuleComment: { enable: true, location: 'separateLine' },
             showDocumentation: { enable: true },
         },
         codeActionOnSave: { enable: false, mode: 'all' },
-        experimental: { useFlatConfig: false },                  # Use the normal 'eslint' entry point
+        experimental: { useFlatConfig: false },
         nodePath: '',
-        onIgnoredFiles: 'off',                                   # Leave out and ignored files get warned about
+        onIgnoredFiles: 'off',
         problems: { shortenToSingleLine: false },
         rulesCustomizations: [],
-        validate: 'on',                                          # Leave out and there are no diagnostics at all
+        validate: 'on',
     }
 
     # Servers are looked up on $PATH so mise shims resolve per project:
@@ -240,6 +240,10 @@ vim9script
             filetype: ['javascript', 'javascriptreact', 'typescript', 'typescriptreact'],
             path: 'typescript-language-server',
             args: ['--stdio'],
+            initializationOptions: {
+                maxTsServerMemory: 2048,                         # Drop from default 4GB on 16GB machine to 2GB per process
+                disableAutomaticTypingAcquisition: true,         # We get types from node_modules; skip the @types downloader
+            },
         },
     ]
     # }}}

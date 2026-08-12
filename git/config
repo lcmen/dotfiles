@@ -16,6 +16,9 @@
   textconv = "bin/rails credentials:diff"
 [fetch]
   prune = true
+[hook "worktree-setup"]
+  command = ~/.config/git/worktree-setup
+  event = post-checkout
 [merge]
   conflictstyle = zdiff3
 [pull]
