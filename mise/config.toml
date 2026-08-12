@@ -8,3 +8,4 @@ compile = false
 [tools]
 node = "latest"
 ruby = "latest"
+usage = "latest"

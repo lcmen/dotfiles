@@ -6,8 +6,13 @@ set -euo pipefail
 . /etc/os-release
 
 # Symlink batcat to bat on Ubuntu
-if [[ "${ID:-}" == "ubuntu" ]] && command -v batcat >/dev/null 2>&1; then
-    sudo ln -sfn "$(command -v batcat)" /usr/local/bin/bat
+if [[ "${ID:-}" == "ubuntu" ]]; then
+    sudo locale-gen en_US.UTF-8
+    sudo update-locale LANG=en_US.UTF-8
+
+    if command -v batcat >/dev/null 2>&1; then
+        sudo ln -sfn "$(command -v batcat)" /usr/local/bin/bat
+    fi
 fi
 
 # Add user to docker group

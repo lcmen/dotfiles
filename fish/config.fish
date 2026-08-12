@@ -1,6 +1,5 @@
 # System
 set -gx LANG en_US.UTF-8
-set -gx LC_ALL en_US.UTF-8
 set -gx EDITOR "nvim"
 
 # Specify config paths to use XDG_CONFIG_HOME
