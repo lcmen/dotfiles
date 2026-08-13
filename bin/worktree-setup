@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 
+# It calls mise trust, and install all tools.
+# Copy all files listed in .worktreeinclude from the main worktree.
+# Dependency directories such as deps, node_modules and vendor/bundle are symlinked to the main worktree.
+
 set -Eeuo pipefail
 
 NULL_SHA=0000000000000000000000000000000000000000
 WORKTREE_PATH="$PWD"
-# The first entry of `git worktree list` is always the main worktree.
 REPO_ROOT="$(git worktree list --porcelain | sed -n '1s/^worktree //p')"
 SYMLINK_DIRS=(deps node_modules vendor/bundle)
 
@@ -15,17 +18,14 @@ copy_included_files() {
     entry="$(printf '%s' "$entry" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
 
     [[ -z "$entry" ]] && continue
-    # Already there when the entry is tracked rather than ignored.
-    [[ -e "$WORKTREE_PATH/$entry" ]] && continue
 
     if [[ -e "$REPO_ROOT/$entry" ]]; then
       mkdir -p "$(dirname "$WORKTREE_PATH/$entry")"
-      if [[ -d "$REPO_ROOT/$entry" ]]; then
-        if is_symlink_dir "$entry"; then
-          ln -s "$REPO_ROOT/$entry" "$WORKTREE_PATH/$entry"
-        else
-          cp -R "$REPO_ROOT/$entry/." "$WORKTREE_PATH/$entry"
-        fi
+      if is_symlink_dir "$entry"; then
+        ln -sfn "$REPO_ROOT/$entry" "$WORKTREE_PATH/$entry"
+      elif [[ -d "$REPO_ROOT/$entry" ]]; then
+        mkdir -p "$WORKTREE_PATH/$entry"
+        cp -R "$REPO_ROOT/$entry/." "$WORKTREE_PATH/$entry"
       else
         cp -R "$REPO_ROOT/$entry" "$WORKTREE_PATH/$entry"
       fi
@@ -33,11 +33,6 @@ copy_included_files() {
       warn "included entry '$entry' does not exist"
     fi
   done < <(included_file_entries)
-}
-
-# Worktree-only layouts keep the main entry bare, so it has no files to copy from.
-has_working_copy() {
-  [[ "$(git -C "$REPO_ROOT" rev-parse --is-bare-repository)" == "false" ]]
 }
 
 included_file_entries() {
@@ -48,14 +43,7 @@ included_file_entries() {
   cat "$manifest"
 }
 
-is_linked_worktree() {
-  local git_dir="$(git rev-parse --absolute-git-dir)"
-  local common_dir="$(cd "$(git rev-parse --git-common-dir)" && pwd)"
-
-  [[ "$git_dir" != "$common_dir" ]]
-}
-
-is_new_checkout() {
+is_checkout() {
   local prev_head="${1:-}"
   local new_head="${2:-}"
   local checkout_flags="${3:-}"
@@ -72,6 +60,18 @@ is_symlink_dir() {
   done
 
   return 1
+}
+
+is_worktree() {
+  local git_dir="$(git rev-parse --absolute-git-dir)"
+  local common_dir="$(cd "$(git rev-parse --git-common-dir)" && pwd)"
+
+  # Git worktrees keep their git dir under the main worktree's .git/worktrees
+  [[ "$git_dir" != "$common_dir" ]]
+}
+
+non_bare_repo() {
+  [[ "$(git -C "$REPO_ROOT" rev-parse --is-bare-repository)" == "false" ]]
 }
 
 setup_mise() {
@@ -91,9 +91,9 @@ warn() {
 
 trap 'warn "setup did not complete"; exit 0' ERR
 
-is_new_checkout "$@" || exit 0
-is_linked_worktree || exit 0
-has_working_copy || exit 0
+is_checkout "$@" || exit 0
+is_worktree || exit 0
+non_bare_repo || exit 0
 
 copy_included_files
 setup_mise
