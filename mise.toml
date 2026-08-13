@@ -7,6 +7,7 @@ env_shell_expand = true
 "~/.config/fish" = "fish"
 "~/.config/gem" = "gem"
 "~/.config/git" = "git"
+"~/.config/herdr" = "herdr"
 "~/.config/mise" = "mise"
 "~/.config/nvim" = "nvim"
 "~/.config/psql" = "psql"

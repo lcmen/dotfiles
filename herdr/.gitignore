@@ -1,0 +1,8 @@
+# Ignore all herdr runtime state (sessions, logs, sockets, caches), and keep only config.toml files
+*
+!*/
+!config.toml
+!.gitignore
+
+# Ignore all plugins
+plugins/github/
