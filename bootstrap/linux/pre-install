@@ -48,6 +48,10 @@ case "${ID:-}" in
             sudo add-apt-repository ppa:neovim-ppa/unstable -y
         fi
 
+        if ! grep -Rqs 'git-core/ppa' /etc/apt/sources.list /etc/apt/sources.list.d 2>/dev/null; then
+            sudo add-apt-repository ppa:git-core/ppa -y
+        fi
+
         add_apt_gpg_key \
             "https://cli.github.com/packages/githubcli-archive-keyring.gpg" \
             "/etc/apt/keyrings/githubcli-archive-keyring.gpg"

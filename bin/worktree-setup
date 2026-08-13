@@ -10,6 +10,7 @@ NULL_SHA=0000000000000000000000000000000000000000
 WORKTREE_PATH="$PWD"
 REPO_ROOT="$(git worktree list --porcelain | sed -n '1s/^worktree //p')"
 SYMLINK_DIRS=(deps node_modules vendor/bundle)
+ENV_SECTION_PATTERN='^[[:space:]]*\[env\][[:space:]]*(#.*)?$'
 
 copy_included_files() {
   local entry
@@ -74,8 +75,71 @@ non_bare_repo() {
   [[ "$(git -C "$REPO_ROOT" rev-parse --is-bare-repository)" == "false" ]]
 }
 
+next_worktree_id() {
+  local path id candidate
+  local -a used=()
+
+  while IFS= read -r path; do
+    id="$(git -C "$path" config --worktree --get worktreeSetup.id 2>/dev/null || true)"
+    if [[ "$id" =~ ^[0-9]+$ ]] && (( id >= 1 && id <= 16 )); then
+      used[$id]=1
+    fi
+  done < <(git worktree list --porcelain | sed -n 's/^worktree //p')
+
+  for (( candidate = 1; candidate <= 16; candidate++ )); do
+    if [[ -z "${used[$candidate]:-}" ]]; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+prepend_to_env_section() {
+  local source="$1"
+  local target="$2"
+  local id="$3"
+  local line
+  local inserted=false
+
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    printf '%s\n' "$line"
+
+    if [[ "$inserted" == false && "$line" =~ $ENV_SECTION_PATTERN ]]; then
+      printf 'WORKTREE_ID = "%s"\n' "$id"
+      inserted=true
+    fi
+  done < "$source" > "$target"
+}
+
+write_mise_local() {
+  local id="$1"
+  local source="$REPO_ROOT/mise.local.toml"
+  local target="$WORKTREE_PATH/mise.local.toml"
+
+  if [[ -f "$source" ]] && grep -Eq "$ENV_SECTION_PATTERN" "$source"; then
+    prepend_to_env_section "$source" "$target" "$id"
+  else
+    printf '[env]\nWORKTREE_ID = "%s"\n' "$id" > "$target"
+    if [[ -f "$source" ]]; then cat "$source" >> "$target"; fi
+  fi
+}
+
 setup_mise() {
-  [[ -f "$WORKTREE_PATH/mise.toml" ]] || return 0
+  local id
+
+  [[ -f "$REPO_ROOT/mise.toml" ]] || return 0
+
+  git -C "$REPO_ROOT" config extensions.worktreeConfig true
+
+  if id="$(next_worktree_id)"; then
+    git config --worktree worktreeSetup.id "$id"
+    write_mise_local "$id"
+  else
+    warn "all worktree IDs (1-16) are in use; skipping ID assignment"
+  fi
+
   command -v mise >/dev/null 2>&1 || {
     warn "mise.toml found but mise is not installed; skipping"
     return 0
