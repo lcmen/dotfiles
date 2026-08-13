@@ -5,6 +5,14 @@ set -euo pipefail
 # Apply Linux setup that depends on installed system packages.
 . /etc/os-release
 
+repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+mise_local_config="$repository_root/mise/config.local.toml"
+
+# Keep Linux-only global tools in the ignored machine-local configuration. Using
+# `mise use` both merges the declaration without replacing other local tools and
+# installs Herdr.
+mise use --path "$mise_local_config" herdr@latest
+
 # Symlink batcat to bat on Ubuntu
 if [[ "${ID:-}" == "ubuntu" ]]; then
     sudo locale-gen en_US.UTF-8

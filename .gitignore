@@ -9,6 +9,12 @@ bundle/cache
 fish/fish_variables
 fish/conf.d/secrets.local.fish
 
+# Ignore machine-local Mise tools
+mise/config.local.toml
+
+# Ignore local configs
+configs/mise.local.toml
+
 # Ignore Postgres history and passwords
 psql/history
 psql/pgpass
