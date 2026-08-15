@@ -33,7 +33,6 @@
   cma = !git add -A && git commit --amend --no-edit --reset-author
   co = checkout
   cob = checkout -b
-  # Deprecated alias for `git up`
   fe = "!f() { echo 'git fe is deprecated; use git up' >&2; git up \"$@\"; }; f"
   his = log --oneline --graph --decorate
   pl = pull --rebase
