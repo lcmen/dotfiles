@@ -76,3 +76,13 @@ Preview bootstrap changes or inspect current state:
 mise bootstrap --dry-run
 mise bootstrap status
 ```
+
+## Utilities
+
+Rename photos from their EXIF timestamps, without changing anything first:
+
+```sh
+photon /path/to/photos --dry-run
+```
+
+Remove `--dry-run` to apply names in the `IMG_yyyyMMdd_HHmmss` format. Duplicate timestamps receive a numeric suffix.

@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install linters
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes fish shellcheck
+
+      - name: Check Bash
+        run: |
+          bash -n bin/* bootstrap/linux/* bootstrap/macos/*
+          shellcheck --external-sources --exclude=SC2155 bin/* bootstrap/linux/* bootstrap/macos/*
+
+      - name: Check Fish
+        run: fish -n fish/config.fish fish/conf.d/*.fish fish/functions/*.fish
+
+      - name: Check PowerShell
+        shell: pwsh
+        run: |
+          $tokens = $null
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path ./windows.ps1),
+            [ref]$tokens,
+            [ref]$errors
+          ) | Out-Null
+
+          if ($errors.Count -gt 0) {
+            $errors | ForEach-Object { Write-Error $_ }
+            exit 1
+          }
+
+      - name: Check TOML
+        run: |
+          python3 - <<'PY'
+          import pathlib
+          import tomllib
+
+          for path in pathlib.Path('.').rglob('*.toml'):
+              if '.git' not in path.parts and 'tmux/plugins/tpm' not in path.as_posix():
+                  with path.open('rb') as config:
+                      tomllib.load(config)
+          PY
+
+      - name: Check whitespace
+        run: git diff --check

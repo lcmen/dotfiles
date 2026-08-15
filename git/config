@@ -34,7 +34,7 @@
   co = checkout
   cob = checkout -b
   # Fetch and delete branches that have been deleted on the remote
-  fe = "!f() { git fetch -p && git branch -vv | awk '/: gone]/{print $1}' | xargs git br -D; }; f"
+  fe = !git-fe
   his = log --oneline --graph --decorate
   pl = pull --rebase
   ps = push
