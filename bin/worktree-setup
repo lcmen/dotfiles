@@ -11,6 +11,9 @@ WORKTREE_PATH="$PWD"
 REPO_ROOT="$(git worktree list --porcelain | sed -n '1s/^worktree //p')"
 SYMLINK_DIRS=(deps node_modules vendor/bundle)
 ENV_SECTION_PATTERN='^[[:space:]]*\[env\][[:space:]]*(#.*)?$'
+PREVIOUS_HEAD="${1:-}"
+NEW_HEAD="${2:-}"
+BRANCH_CHECKOUT="${3:-}"
 
 copy_included_files() {
   local entry
@@ -45,10 +48,7 @@ included_file_entries() {
 }
 
 is_checkout() {
-  local prev_head="${1:-}"
-  local checkout_flags="${3:-}"
-
-  [[ "$prev_head" == "$NULL_SHA" && "$checkout_flags" == "1" ]]
+  [[ "$PREVIOUS_HEAD" == "$NULL_SHA" && "$NEW_HEAD" != "$NULL_SHA" && "$BRANCH_CHECKOUT" == "1" ]]
 }
 
 is_symlink_dir() {
@@ -154,7 +154,7 @@ warn() {
 
 trap 'warn "setup did not complete"; exit 0' ERR
 
-is_checkout "$@" || exit 0
+is_checkout || exit 0
 is_worktree || exit 0
 non_bare_repo || exit 0
 

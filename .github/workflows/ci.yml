@@ -50,12 +50,17 @@ jobs:
         run: |
           python3 - <<'PY'
           import pathlib
+          import subprocess
           import tomllib
 
-          for path in pathlib.Path('.').rglob('*.toml'):
-              if '.git' not in path.parts and 'tmux/plugins/tpm' not in path.as_posix():
-                  with path.open('rb') as config:
-                      tomllib.load(config)
+          paths = [pathlib.Path(filename) for filename in subprocess.check_output(
+              ['git', 'ls-files', '--', '*.toml'],
+              text=True,
+          ).splitlines()]
+
+          for path in paths:
+              with path.open('rb') as config:
+                  tomllib.load(config)
           PY
 
       - name: Check whitespace
