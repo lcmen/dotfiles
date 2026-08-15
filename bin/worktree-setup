@@ -46,7 +46,6 @@ included_file_entries() {
 
 is_checkout() {
   local prev_head="${1:-}"
-  local new_head="${2:-}"
   local checkout_flags="${3:-}"
 
   [[ "$prev_head" == "$NULL_SHA" && "$checkout_flags" == "1" ]]
@@ -82,7 +81,7 @@ next_worktree_id() {
   while IFS= read -r path; do
     id="$(git -C "$path" config --worktree --get worktreeSetup.id 2>/dev/null || true)"
     if [[ "$id" =~ ^[0-9]+$ ]] && (( id >= 1 && id <= 16 )); then
-      used[$id]=1
+      used[id]=1
     fi
   done < <(git worktree list --porcelain | sed -n 's/^worktree //p')
 
