@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Fetch remote updates and delete local branches whose upstream no longer exists.
+# Fetch updates and delete local branches whose upstream no longer exists.
 
 set -euo pipefail
 

@@ -42,7 +42,7 @@
   sw = !git checkout $(git br | fzf)
   swa = !git checkout $(git br --all | fzf)
   un = reset HEAD~1 --soft
-  up = !get-update
+  up = !git-update
   wip = !git add -A && git commit -m "WIP"
   # Open modified or added files in neovim
   edit = "!git status --porcelain | grep -v '^D' | awk '{print $2 \":1:1: [\" $1 \"]\"}' | nvim -q - +copen"
