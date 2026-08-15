@@ -4,13 +4,18 @@
 # Copy all files listed in .worktreeinclude from the main worktree.
 # Dependency directories such as deps, node_modules and vendor/bundle are symlinked to the main worktree.
 
+# Usage: worktree-setup <previous-head> <new-head> <branch-checkout>
+
 set -Eeuo pipefail
 
+BRANCH_CHECKOUT="${3:-}"
+ENV_SECTION_PATTERN='^[[:space:]]*\[env\][[:space:]]*(#.*)?$'
+NEW_HEAD="${2:-}"
 NULL_SHA=0000000000000000000000000000000000000000
-WORKTREE_PATH="$PWD"
+PREVIOUS_HEAD="${1:-}"
 REPO_ROOT="$(git worktree list --porcelain | sed -n '1s/^worktree //p')"
 SYMLINK_DIRS=(deps node_modules vendor/bundle)
-ENV_SECTION_PATTERN='^[[:space:]]*\[env\][[:space:]]*(#.*)?$'
+WORKTREE_PATH="$PWD"
 
 copy_included_files() {
   local entry
@@ -45,11 +50,7 @@ included_file_entries() {
 }
 
 is_checkout() {
-  local prev_head="${1:-}"
-  local new_head="${2:-}"
-  local checkout_flags="${3:-}"
-
-  [[ "$prev_head" == "$NULL_SHA" && "$checkout_flags" == "1" ]]
+  [[ "$PREVIOUS_HEAD" == "$NULL_SHA" && "$NEW_HEAD" != "$NULL_SHA" && "$BRANCH_CHECKOUT" == "1" ]]
 }
 
 is_symlink_dir() {
@@ -64,8 +65,8 @@ is_symlink_dir() {
 }
 
 is_worktree() {
-  local git_dir="$(git rev-parse --absolute-git-dir)"
-  local common_dir="$(cd "$(git rev-parse --git-common-dir)" && pwd)"
+  local git_dir="$(git -C "$WORKTREE_PATH" rev-parse --absolute-git-dir)"
+  local common_dir="$(git -C "$WORKTREE_PATH" rev-parse --path-format=absolute --git-common-dir)"
 
   # Git worktrees keep their git dir under the main worktree's .git/worktrees
   [[ "$git_dir" != "$common_dir" ]]
@@ -82,7 +83,7 @@ next_worktree_id() {
   while IFS= read -r path; do
     id="$(git -C "$path" config --worktree --get worktreeSetup.id 2>/dev/null || true)"
     if [[ "$id" =~ ^[0-9]+$ ]] && (( id >= 1 && id <= 16 )); then
-      used[$id]=1
+      used[id]=1
     fi
   done < <(git worktree list --porcelain | sed -n 's/^worktree //p')
 
@@ -155,7 +156,7 @@ warn() {
 
 trap 'warn "setup did not complete"; exit 0' ERR
 
-is_checkout "$@" || exit 0
+is_checkout || exit 0
 is_worktree || exit 0
 non_bare_repo || exit 0
 

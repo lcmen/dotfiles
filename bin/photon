@@ -3,7 +3,7 @@
 # Batch rename photos to IMG_yyyyMMdd_HHmmss format using EXIF data.
 # Dependencies: exiftool (brew install exiftool / apt install libimage-exiftool-perl)
 #
-# Usage: rp <directory> [--dry-run]
+# Usage: photon <directory> [--dry-run]
 
 set -euo pipefail
 
@@ -11,7 +11,7 @@ DIR=""
 DRY_RUN=false
 
 usage() {
-  echo "Usage: rp <directory> [--dry-run]"
+  echo "Usage: photon <directory> [--dry-run]"
   exit 1
 }
 
@@ -24,8 +24,7 @@ check_deps() {
 
 get_datetime() {
   local file="$1"
-  local datetime
-  datetime=$(exiftool -s3 -d '%Y%m%d_%H%M%S' -DateTimeOriginal "$file" 2>/dev/null)
+  local datetime=$(exiftool -s3 -d '%Y%m%d_%H%M%S' -DateTimeOriginal "$file" 2>/dev/null)
   [[ -z "$datetime" ]] && datetime=$(exiftool -s3 -d '%Y%m%d_%H%M%S' -CreateDate "$file" 2>/dev/null)
   [[ -z "$datetime" ]] && datetime=$(exiftool -s3 -d '%Y%m%d_%H%M%S' -FileModifyDate "$file" 2>/dev/null)
 
@@ -39,8 +38,7 @@ build_new_path() {
   # datetime format: "20240115_143045" -> "IMG_20240115_143045"
   local new_name="IMG_${datetime}"
 
-  local ext
-  ext=$(echo "${file##*.}" | tr '[:upper:]' '[:lower:]')
+  local ext=$(echo "${file##*.}" | tr '[:upper:]' '[:lower:]')
   local new_path="$DIR/${new_name}.${ext}"
 
   # Handle duplicates by appending _1, _2, etc.
@@ -60,25 +58,22 @@ rename_photos() {
   for file in "$DIR"/*; do
     [[ -f "$file" ]] || continue
 
-    local mime
-    mime=$(file --brief --mime-type "$file")
+    local mime=$(file --brief --mime-type "$file")
     [[ "$mime" == image/* ]] || continue
 
-    local datetime
-    datetime=$(get_datetime "$file")
+    local datetime=$(get_datetime "$file")
 
     if [[ -z "$datetime" || "$datetime" == "00000000_000000" ]]; then
       echo "SKIP (no date): $file"
-      ((skipped++))
+      ((++skipped))
       continue
     fi
 
-    local new_path
-    new_path=$(build_new_path "$file" "$datetime")
+    local new_path=$(build_new_path "$file" "$datetime")
 
     if [[ -e "$new_path" && "$file" -ef "$new_path" ]]; then
       echo "SKIP (already named): $file"
-      ((skipped++))
+      ((++skipped))
       continue
     fi
 
@@ -88,7 +83,7 @@ rename_photos() {
       mv "$file" "$new_path"
       echo "RENAMED: $file -> $new_path"
     fi
-    ((renamed++))
+    ((++renamed))
   done
 
   echo ""

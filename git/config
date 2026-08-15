@@ -33,8 +33,7 @@
   cma = !git add -A && git commit --amend --no-edit --reset-author
   co = checkout
   cob = checkout -b
-  # Fetch and delete branches that have been deleted on the remote
-  fe = "!f() { git fetch -p && git branch -vv | awk '/: gone]/{print $1}' | xargs git br -D; }; f"
+  fe = "!f() { echo 'git fe is deprecated; use git up' >&2; git up \"$@\"; }; f"
   his = log --oneline --graph --decorate
   pl = pull --rebase
   ps = push
@@ -42,6 +41,7 @@
   sw = !git checkout $(git br | fzf)
   swa = !git checkout $(git br --all | fzf)
   un = reset HEAD~1 --soft
+  up = !git-update
   wip = !git add -A && git commit -m "WIP"
   # Open modified or added files in neovim
   edit = "!git status --porcelain | grep -v '^D' | awk '{print $2 \":1:1: [\" $1 \"]\"}' | nvim -q - +copen"
