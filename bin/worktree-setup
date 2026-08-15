@@ -4,16 +4,18 @@
 # Copy all files listed in .worktreeinclude from the main worktree.
 # Dependency directories such as deps, node_modules and vendor/bundle are symlinked to the main worktree.
 
+# Usage: worktree-setup <previous-head> <new-head> <branch-checkout>
+
 set -Eeuo pipefail
 
+BRANCH_CHECKOUT="${3:-}"
+ENV_SECTION_PATTERN='^[[:space:]]*\[env\][[:space:]]*(#.*)?$'
+NEW_HEAD="${2:-}"
 NULL_SHA=0000000000000000000000000000000000000000
-WORKTREE_PATH="$PWD"
+PREVIOUS_HEAD="${1:-}"
 REPO_ROOT="$(git worktree list --porcelain | sed -n '1s/^worktree //p')"
 SYMLINK_DIRS=(deps node_modules vendor/bundle)
-ENV_SECTION_PATTERN='^[[:space:]]*\[env\][[:space:]]*(#.*)?$'
-PREVIOUS_HEAD="${1:-}"
-NEW_HEAD="${2:-}"
-BRANCH_CHECKOUT="${3:-}"
+WORKTREE_PATH="$PWD"
 
 copy_included_files() {
   local entry
@@ -48,11 +50,7 @@ included_file_entries() {
 }
 
 is_checkout() {
-  local previous_head="$1"
-  local new_head="$2"
-  local branch_checkout="$3"
-
-  [[ "$previous_head" == "$NULL_SHA" && "$new_head" != "$NULL_SHA" && "$branch_checkout" == "1" ]]
+  [[ "$PREVIOUS_HEAD" == "$NULL_SHA" && "$NEW_HEAD" != "$NULL_SHA" && "$BRANCH_CHECKOUT" == "1" ]]
 }
 
 is_symlink_dir() {
@@ -67,18 +65,15 @@ is_symlink_dir() {
 }
 
 is_worktree() {
-  local worktree_path="$1"
-  local git_dir="$(git -C "$worktree_path" rev-parse --absolute-git-dir)"
-  local common_dir="$(git -C "$worktree_path" rev-parse --path-format=absolute --git-common-dir)"
+  local git_dir="$(git -C "$WORKTREE_PATH" rev-parse --absolute-git-dir)"
+  local common_dir="$(git -C "$WORKTREE_PATH" rev-parse --path-format=absolute --git-common-dir)"
 
   # Git worktrees keep their git dir under the main worktree's .git/worktrees
   [[ "$git_dir" != "$common_dir" ]]
 }
 
 non_bare_repo() {
-  local repo_root="$1"
-
-  [[ "$(git -C "$repo_root" rev-parse --is-bare-repository)" == "false" ]]
+  [[ "$(git -C "$REPO_ROOT" rev-parse --is-bare-repository)" == "false" ]]
 }
 
 next_worktree_id() {
@@ -161,9 +156,9 @@ warn() {
 
 trap 'warn "setup did not complete"; exit 0' ERR
 
-is_checkout "$PREVIOUS_HEAD" "$NEW_HEAD" "$BRANCH_CHECKOUT" || exit 0
-is_worktree "$WORKTREE_PATH" || exit 0
-non_bare_repo "$REPO_ROOT" || exit 0
+is_checkout || exit 0
+is_worktree || exit 0
+non_bare_repo || exit 0
 
 copy_included_files
 setup_mise
