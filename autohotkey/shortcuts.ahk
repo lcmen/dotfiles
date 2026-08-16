@@ -2,8 +2,7 @@
 #SingleInstance Force
 SendMode "Input"
 
-; Center newly created windows. Windows that open at effectively the full height of
-; the monitor (for example, Chrome and Edge) are reduced slightly before centering.
+; Center newly created windows
 DllCall("RegisterShellHookWindow", "Ptr", A_ScriptHwnd)
 OnMessage(DllCall("RegisterWindowMessage", "Str", "ShellHook"), ShellMessage)
 
@@ -11,8 +10,6 @@ ShellMessage(wParam, lParam, *) {
     static HSHELL_WINDOWCREATED := 1
     static WS_MAXIMIZE := 0x01000000
     static WS_MINIMIZE := 0x20000000
-    static MAX_HEIGHT_RATIO := 0.90
-    static FULL_HEIGHT_THRESHOLD := 0.98
 
     if wParam != HSHELL_WINDOWCREATED
         return
@@ -24,21 +21,12 @@ ShellMessage(wParam, lParam, *) {
         if !WinExist(window)
             return
 
+        ; Resize window before centering
         style := WinGetStyle(window)
         if (style & WS_MAXIMIZE) || (style & WS_MINIMIZE)
             return
 
-        WinGetPos &x, &y, &width, &height, window
-        GetWindowWorkArea(lParam, &left, &top, &right, &bottom)
-
-        workWidth := right - left
-        workHeight := bottom - top
-        if height >= workHeight * FULL_HEIGHT_THRESHOLD
-            height := Round(workHeight * MAX_HEIGHT_RATIO)
-
-        targetX := Round(left + (workWidth - width) / 2)
-        targetY := Round(top + (workHeight - height) / 2)
-        WinMove targetX, targetY, width, height, window
+        CenterWindow(lParam)
     }
 }
 
@@ -63,16 +51,39 @@ GetWindowWorkArea(hwnd, &left, &top, &right, &bottom) {
     bottom := NumGet(monitorInfo, 32, "Int")
 }
 
+CenterWindow(hwnd := 0) {
+    static MAX_HEIGHT_RATIO := 0.90
+    static FULL_HEIGHT_THRESHOLD := 0.98
+
+    if !hwnd
+        hwnd := WinExist("A")
+    if !hwnd
+        return
+
+    window := "ahk_id " hwnd
+    if WinGetMinMax(window) != 0 {
+        WinRestore window
+        Sleep 50
+    }
+
+    WinGetPos &x, &y, &width, &height, window
+    GetWindowWorkArea(hwnd, &left, &top, &right, &bottom)
+
+    workWidth := right - left
+    workHeight := bottom - top
+    if height >= workHeight * FULL_HEIGHT_THRESHOLD
+        height := Round(workHeight * MAX_HEIGHT_RATIO)
+
+    targetX := Round(left + (workWidth - width) / 2)
+    targetY := Round(top + (workHeight - height) / 2)
+    WinMove targetX, targetY, width, height, window
+}
+
 ; Windows Terminal uses Ctrl+Shift+C/V for copy and paste.
 #HotIf WinActive("ahk_exe WindowsTerminal.exe")
 ^c::Send "^+c"
 ^v::Send "^+v"
 #c::Send "^+c"
-#v::Send "^+v"
-#HotIf
-
-; Zed terminals use Ctrl+Shift+V, while its agent composer treats it as raw paste.
-#HotIf WinActive("ahk_exe zed.exe")
 #v::Send "^+v"
 #HotIf
 
@@ -88,15 +99,28 @@ GetWindowWorkArea(hwnd, &left, &top, &right, &bottom) {
 #s::Send "^s"
 #o::Send "^o"
 
-; Beginning and end of line
+; Beginning/end of a line and top/bottom of a document
 #Left::Send "{Home}"
 #Right::Send "{End}"
-#+Left::Send "+{Home}"
-#+Right::Send "+{End}"
+#Up::Send "^{Home}"
+#Down::Send "^{End}"
+
+; Snap left/right
+#+Left::Send "{Blind}{Shift up}{Left}"
+#+Right::Send "{Blind}{Shift up}{Right}"
+
+; Center the active window
+#+Space::CenterWindow()
 
 ; Undo and redo
 #z::Send "^z"
 #+z::Send "^+z"
+
+; Snap layouts
+#+\::{
+    Send "{Blind}{Shift up}z"
+    KeyWait "\", "P"
+}
 
 ; Prevent releasing the Windows key from opening the Start menu.
 ~LWin Up::Return
@@ -107,12 +131,6 @@ GetWindowWorkArea(hwnd, &left, &top, &right, &bottom) {
 !Right::Send "^{Right}"
 !+Left::Send "^+{Left}"
 !+Right::Send "^+{Right}"
-
-; Move or select to the top/bottom of a document
-#Up::Send "^{Home}"
-#Down::Send "^{End}"
-#+Up::Send "^+{Home}"
-#+Down::Send "^+{End}"
 
 ; Search, window management and force quit
 #q::WinClose "A"

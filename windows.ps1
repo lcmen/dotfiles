@@ -19,7 +19,6 @@ $packageMap = @{
     "vlc"            = @{ Id = "VideoLAN.VLC";          Source = "winget" }
     "whatsapp"       = @{ Id = "9NKSQGP7F2NH";          Source = "msstore" }
     "win32yank"      = @{ Id = "equalsraf.win32yank";   Source = "winget" }
-    "zed"            = @{ Id = "ZedIndustries.Zed";     Source = "winget" }
 }
 
 $failed = @()
