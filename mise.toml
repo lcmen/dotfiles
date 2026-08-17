@@ -14,5 +14,4 @@ env_shell_expand = true
 "~/.config/ripgrep" = "ripgrep"
 "~/.config/tmux" = "tmux"
 "~/.config/vim" = "vim"
-"~/.config/zed" = "zed"
 "~/.local/bin" = { source = "bin", mode = "symlink-each" }

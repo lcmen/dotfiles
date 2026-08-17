@@ -45,6 +45,7 @@ vim9script
 
 # Settings {{{
     g:mapleader = ' '                                            # Change leader to space
+    g:no_ruby_maps = 1                                           # Ruby's ftplugin maps gf / <C-]> to :find / :tag, clobbering the LSP bindings
 
     # General {{{
     set belloff=all                                              # Disable all sounds
@@ -315,10 +316,10 @@ vim9script
     inoremap <S-Tab> <C-d>
 
     # Move by display line when wrapping, but keep counts on real lines (so 5j still matches the relativenumber gutter)
-    nnoremap <expr> j v:count ? 'j' : 'gj'
-    nnoremap <expr> k v:count ? 'k' : 'gk'
-    xnoremap <expr> j v:count ? 'j' : 'gj'
-    xnoremap <expr> k v:count ? 'k' : 'gk'
+    nnoremap <expr> j v:count > 0 ? 'j' : 'gj'
+    nnoremap <expr> k v:count > 0 ? 'k' : 'gk'
+    xnoremap <expr> j v:count > 0 ? 'j' : 'gj'
+    xnoremap <expr> k v:count > 0 ? 'k' : 'gk'
 
     # Select all text
     nnoremap va ggVG
