@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
-# It calls mise trust, and install all tools.
-# Copy all files listed in .worktreeinclude from the main worktree.
+# It calls mise trust, then install all tools, and copy all files from .worktreeinclude in the main repo.
 # Dependency directories such as deps, node_modules and vendor/bundle are symlinked to the main worktree.
-
+#
 # Usage: worktree-setup <previous-head> <new-head> <branch-checkout>
 
 set -Eeuo pipefail

@@ -49,7 +49,7 @@ vim9script
 
     # General {{{
     set belloff=all                                              # Disable all sounds
-    set completeopt=menu,menuone,noselect,popup                  # Show completion menu without selecting, docs in a popup
+    set completeopt=menu,menuone,noinsert,noselect,popup         # Menu even for one match, never insert/select until chosen, docs in a popup
     set encoding=UTF-8
     set mouse=a                                                  # Enable mouse support
     set scrolloff=5                                              # Start scrolling 5 lines away from y margin
@@ -184,7 +184,10 @@ vim9script
 # LSP {{{
     # Options {{{
     var lsp_options = {
-        autoComplete: true,
+        autoComplete: false,                                     # Popup as-you-type garbles the buffer; complete on demand with <C-x><C-o>
+        omniComplete: true,                                      # Wire omnifunc to g:LspOmniFunc on attached buffers
+        completionTextEdit: false,                               # Insert only the completion word; skip server textEdits/imports that rewrite the line
+        completionMatcher: 'fuzzy',
         diagSignErrorText: '󱈸',
         diagSignHintText: '󰌵',
         diagSignInfoText: '󰐾',

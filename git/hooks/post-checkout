@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# Git ignores .git/hooks when core.hooksPath is set, so run the repo-local hook
+# first to keep per-repo hooks working, then run the shared worktree setup.
+
+set -Eeuo pipefail
+
+repo_hook="$(git rev-parse --path-format=absolute --git-common-dir)/hooks/post-checkout"
+
+if [[ -x "$repo_hook" ]]; then
+  "$repo_hook" "$@"
+fi
+
+exec worktree-setup "$@"

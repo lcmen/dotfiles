@@ -1,12 +1,29 @@
 #!/usr/bin/env bash
 
-# Fetch updates and delete local branches whose upstream no longer exists.
+# Fetch updates, delete local branches whose upstream no longer exists, and bring those which track a remote up to date.
+#
+# Usage: git-update
 
 set -euo pipefail
 
 git fetch --prune
-git for-each-ref --format='%(refname:short) %(upstream:track)' refs/heads |
-  awk '$NF == "[gone]" {print $1}' |
-  while IFS= read -r branch; do
+
+current=$(git symbolic-ref --quiet --short HEAD || true)
+
+while read -r branch upstream track; do
+  if [[ $track == '[gone]' ]]; then
     git branch -D -- "$branch"
-  done
+    continue
+  fi
+
+  # Local branch only, nothing to pull from
+  [[ -n $upstream ]] || continue
+
+  if [[ $branch == "$current" ]]; then
+    # Apply local commits on top of the remote refs for checked-out branch
+    git rebase -- "$upstream"
+  else
+    # Otherwise fast-forward the ref without checkout, and refuse if branch has diverged
+    git fetch . "$upstream:$branch" || echo "Skipped $branch"
+  fi
+done < <(git for-each-ref --format='%(refname:short) %(upstream:short) %(upstream:track)' refs/heads)
