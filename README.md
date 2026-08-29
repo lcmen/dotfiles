@@ -5,19 +5,25 @@ Dotfiles and repository-scoped machine bootstrap configuration for macOS, Window
 ## Prerequisites
 
 - [Git](https://git-scm.com/)
-- [mise](https://mise.jdx.dev/installing-mise.html) 2026.7.11 or newer
 
 ## Install
 
-1. Clone repo
+1. Install [mise](https://mise.jdx.dev/installing-mise.html) and add it to the current shell's `PATH`
+
+   ```sh
+   curl https://mise.run | sh
+   export PATH="$HOME/.local/bin:$PATH"
+   ```
+
+2. Clone repo
 
    ```sh
    git clone https://github.com/lcmen/dotfiles.git ~/.dotfiles
    cd ~/.dotfiles
    ```
 
-2. Init submodules `git submodule update --init --recursive`
-3. Trust and bootstrap the configuration
+3. Init submodules `git submodule update --init --recursive`
+4. Trust and bootstrap the configuration
 
    ```sh
    mise trust
@@ -45,19 +51,17 @@ To launch the Windows installer directly from a WSL shell, run this from the rep
 pwsh.exe -NoProfile -ExecutionPolicy Bypass -File "$(wslpath -w "$PWD/windows.ps1")"
 ```
 
-### AutoHotkey shortcuts
+### Tiling window manager
 
-The Windows installer installs AutoHotkey v2, copies [`autohotkey/shortcuts.ahk`](autohotkey/shortcuts.ahk) into the current user's Windows Startup folder, downloads the pinned `VirtualDesktopAccessor.dll` release beside it, and starts the script. The DLL download is verified by SHA-256, and the shortcuts start automatically on subsequent sign-ins.
+The Windows installer installs LeopardWM and AutoHotkey v2, configures LeopardWM, creates its AutoHotkey bindings, and enables both at startup. Application installation lives in [`windows/apps.ps1`](windows/apps.ps1), while [`windows/tiling.ps1`](windows/tiling.ps1) owns the LeopardWM and AutoHotkey configuration.
 
-`Super+1` through `Super+9` switch directly to virtual desktops 1–9, and `Super+0` switches to desktop 10. This requires Windows 11 24H2 build 26100.2605 or newer and the requested desktop must already exist.
+`Super+1` through `Super+9` switch directly to LeopardWM workspaces 1–9. Use `Super+Shift+1` through `Super+Shift+9` to move the active window to a workspace.
 
 After changing the script, rerun the Windows installer from the repository root in WSL to copy and reload it:
 
 ```sh
 pwsh.exe -NoProfile -ExecutionPolicy Bypass -File "$(wslpath -w "$PWD/windows.ps1")"
 ```
-
-If the script was previously started directly from the WSL repository, exit that instance from its AutoHotkey tray menu before running the installer once. This prevents the repository and Startup copies from running at the same time.
 
 ## What Gets Installed
 

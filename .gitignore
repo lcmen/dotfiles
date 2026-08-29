@@ -27,7 +27,3 @@ fish/completions/orbctl.fish
 # Ignore tmux
 tmux/plugins/*
 !tmux/plugins/tpm
-
-# Ignore zed
-zed/prompts
-zed/themes

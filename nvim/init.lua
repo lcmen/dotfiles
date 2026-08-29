@@ -52,14 +52,14 @@ local user_cmd = vim.api.nvim_create_user_command
 -- }}}
 
 -- Settings {{{
-    cmd.colorscheme('onehalflight')
-
     g.mapleader = " "                                            -- Change leader to space
     opt.relativenumber = true                                    -- Use relative line numbers
     opt.spell = false                                            -- Spell checking off
-    opt.termguicolors = false                                    -- Disable true colors for compatibility with Tmux
+    opt.termguicolors = true                                     -- Enable true colors
     opt.textwidth = 120                                          -- Set max width to 120 characters
     opt.wrap = false                                             -- Disable line wrapping
+
+    cmd.colorscheme('onehalflight')
 -- }}}
 
 -- Packages configuration {{{
