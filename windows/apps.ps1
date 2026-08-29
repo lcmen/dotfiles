@@ -12,8 +12,10 @@ if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
 $packageMap = @{
     "affinity"       = @{ Id = "Canva.Affinity";        Source = "winget" }
     "autohotkey"     = @{ Id = "AutoHotkey.AutoHotkey"; Source = "winget" }
+    "epic-games"     = @{ Id = "EpicGames.EpicGamesLauncher"; Source = "winget" }
     "icloud"         = @{ Id = "9PKTQ5699M62";          Source = "msstore" }
     "leopardwm"      = @{ Id = "jcardama.LeopardWM";    Source = "winget" }
+    "steam"          = @{ Id = "Valve.Steam";            Source = "winget" }
     "synology-drive" = @{ Id = "Synology.DriveClient";  Source = "winget" }
     "vlc"            = @{ Id = "VideoLAN.VLC";          Source = "winget" }
     "whatsapp"       = @{ Id = "9NKSQGP7F2NH";          Source = "msstore" }
