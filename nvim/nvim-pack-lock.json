@@ -1,0 +1,64 @@
+{
+  "plugins": {
+    "closetag.vim": {
+      "rev": "a52525b7220bb28309d1905108e9e8914fdb4112",
+      "src": "https://github.com/docunext/closetag.vim"
+    },
+    "fzf-lua": {
+      "rev": "05e44d38de0a79c11fba5f7bf8138791b1dbdd1e",
+      "src": "https://github.com/ibhagwan/fzf-lua"
+    },
+    "nerdtree": {
+      "rev": "690d061b591525890f1471c6675bcb5bdc8cdff9",
+      "src": "https://github.com/scrooloose/nerdtree"
+    },
+    "nvim-lspconfig": {
+      "rev": "16286347bdba1333c7d124d9de9fe6630731b2b2",
+      "src": "https://github.com/neovim/nvim-lspconfig"
+    },
+    "rational.nvim": {
+      "rev": "66c1235f1b416febd730d4ae08093a6dd375a78d",
+      "src": "https://github.com/lcmen/rational.nvim"
+    },
+    "sideways.vim": {
+      "rev": "1efb7db049e5536742dc89205f6e229297c31230",
+      "src": "https://github.com/AndrewRadev/sideways.vim"
+    },
+    "splitjoin.vim": {
+      "rev": "b26971a7fdc7ca645b766459e3ed7949300c404f",
+      "src": "https://github.com/AndrewRadev/splitjoin.vim"
+    },
+    "vim-devicons": {
+      "rev": "71f239af28b7214eebb60d4ea5bd040291fb7e33",
+      "src": "https://github.com/ryanoasis/vim-devicons"
+    },
+    "vim-gitgutter": {
+      "rev": "90b75207bd9b55d8ac4af15f72b4e935462014d0",
+      "src": "https://github.com/airblade/vim-gitgutter"
+    },
+    "vim-polyglot": {
+      "rev": "f061eddb7cdcc614c8406847b2bfb53099832a4e",
+      "src": "https://github.com/sheerun/vim-polyglot"
+    },
+    "vim-projectionist": {
+      "rev": "5ff7bf79a6ef741036d2038a226bcb5f8b1cd296",
+      "src": "https://github.com/tpope/vim-projectionist"
+    },
+    "vim-repeat": {
+      "rev": "65846025c15494983dafe5e3b46c8f88ab2e9635",
+      "src": "https://github.com/tpope/vim-repeat"
+    },
+    "vim-surround": {
+      "rev": "3d188ed2113431cf8dac77be61b842acb64433d9",
+      "src": "https://github.com/tpope/vim-surround"
+    },
+    "vim-unimpaired": {
+      "rev": "db65482581a28e4ccf355be297f1864a4e66985c",
+      "src": "https://github.com/tpope/vim-unimpaired"
+    },
+    "zoomwintab.vim": {
+      "rev": "3b76f740534ecc4114bc8a207ecb0db77b2fb002",
+      "src": "https://github.com/troydm/zoomwintab.vim"
+    }
+  }
+}

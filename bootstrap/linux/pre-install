@@ -29,15 +29,6 @@ add_apt_source() {
     printf '%s\n' "$source_content" | sudo tee "$source_file" >/dev/null
 }
 
-add_dnf_repository() {
-    local repository_id=$1
-    local repository_url=$2
-
-    if ! sudo dnf repolist --enabled | grep -q "$repository_id"; then
-        sudo dnf config-manager addrepo --from-repofile="$repository_url"
-    fi
-}
-
 case "${ID:-}" in
     ubuntu)
         sudo apt-get update
@@ -66,13 +57,6 @@ case "${ID:-}" in
             "/etc/apt/sources.list.d/docker.list"
 
         sudo apt-get update
-        ;;
-    fedora)
-        sudo dnf -y install dnf-plugins-core
-        sudo dnf -y copr enable atim/starship
-        add_dnf_repository \
-            "docker-ce-stable" \
-            "https://download.docker.com/linux/fedora/docker-ce.repo"
         ;;
     *)
         echo "Unsupported Linux distribution: ${ID:-unknown}" >&2

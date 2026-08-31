@@ -8,9 +8,6 @@ set -euo pipefail
 repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 mise_local_config="$repository_root/mise/config.local.toml"
 
-# Keep Linux-only global tools in the ignored machine-local configuration. Using
-# `mise use` both merges the declaration without replacing other local tools and
-# installs Herdr.
 mise use --path "$mise_local_config" herdr@latest
 
 # Symlink batcat to bat on Ubuntu
@@ -21,10 +18,4 @@ if [[ "${ID:-}" == "ubuntu" ]]; then
     if command -v batcat >/dev/null 2>&1; then
         sudo ln -sfn "$(command -v batcat)" /usr/local/bin/bat
     fi
-fi
-
-# Add user to docker group
-if getent group docker >/dev/null 2>&1 && ! id -nG "$USER" | tr ' ' '\n' | grep -qx docker; then
-    sudo usermod -aG docker "$USER"
-    echo "Docker group membership changed; start a new login session before using Docker."
 fi

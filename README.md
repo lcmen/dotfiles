@@ -1,6 +1,6 @@
 # .files
 
-Dotfiles and repository-scoped machine bootstrap configuration for macOS, Windows, Ubuntu, and Fedora, managed with [mise](https://mise.jdx.dev/).
+Dotfiles and repository-scoped machine bootstrap configuration for macOS, Windows, and Ubuntu, managed with [mise](https://mise.jdx.dev/).
 
 ## Prerequisites
 
@@ -67,7 +67,7 @@ pwsh.exe -NoProfile -ExecutionPolicy Bypass -File "$(wslpath -w "$PWD/windows.ps
 
 Running `mise bootstrap` will:
 
-- Install native packages via Mise's Homebrew, apt, or dnf managers
+- Install native packages via Mise's Homebrew or apt managers
 - Symlink configuration directories into `~/.config/`
 - Symlink individual scripts into `~/.local/bin/`
 - Apply macOS preferences and keyboard shortcuts on macOS

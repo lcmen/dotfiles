@@ -2,9 +2,6 @@
 # machine-local files out of version control.
 .brew-skip
 
-# Ignore caches
-bundle/cache
-
 # Ignore fish variables
 fish/fish_variables
 fish/conf.d/secrets.local.fish
@@ -24,6 +21,3 @@ fish/completions/docker.fish
 fish/completions/kubectl.fish
 fish/completions/orbctl.fish
 
-# Ignore tmux
-tmux/plugins/*
-!tmux/plugins/tpm

@@ -32,6 +32,8 @@ function rake
 end
 
 set -gx BUNDLE_USER_HOME "$XDG_CONFIG_HOME/bundle"
+set -gx BUNDLE_USER_CACHE "$XDG_CACHE_HOME/bundle"
+set -gx BUNDLE_USER_PLUGIN "$XDG_DATA_HOME/bundle"
 set -gx GEMRC "$XDG_CONFIG_HOME/gem/config"
 
 abbr -a bi 'bundle install'
