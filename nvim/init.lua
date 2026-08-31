@@ -44,6 +44,7 @@ local user_cmd = vim.api.nvim_create_user_command
 -- }}}
 
 -- Settings {{{
+    vim.opt.clipboard = 'unnamedplus'                                          -- Use the system clipboard for default yank/delete operations
     cmd.colorscheme('onehalflight')
 -- }}}
 
