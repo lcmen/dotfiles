@@ -13,11 +13,6 @@ delivery = "herdr"
 [keys]
 prefix="ctrl+s"
 
-focus_pane_left = "ctrl+h"
-focus_pane_down = "ctrl+j"
-focus_pane_up = "ctrl+k"
-focus_pane_right = "ctrl+l"
-
 split_vertical = 'prefix+"'
 split_horizontal = "prefix+%"
 
@@ -29,6 +24,30 @@ close_workspace = "prefix+shift+k"
 key = "prefix+d"
 type = "plugin_action"
 command = "persiyanov.reviewr.toggle"
+
+[[keys.command]]
+key = "ctrl+h"
+type = "shell"
+command = "exec $HOME/.config/herdr/plugins/github/willfish.herdr-navigator-*/bin/herdr-navigator left ctrl+h"
+description = "navigate left"
+
+[[keys.command]]
+key = "ctrl+j"
+type = "shell"
+command = "exec $HOME/.config/herdr/plugins/github/willfish.herdr-navigator-*/bin/herdr-navigator down ctrl+j"
+description = "navigate down"
+
+[[keys.command]]
+key = "ctrl+k"
+type = "shell"
+command = "exec $HOME/.config/herdr/plugins/github/willfish.herdr-navigator-*/bin/herdr-navigator up ctrl+k"
+description = "navigate up"
+
+[[keys.command]]
+key = "ctrl+l"
+type = "shell"
+command = "exec $HOME/.config/herdr/plugins/github/willfish.herdr-navigator-*/bin/herdr-navigator right ctrl+l"
+description = "navigate right"
 
 [ui.sound]
 enabled = false

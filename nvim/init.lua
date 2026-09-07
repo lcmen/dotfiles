@@ -39,6 +39,7 @@ local user_cmd = vim.api.nvim_create_user_command
         gh('tpope/vim-surround'),
         gh('tpope/vim-unimpaired'),
         gh('troydm/zoomwintab.vim'),
+        gh('willfish/herdr-navigator.nvim'),
     })
     -- }}}
 -- }}}
@@ -49,6 +50,12 @@ local user_cmd = vim.api.nvim_create_user_command
 -- }}}
 
 -- Packages configuration {{{
+    -- Herdr Navigator {{{
+    require('herdr-navigator').setup({                                           -- Ctrl+h/j/k/l: move between Neovim windows, fall back to Herdr panes at the edges
+        mappings = { left = '<C-h>', down = '<C-j>', up = '<C-k>', right = '<C-l>' },
+    })
+    -- }}}
+
     -- FZF {{{
     local fzf = require('fzf-lua')
     fzf.setup({
