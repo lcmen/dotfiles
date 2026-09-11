@@ -1,9 +1,9 @@
 [core]
-  excludesfile = ~/.config/git/ignore
   editor = nvim
+  excludesfile = ~/.config/git/ignore
   hooksPath = ~/.config/git/hooks
 [credential]
-  helper =
+  helper = osxkeychain
 [init]
   defaultBranch = main
 [user]
@@ -13,6 +13,8 @@
   # Automatically track remote branches when checking out to a branch
   autoSetupMerge = true
   sort = -committerdate
+[http "https://git.032067.xyz/"]
+  extraHeader = "CF-Access-Client-Id: b7a90fb157d0898d662c9d2cfdd9d8ad.access"
 [diff "rails_credentials"]
   textconv = "bin/rails credentials:diff"
 [fetch]

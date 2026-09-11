@@ -9,3 +9,4 @@ compile = false
 node = "latest"
 ruby = "latest"
 usage = "latest"
+"npm:@bitwarden/cli" = "latest"
