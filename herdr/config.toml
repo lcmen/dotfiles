@@ -27,26 +27,26 @@ command = "persiyanov.reviewr.toggle"
 
 [[keys.command]]
 key = "ctrl+h"
-type = "shell"
-command = "exec $HOME/.config/herdr/plugins/github/willfish.herdr-navigator-*/bin/herdr-navigator left ctrl+h"
+type = "plugin_action"
+command = "herdr-splits.nav-left"
 description = "navigate left"
 
 [[keys.command]]
 key = "ctrl+j"
-type = "shell"
-command = "exec $HOME/.config/herdr/plugins/github/willfish.herdr-navigator-*/bin/herdr-navigator down ctrl+j"
+type = "plugin_action"
+command = "herdr-splits.nav-down"
 description = "navigate down"
 
 [[keys.command]]
 key = "ctrl+k"
-type = "shell"
-command = "exec $HOME/.config/herdr/plugins/github/willfish.herdr-navigator-*/bin/herdr-navigator up ctrl+k"
+type = "plugin_action"
+command = "herdr-splits.nav-up"
 description = "navigate up"
 
 [[keys.command]]
 key = "ctrl+l"
-type = "shell"
-command = "exec $HOME/.config/herdr/plugins/github/willfish.herdr-navigator-*/bin/herdr-navigator right ctrl+l"
+type = "plugin_action"
+command = "herdr-splits.nav-right"
 description = "navigate right"
 
 [ui.sound]

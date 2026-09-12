@@ -8,9 +8,9 @@
       "rev": "05e44d38de0a79c11fba5f7bf8138791b1dbdd1e",
       "src": "https://github.com/ibhagwan/fzf-lua"
     },
-    "herdr-navigator.nvim": {
-      "rev": "e6b05e6f99b4f99df42cd7e78ae33a066351138d",
-      "src": "https://github.com/willfish/herdr-navigator.nvim"
+    "herdr-splits.nvim": {
+      "rev": "94f30cf4e9ac76ddf185a3acd0977be728fa4106",
+      "src": "https://github.com/lmilojevicc/herdr-splits.nvim"
     },
     "nerdtree": {
       "rev": "690d061b591525890f1471c6675bcb5bdc8cdff9",

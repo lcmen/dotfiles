@@ -30,6 +30,7 @@ local user_cmd = vim.api.nvim_create_user_command
         gh('docunext/closetag.vim'),
         gh('ibhagwan/fzf-lua'),
         gh('lcmen/rational.nvim'),
+        gh('lmilojevicc/herdr-splits.nvim'),
         gh('neovim/nvim-lspconfig'),
         gh('ryanoasis/vim-devicons'),
         gh('scrooloose/nerdtree'),
@@ -39,7 +40,6 @@ local user_cmd = vim.api.nvim_create_user_command
         gh('tpope/vim-surround'),
         gh('tpope/vim-unimpaired'),
         gh('troydm/zoomwintab.vim'),
-        gh('willfish/herdr-navigator.nvim'),
     })
     -- }}}
 -- }}}
@@ -50,10 +50,16 @@ local user_cmd = vim.api.nvim_create_user_command
 -- }}}
 
 -- Packages configuration {{{
-    -- Herdr Navigator {{{
-    require('herdr-navigator').setup({                                           -- Ctrl+h/j/k/l: move between Neovim windows, fall back to Herdr panes at the edges
-        mappings = { left = '<C-h>', down = '<C-j>', up = '<C-k>', right = '<C-l>' },
+    -- Herdr Splits {{{
+    local herdr_splits = require('herdr-splits')
+    herdr_splits.setup({
+        at_edge = 'stop',
+        nav_at_edge = 'stop',
     })
+    map('n', '<C-h>', herdr_splits.move_cursor_left, opts)
+    map('n', '<C-j>', herdr_splits.move_cursor_down, opts)
+    map('n', '<C-k>', herdr_splits.move_cursor_up, opts)
+    map('n', '<C-l>', herdr_splits.move_cursor_right, opts)
     -- }}}
 
     -- FZF {{{

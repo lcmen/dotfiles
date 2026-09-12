@@ -12,3 +12,10 @@ env_shell_expand = true
 "~/.config/psql" = "psql"
 "~/.config/ripgrep" = "ripgrep"
 "~/.local/bin" = { source = "bin", mode = "symlink-each" }
+
+[tasks.herdr-plugins]
+description = "Install Herdr plugins"
+run = [
+    "herdr plugin install lmilojevicc/herdr-splits.nvim --yes",
+    "herdr plugin install persiyanov/herdr-reviewr --yes",
+]
