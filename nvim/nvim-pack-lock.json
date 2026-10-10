@@ -5,7 +5,7 @@
       "src": "https://github.com/docunext/closetag.vim"
     },
     "fzf-lua": {
-      "rev": "05e44d38de0a79c11fba5f7bf8138791b1dbdd1e",
+      "rev": "48d7c3db291a2c7c1825905c227a6bc81c83b837",
       "src": "https://github.com/ibhagwan/fzf-lua"
     },
     "herdr-splits.nvim": {
@@ -17,19 +17,19 @@
       "src": "https://github.com/scrooloose/nerdtree"
     },
     "nvim-lspconfig": {
-      "rev": "16286347bdba1333c7d124d9de9fe6630731b2b2",
+      "rev": "c59fc922f718fa055f69f5f3bc888f23211571eb",
       "src": "https://github.com/neovim/nvim-lspconfig"
     },
     "rational.nvim": {
-      "rev": "66c1235f1b416febd730d4ae08093a6dd375a78d",
+      "rev": "d55cd7c8fef78aa1eabddffa772da411ce1f252e",
       "src": "https://github.com/lcmen/rational.nvim"
     },
     "sideways.vim": {
-      "rev": "1efb7db049e5536742dc89205f6e229297c31230",
+      "rev": "631e8f4e5260960592b7672990e806b1b280d4b3",
       "src": "https://github.com/AndrewRadev/sideways.vim"
     },
     "splitjoin.vim": {
-      "rev": "b26971a7fdc7ca645b766459e3ed7949300c404f",
+      "rev": "659635fd768d8061b0db89a1ecb4611718a41277",
       "src": "https://github.com/AndrewRadev/splitjoin.vim"
     },
     "vim-devicons": {
