@@ -90,3 +90,4 @@ photon /path/to/photos --dry-run
 ```
 
 Remove `--dry-run` to apply names in the `IMG_yyyyMMdd_HHmmss` format. Duplicate timestamps receive a numeric suffix.
+Add `--remove-location` to remove GPS metadata after each photo is renamed. Location metadata is kept by default. With `--dry-run`, photon previews the rename and keeps the metadata.

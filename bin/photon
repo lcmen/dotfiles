@@ -3,15 +3,16 @@
 # Batch rename photos to IMG_yyyyMMdd_HHmmss format using EXIF data.
 # Dependencies: exiftool (brew install exiftool / apt install libimage-exiftool-perl)
 #
-# Usage: photon <directory> [--dry-run]
+# Usage: photon <directory> [--dry-run] [--remove-location]
 
 set -euo pipefail
 
 DIR=""
 DRY_RUN=false
+REMOVE_LOCATION=false
 
 usage() {
-  echo "Usage: photon <directory> [--dry-run]"
+  echo "Usage: photon <directory> [--dry-run] [--remove-location]"
   exit 1
 }
 
@@ -82,6 +83,10 @@ rename_photos() {
     else
       mv "$file" "$new_path"
       echo "RENAMED: $file -> $new_path"
+      if $REMOVE_LOCATION; then
+        exiftool -overwrite_original -gps:all= "$new_path"
+        echo "LOCATION REMOVED: $new_path"
+      fi
     fi
     ((++renamed))
   done
@@ -93,7 +98,15 @@ rename_photos() {
 [[ $# -lt 1 ]] && usage
 
 DIR="$1"
-[[ "${2:-}" == "--dry-run" ]] && DRY_RUN=true
+shift
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --dry-run) DRY_RUN=true ;;
+    --remove-location) REMOVE_LOCATION=true ;;
+    *) usage ;;
+  esac
+  shift
+done
 
 [[ ! -d "$DIR" ]] && { echo "Error: '$DIR' is not a directory"; exit 1; }
 
