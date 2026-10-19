@@ -135,7 +135,7 @@ local user_cmd = vim.api.nvim_create_user_command
 
     map('n', '<leader>R', '<cmd>source $MYVIMRC<CR>', opts)                      -- Reload config
 
-    map('n', ';', ':')                                                           -- Alias ';' to ':'
+    map('n', ',', ':')                                                           -- Alias ';' to ':'
     map('n', '[g', 'gT', opts)                                                   -- Move to tab on the left
     map('n', ']g', 'gt', opts)                                                   -- Move to tab on the right
     map('n', '[d', function() diag.jump({ count = -1, float = true }) end, opts) -- Move prev / next diagnostic errors
@@ -152,15 +152,18 @@ local user_cmd = vim.api.nvim_create_user_command
 
 -- Commands {{{
     -- Abbreviations {{{
-    cmd [[cnoreabbrev rg Rg]]                                                    -- Alias rg to Rg
-    cmd [[cnoreabbrev rgc Rgword]]                                               -- Alias rgc to Rgword
-    cmd [[cnoreabbrev rgC RgWord]]                                               -- Allow rgC to RgWord
+    cmd [[cnoreabbrev <expr> rg  getcmdtype() == ':' && getcmdline() ==# 'rg'  ? 'Rg'     : 'rg']]
+    cmd [[cnoreabbrev <expr> rgc getcmdtype() == ':' && getcmdline() ==# 'rgc' ? 'Rgword' : 'rgc']]
+    cmd [[cnoreabbrev <expr> rgC getcmdtype() == ':' && getcmdline() ==# 'rgC' ? 'RgWord' : 'rgC']]
     -- }}}
 
     -- Greps {{{
     -- Override default --nth (3..) to search based on the path (--nth 1..) instead of the content
     local grep_opts = { fzf_opts = { ['--nth'] = '1..' } }
-    user_cmd('Rg', function(args) fzf.grep_project(vim.tbl_extend('force', grep_opts, { search = args.args })) end, { nargs = '*' })
+    user_cmd('Rg', function(args)
+        local search = args.args:match([[^"(.*)"$]]) or args.args:match([[^'(.*)'$]]) or args.args
+        fzf.grep_project(vim.tbl_extend('force', grep_opts, { search = search }))
+    end, { nargs = '*' })
     user_cmd('Rgword', function() fzf.grep_cword(grep_opts) end, {})
     user_cmd('RgWord', function() fzf.grep_cWORD(grep_opts) end, {})
     -- }}}

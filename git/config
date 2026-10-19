@@ -43,3 +43,5 @@
   wip = !git add -A && git commit -m "WIP"
   # Open modified or added files in neovim
   edit = "!git status --porcelain | grep -v '^D' | awk '{print $2 \":1:1: [\" $1 \"]\"}' | nvim -q - +copen"
+[credential "https://git.heroku.com"]
+	helper = !heroku git:credentials
