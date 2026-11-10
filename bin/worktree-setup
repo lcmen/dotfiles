@@ -12,7 +12,7 @@ NEW_HEAD="${2:-}"
 NULL_SHA=0000000000000000000000000000000000000000
 PREVIOUS_HEAD="${1:-}"
 REPO_ROOT="$(git worktree list --porcelain | sed -n '1s/^worktree //p')"
-SYMLINK_DIRS=(deps node_modules vendor/bundle)
+SYMLINK_DIRS=(.claude/plans deps node_modules vendor/bundle)
 WORKTREE_PATH="$PWD"
 
 copy_included_files() {
