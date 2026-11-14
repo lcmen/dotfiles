@@ -1,7 +1,6 @@
 [core]
   editor = nvim
   excludesfile = ~/.config/git/ignore
-  hooksPath = ~/.config/git/hooks
 [credential]
   helper = osxkeychain
 [init]
